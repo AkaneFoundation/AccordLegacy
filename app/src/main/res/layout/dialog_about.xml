@@ -20,6 +20,8 @@
         <ImageView
             android:layout_width="52dp"
             android:layout_height="52dp"
+            android:scaleX="1.3"
+            android:scaleY="1.3"
             android:src="@drawable/ic_gramophone_monochrome"
             app:tint="?attr/colorOnSecondaryContainer"
             android:importantForAccessibility="no" />

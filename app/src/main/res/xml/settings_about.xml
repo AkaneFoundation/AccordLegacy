@@ -46,11 +46,11 @@
         android:layout="@layout/preference_category_md">
         <Preference
             android:layout="@layout/basic_preference_iconless"
-            android:summary="https://github.com/AkaneTan/Gramophone"
+            android:summary="https://github.com/AkaneFoundation/Accord"
             android:title="@string/settings_repository">
             <intent
                 android:action="android.intent.action.VIEW"
-                android:data="https://github.com/AkaneTan/Gramophone" />
+                android:data="https://github.com/AkaneFoundation/Accord" />
         </Preference>
         <Preference
             android:layout="@layout/basic_preference_iconless"
