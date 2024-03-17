@@ -35,11 +35,11 @@
             android:insetRight="0dp"
             android:insetBottom="0dp"
             android:visibility="gone"
-            app:icon="@drawable/ic_play_arrow"
+            app:icon="@drawable/ic_apple_play"
             app:iconGravity="textStart"
             app:iconPadding="0dp"
-            app:iconSize="26dp"
-            app:iconTint="?attr/colorPrimary"
+            app:iconSize="14dp"
+            app:iconTint="?attr/colorOnSurface"
             tools:visibility="visible" />
 
         <com.google.android.material.button.MaterialButton
@@ -56,7 +56,7 @@
             app:iconGravity="textStart"
             app:iconPadding="0dp"
             app:iconSize="22dp"
-            app:iconTint="?attr/colorPrimary"
+            app:iconTint="?attr/colorOnSurface"
             tools:visibility="visible" />
 
         <com.google.android.material.button.MaterialButton
@@ -68,45 +68,11 @@
             android:insetTop="0dp"
             android:insetRight="0dp"
             android:insetBottom="0dp"
-            app:icon="@drawable/ic_filter_alt"
+            app:icon="@drawable/ic_apple_sort"
             app:iconGravity="textStart"
             app:iconPadding="0dp"
-            app:iconSize="24dp"
-            app:iconTint="?attr/colorPrimary" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/jumpUp"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:visibility="gone"
-            android:background="@drawable/rp_buttons"
-            android:insetLeft="0dp"
-            android:insetTop="0dp"
-            android:insetRight="0dp"
-            android:insetBottom="0dp"
-            app:icon="@drawable/baseline_arrow_upward_24"
-            app:iconGravity="textStart"
-            app:iconPadding="0dp"
-            app:iconSize="24dp"
-            app:iconTint="?attr/colorPrimary"
-            tools:visibility="visible" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/jumpDown"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:visibility="gone"
-            android:background="@drawable/rp_buttons"
-            android:insetLeft="0dp"
-            android:insetTop="0dp"
-            android:insetRight="0dp"
-            android:insetBottom="0dp"
-            app:icon="@drawable/baseline_arrow_downward_24"
-            app:iconGravity="textStart"
-            app:iconPadding="0dp"
-            app:iconSize="24dp"
-            app:iconTint="?attr/colorPrimary"
-            tools:visibility="visible" />
+            app:iconSize="22dp"
+            app:iconTint="?attr/colorOnSurface" />
 
 
     </LinearLayout>

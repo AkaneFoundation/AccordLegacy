@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout"
+    android:id="@+id/blend_background">
+
+    <ImageView
+        android:id="@+id/bg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:scaleType="centerCrop" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5"/>
+
+    <ImageView
+        android:id="@+id/type1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layerType="hardware"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintHeight_percent="0.6"
+        app:layout_constraintBottom_toTopOf="@id/guideline_2"
+        app:layout_constraintEnd_toStartOf="@id/guideline" />
+
+    <ImageView
+        android:id="@+id/type2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layerType="hardware"
+        app:layout_constraintHeight_percent="0.6"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintBottom_toTopOf="@id/guideline_2"
+        app:layout_constraintStart_toEndOf="@id/guideline" />
+
+    <ImageView
+        android:id="@+id/type3"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layerType="hardware"
+        app:layout_constraintHeight_percent="0.6"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintTop_toBottomOf="@id/guideline_2"
+        app:layout_constraintStart_toEndOf="@id/guideline" />
+
+    <ImageView
+        android:id="@+id/type4"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layerType="hardware"
+        app:layout_constraintTop_toBottomOf="@id/guideline_2"
+        app:layout_constraintHeight_percent="0.6"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toStartOf="@id/guideline"/>
+
+    <ImageView
+        android:id="@+id/type5"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:layerType="hardware"
+        app:layout_constraintHeight_percent="0.40"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <org.akanework.gramophone.ui.components.blurview.BlurView
+        android:id="@+id/blur_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:blurOverlayColor="#66000000" />
+
+</merge>

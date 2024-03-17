@@ -12,37 +12,27 @@
 	android:clipToPadding="false"
 	android:clipChildren="false">
 
-	<com.google.android.material.button.MaterialButton
-		android:id="@+id/slide_down"
-		android:layout_width="52dp"
-		android:layout_height="52dp"
-		android:layout_marginStart="24dp"
+	<com.google.android.material.bottomsheet.BottomSheetDragHandleView
+		android:id="@+id/drag"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
 		android:layout_marginTop="16dp"
-		android:background="@drawable/rp_buttons"
-		app:icon="@drawable/ic_expand_more"
-		app:iconGravity="textStart"
-		app:iconPadding="0dp"
-		app:iconSize="28dp"
-		app:iconTint="?attr/colorOnSurface"
-		app:layout_constraintBottom_toTopOf="@id/album_cover_frame"
-		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintHorizontal_bias="0.0"
-		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toTopOf="parent"
-		app:layout_constraintVertical_bias="0.0" />
+		app:tint="#80FFFFFF"
+		app:layout_constraintTop_toTopOf="parent" />
 
 	<com.google.android.material.card.MaterialCardView
 		android:id="@+id/album_cover_frame"
 		android:layout_width="0dp"
 		android:layout_height="0dp"
-		android:layout_marginHorizontal="24dp"
-		android:layout_marginTop="16dp"
+		android:layout_marginHorizontal="26dp"
+		android:layout_marginTop="8dp"
+		android:background="?attr/colorSurfaceVariant"
 		app:cardBackgroundColor="?attr/colorSurfaceVariant"
-		app:cardCornerRadius="22dp"
+		app:cardCornerRadius="8dp"
 		app:layout_constraintDimensionRatio="1:1"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toBottomOf="@id/slide_down"
+		app:layout_constraintTop_toBottomOf="@id/drag"
 		app:strokeWidth="0dp">
 
 		<ImageView
@@ -72,12 +62,12 @@
 			android:id="@+id/textLayout"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_marginHorizontal="28dp"
-			android:layout_marginBottom="12dp"
+			android:layout_marginHorizontal="30dp"
 			android:gravity="center"
 			android:minHeight="70dp"
+			android:layout_marginBottom="12dp"
 			android:orientation="vertical"
-			app:layout_constraintBottom_toTopOf="@id/slider"
+			app:layout_constraintBottom_toTopOf="@id/overlaySlider"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toTopOf="parent">
@@ -86,12 +76,13 @@
 				android:id="@+id/full_song_name"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:gravity="center"
+				android:gravity="start"
 				android:scrollbars="none"
-				android:textColor="?attr/colorOnSurface"
-				android:textFontWeight="500"
+				android:textColor="#EBFFFFFF"
+				android:textFontWeight="600"
 				android:fontFamily="sans-serif"
-				android:textSize="22sp"
+				android:includeFontPadding="false"
+				android:textSize="20sp"
 				tools:targetApi="p"
 				tools:text="Artifiction" />
 
@@ -100,40 +91,27 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="3dp"
-				android:gravity="center"
+				android:gravity="start"
 				android:scrollbars="none"
-				android:textColor="?attr/colorOnSurfaceVariant"
+				android:textColor="#80FFFFFF"
 				android:textFontWeight="500"
 				android:fontFamily="sans-serif"
-				android:textSize="17sp"
+				android:includeFontPadding="false"
+				android:textSize="19sp"
 				tools:targetApi="p"
 				tools:text="Artifiction" />
 
 		</LinearLayout>
 
 		<FrameLayout
-			android:id="@+id/slider"
+			android:id="@+id/overlaySlider"
 			android:layout_width="match_parent"
 			android:layout_height="48dp"
-			android:layout_marginHorizontal="15dp"
-			android:layout_marginBottom="0.5dp"
+			android:layout_marginHorizontal="17dp"
 			app:layout_constraintBottom_toTopOf="@id/duration_frame"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toBottomOf="@id/textLayout">
-
-			<SeekBar
-				android:id="@+id/slider_squiggly"
-				style="@style/MediaPlayer.ProgressBar"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_gravity="center"
-				android:progress="0"
-				android:thumbTint="?attr/colorPrimary"
-				android:visibility="gone"
-				app:labelBehavior="gone"
-				tools:progress="20"
-				tools:visibility="visible" />
 
 			<com.google.android.material.slider.Slider
 				android:id="@+id/slider_vert"
@@ -141,12 +119,14 @@
 				android:layout_height="wrap_content"
 				android:layout_gravity="center"
 				android:value="0"
-				android:visibility="gone"
 				app:labelBehavior="gone"
 				app:thumbHeight="0dp"
 				app:thumbWidth="0dp"
 				app:thumbTrackGapSize="2dp"
 				app:trackHeight="6dp"
+				app:trackStopIndicatorSize="0dp"
+				app:trackColorActive="#EBFFFFFF"
+				app:trackColorInactive="#1AFFFFFF"
 				tools:value="0.5"
 				tools:visibility="visible" />
 
@@ -156,11 +136,11 @@
 			android:id="@+id/duration_frame"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_marginHorizontal="28dp"
+			android:layout_marginHorizontal="30dp"
 			app:layout_constraintBottom_toTopOf="@id/sheet_mid_button"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintTop_toBottomOf="@id/slider"
+			app:layout_constraintTop_toBottomOf="@id/overlaySlider"
 			app:layout_constraintVertical_bias="0.0">
 
 			<TextView
@@ -169,7 +149,7 @@
 				android:layout_height="wrap_content"
 				android:layout_gravity="start"
 				android:text="@string/default_time"
-				android:textColor="?attr/colorAccent"
+				android:textColor="#EBFFFFFF"
 				android:textFontWeight="600"
 				android:fontFamily="sans-serif"
 				tools:targetApi="p" />
@@ -180,7 +160,7 @@
 				android:layout_height="wrap_content"
 				android:layout_gravity="end"
 				android:text="@string/default_time"
-				android:textColor="?attr/colorAccent"
+				android:textColor="#66FFFFFF"
 				android:textFontWeight="600"
 				android:fontFamily="sans-serif"
 				tools:targetApi="p" />
@@ -193,17 +173,17 @@
 			android:layout_height="90dp"
 			android:layout_centerHorizontal="true"
 			android:layout_marginTop="18dp"
-			android:background="@drawable/bg_play_anim"
+			android:background="@drawable/rp_buttons_dynamic"
 			android:insetLeft="0dp"
 			android:insetTop="0dp"
 			android:insetRight="0dp"
 			android:insetBottom="0dp"
-			app:backgroundTint="?attr/colorSecondaryContainer"
-			app:icon="@drawable/play_anim"
+			app:backgroundTint="@android:color/transparent"
+			app:icon="@drawable/ic_apple_pause"
 			app:iconGravity="textStart"
 			app:iconPadding="0dp"
-			app:iconSize="42dp"
-			app:iconTint="?attr/colorOnSecondaryContainer"
+			app:iconSize="46dp"
+			app:iconTint="#EBFFFFFF"
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
@@ -221,14 +201,14 @@
 			android:insetTop="0dp"
 			android:insetRight="0dp"
 			android:insetBottom="0dp"
-			app:icon="@drawable/ic_skip_previous"
+			app:icon="@drawable/ic_apple_previous"
 			app:iconGravity="textStart"
 			app:iconPadding="0dp"
-			app:iconSize="38sp"
-			app:iconTint="?attr/colorOnSurface"
+			app:iconSize="42sp"
+			app:iconTint="#EBFFFFFF"
 			app:layout_constraintBottom_toBottomOf="@id/sheet_mid_button"
 			app:layout_constraintEnd_toStartOf="@id/sheet_mid_button"
-			app:layout_constraintHorizontal_bias="0.80"
+			app:layout_constraintHorizontal_bias="0.70"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toTopOf="@id/sheet_mid_button" />
 
@@ -244,14 +224,14 @@
 			android:insetTop="0dp"
 			android:insetRight="0dp"
 			android:insetBottom="0dp"
-			app:icon="@drawable/ic_skip_next"
+			app:icon="@drawable/ic_apple_next"
 			app:iconGravity="textStart"
 			app:iconPadding="0dp"
-			app:iconSize="38sp"
-			app:iconTint="?attr/colorOnSurface"
+			app:iconSize="42sp"
+			app:iconTint="#EBFFFFFF"
 			app:layout_constraintBottom_toBottomOf="@id/sheet_mid_button"
 			app:layout_constraintEnd_toEndOf="parent"
-			app:layout_constraintHorizontal_bias="0.20"
+			app:layout_constraintHorizontal_bias="0.30"
 			app:layout_constraintStart_toEndOf="@id/sheet_mid_button"
 			app:layout_constraintTop_toTopOf="@id/sheet_mid_button" />
 	</androidx.constraintlayout.widget.ConstraintLayout>
@@ -269,24 +249,6 @@
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toEndOf="@id/controls"
 		app:layout_constraintStart_toStartOf="@id/controls">
-
-		<com.google.android.material.button.MaterialButton
-			android:id="@+id/lyrics"
-			android:layout_width="48dp"
-			android:layout_height="48dp"
-			android:layout_weight="1"
-			android:background="@drawable/rp_buttons"
-			android:checkable="true"
-			android:insetLeft="0dp"
-			android:insetTop="0dp"
-			android:insetRight="0dp"
-			android:insetBottom="0dp"
-			android:saveEnabled="false"
-			app:icon="@drawable/ic_article"
-			app:iconGravity="textStart"
-			app:iconPadding="0dp"
-			app:iconSize="24sp"
-			app:iconTint="?attr/colorOnSurface" />
 
 		<com.google.android.material.button.MaterialButton
 			android:id="@+id/sheet_loop"
@@ -359,7 +321,7 @@
 			app:iconGravity="textStart"
 			app:iconPadding="0dp"
 			app:iconSize="24sp"
-			app:iconTint="?attr/colorOnSurface" />
+			app:iconTint="#EBFFFFFF" />
 
 		<com.google.android.material.button.MaterialButton
 			android:id="@+id/playlist"
@@ -375,7 +337,7 @@
 			app:iconGravity="textStart"
 			app:iconPadding="0dp"
 			app:iconSize="24dp"
-			app:iconTint="?attr/colorOnSurface" />
+			app:iconTint="#EBFFFFFF" />
 	</LinearLayout>
 
 	<org.akanework.gramophone.logic.ui.MyRecyclerView

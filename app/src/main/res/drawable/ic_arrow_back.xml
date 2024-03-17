@@ -1,11 +1,13 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
-    android:tint="?attr/colorOnSurface"
-    android:autoMirrored="true"
-    android:viewportWidth="960"
-    android:viewportHeight="960">
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <group>
+    <clip-path
+        android:pathData="M7.225,3.523h9.551v16.963h-9.551z"/>
     <path
-        android:fillColor="@android:color/white"
-        android:pathData="M313,520L537,744L480,800L160,480L480,160L537,216L313,440L800,440L800,520L313,520Z" />
+        android:pathData="m7.225,12c0,0.124 0.023,0.239 0.068,0.347 0.046,0.107 0.114,0.207 0.205,0.298L15.242,20.213c0.176,0.176 0.387,0.264 0.635,0.264 0.169,0 0.321,-0.039 0.454,-0.117 0.133,-0.078 0.241,-0.184 0.322,-0.317 0.081,-0.133 0.122,-0.285 0.122,-0.454 0,-0.241 -0.088,-0.452 -0.264,-0.635L9.402,12 16.512,5.047C16.687,4.865 16.775,4.653 16.775,4.412 16.775,4.243 16.735,4.091 16.653,3.958 16.572,3.825 16.465,3.719 16.331,3.641 16.198,3.563 16.046,3.523 15.877,3.523c-0.247,0 -0.459,0.085 -0.635,0.254L7.498,11.355C7.407,11.447 7.339,11.546 7.293,11.653 7.247,11.761 7.225,11.876 7.225,12Z"
+        android:fillColor="#000000"/>
+  </group>
 </vector>

@@ -10,6 +10,7 @@
         android:id="@+id/appbarlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/contrast_colorBackground"
         app:liftOnScroll="false">
 
         <LinearLayout

@@ -10,21 +10,26 @@
         android:id="@+id/appbarlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/contrast_colorBackground"
+        app:liftOnScrollColor="@color/contrast_colorBackground"
         app:liftOnScroll="false">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsingtoolbar"
             style="?attr/collapsingToolbarLayoutMediumStyle"
+            android:background="@color/contrast_colorBackground"
             android:layout_width="match_parent"
             android:layout_height="?attr/collapsingToolbarLayoutMediumSize"
-            app:collapsedTitleTextColor="?attr/colorOnSurface"
-            app:collapsedTitleTextAppearance="?textAppearanceTitleLarge"
-            app:expandedTitleTextColor="?attr/colorOnSurface"
-            app:expandedTitleTextAppearance="?textAppearanceHeadlineLarge"
+            app:collapsedTitleTextColor="@color/contrast_colorOnSurface"
+            app:collapsedTitleTextAppearance="@style/TextAppearance.App.TitleLarge"
+            app:expandedTitleTextColor="@color/contrast_colorOnSurface"
+            app:expandedTitleTextAppearance="@style/TextAppearance.App.HeadlineLarge"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:contentScrim="@android:color/transparent"
             app:title="@string/app_name"
             app:expandedTitleMarginStart="24dp"
+            android:layout_marginStart="0dp"
+            android:paddingStart="0dp"
             app:titleCollapseMode="scale">
 
             <com.google.android.material.appbar.MaterialToolbar
@@ -33,6 +38,7 @@
                 android:layout_height="?attr/actionBarSize"
                 android:elevation="0dp"
                 android:paddingStart="24dp"
+                app:titleMarginStart="0dp"
                 android:paddingEnd="8dp"
                 app:layout_collapseMode="pin"
                 app:menu="@menu/home_menu" />
@@ -43,19 +49,15 @@
             android:id="@+id/tab_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:paddingBottom="0dp"
-            app:tabBackground="@android:color/transparent"
+            android:background="@color/contrast_colorBackground"
             app:tabIndicator="@drawable/selected_chip_background"
-            app:tabIndicatorColor="?colorSecondaryContainer"
+            app:tabIndicatorColor="@color/contrast_colorOnSurface"
             app:tabIndicatorFullWidth="true"
-            app:tabIndicatorGravity="stretch"
             app:tabMinWidth="0dp"
+            app:tabBackground="@android:color/transparent"
             app:tabMode="scrollable"
-            app:tabPaddingEnd="12dp"
-            app:tabPaddingStart="12dp"
             app:tabRippleColor="@android:color/transparent"
-            app:tabSelectedTextColor="?colorOnSecondaryContainer"
+            app:tabSelectedTextColor="@color/contrast_colorOnSurface"
             app:tabTextColor="?attr/colorOnSurfaceVariant"
             app:tabTextAppearance="@style/TabTextAppearance">
 

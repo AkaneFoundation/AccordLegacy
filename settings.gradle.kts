@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Gramophone"
+rootProject.name = "Accord"
 include(":app")

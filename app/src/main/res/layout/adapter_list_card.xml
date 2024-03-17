@@ -19,15 +19,15 @@
 
         <com.google.android.material.card.MaterialCardView
             style="?materialCardViewFilledStyle"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="58dp"
+            android:layout_height="58dp"
             android:layout_gravity="center_vertical"
             app:cardCornerRadius="@dimen/list_round_corner_size">
 
             <ImageView
                 android:id="@+id/cover"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
                 android:background="?attr/colorSurfaceContainer"
                 android:importantForAccessibility="no"
@@ -51,7 +51,7 @@
                 android:textColor="?attr/colorOnSurface"
                 android:textFontWeight="400"
                 android:fontFamily="sans-serif"
-                android:textSize="17sp"
+                android:textSize="16sp"
                 tools:targetApi="p"
                 tools:text="Example Title" />
 

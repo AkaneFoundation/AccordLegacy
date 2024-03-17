@@ -13,14 +13,15 @@
         android:alpha="0"
         android:orientation="horizontal"
         android:visibility="gone"
+        android:background="@color/contrast_colorBackgroundElevated"
         tools:alpha="1"
         tools:visibility="visible">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/preview_album_frame"
             style="?materialCardViewFilledStyle"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="58dp"
+            android:layout_height="58dp"
             android:layout_marginBottom="8dp"
             android:layout_marginTop="12dp"
             android:layout_marginStart="24dp"
@@ -31,8 +32,8 @@
 
             <ImageView
                 android:id="@+id/preview_album_cover"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:background="?attr/colorSurfaceContainer"
                 android:contentDescription="@string/dialog_album"
                 android:src="@drawable/ic_default_cover" />
@@ -54,7 +55,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="?attr/colorOnSurface"
-                android:textSize="17sp"
+                android:textSize="16sp"
                 tools:text="Example title" />
 
             <org.akanework.gramophone.ui.components.MarqueeTextView
@@ -75,10 +76,10 @@
             android:insetTop="0dp"
             android:insetRight="0dp"
             android:insetBottom="0dp"
-            app:icon="@drawable/play_anim"
+            app:icon="@drawable/ic_apple_play"
             app:iconGravity="textStart"
             app:iconPadding="0dp"
-            app:iconSize="24dp"
+            app:iconSize="16dp"
             app:iconTint="?attr/colorOnSurface"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/preview_next"
@@ -95,7 +96,7 @@
             android:insetTop="0dp"
             android:insetRight="0dp"
             android:insetBottom="0dp"
-            app:icon="@drawable/ic_skip_next"
+            app:icon="@drawable/ic_apple_next"
             app:iconGravity="textStart"
             app:iconPadding="0dp"
             app:iconSize="24dp"
@@ -104,6 +105,14 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <org.akanework.gramophone.ui.components.BlendBackgroundView
+        android:id="@+id/blend"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:clipChildren="false"
+        android:scrollbars="none" />
 
     <!-- Full Player -->
     <org.akanework.gramophone.ui.components.FullBottomSheet

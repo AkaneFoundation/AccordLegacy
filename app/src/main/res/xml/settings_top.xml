@@ -10,13 +10,6 @@
         android:title="@string/settings_category_appearance" />
 
     <Preference
-        android:icon="@drawable/ic_play_arrow"
-        android:key="player"
-        android:layout="@layout/basic_preference"
-        android:summary="@string/settings_player_ui_summary"
-        android:title="@string/settings_player_ui" />
-
-    <Preference
         android:icon="@drawable/ic_manufacturing"
         android:key="behavior"
         android:layout="@layout/basic_preference"
