@@ -42,8 +42,8 @@ android {
         // additionally, we (ab)use WindowInsets for bottom sheet padding which won't work on KK
         minSdk = 21 // Android 5.0
         targetSdk = 34 // Android 14.0
-        versionCode = 6
-        versionName = "alpha01"
+        versionCode = 7
+        versionName = "alpha02"
         buildConfigField(
             "String",
             "MY_VERSION_NAME",
