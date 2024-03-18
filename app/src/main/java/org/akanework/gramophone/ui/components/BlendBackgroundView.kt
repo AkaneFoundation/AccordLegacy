@@ -14,12 +14,15 @@ import android.graphics.drawable.RippleDrawable
 import android.net.Uri
 import android.os.Build
 import android.util.AttributeSet
+import android.util.Log
+import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import org.akanework.gramophone.R
 import org.akanework.gramophone.ui.components.blurview.BlurView
 import org.akanework.gramophone.ui.components.blurview.RenderEffectBlur
@@ -41,6 +44,7 @@ class BlendBackgroundView(context: Context, attrs: AttributeSet?, defStyleAttr: 
     private val imageViewBE: ImageView
     private val imageViewC: ImageView
     private val imageViewBG: ImageView
+    private val rotateFrame: ConstraintLayout
     private val blurView: BlurView
 
     init {
@@ -51,13 +55,15 @@ class BlendBackgroundView(context: Context, attrs: AttributeSet?, defStyleAttr: 
         imageViewBS = findViewById(R.id.type4)
         imageViewC = findViewById(R.id.type5)
         imageViewBG = findViewById(R.id.bg)
+        rotateFrame = findViewById(R.id.rotate_frame)
         blurView = findViewById(R.id.blur_view)
-        startRotationAnimation(imageViewTS, 0f, 360f, 22000)
-        startRotationAnimation(imageViewTE, 40f, 400f, 25000)
-        startRotationAnimation(imageViewBS, 120f, 480f, 23000)
-        startRotationAnimation(imageViewBE, 440f, 80f, 27000)
-        startRotationAnimation(imageViewC, 360f, 0f, 24000)
-        setUpBlurView(blurView, this, 128f)
+        startRotationAnimation(imageViewTS, 0f, 360f, 29000)
+        startRotationAnimation(imageViewTE, 40f, 400f, 32000)
+        startRotationAnimation(imageViewBS, 120f, 480f, 27000)
+        startRotationAnimation(imageViewBE, 80f, 440f, 35000)
+        startRotationAnimation(imageViewC, 360f, 0f, 44000)
+        startRotationAnimation(rotateFrame, 360f, 0f, 54000)
+        setUpBlurView(blurView, this, 80f)
     }
 
     fun setImageUri(uri: Uri) {
@@ -80,16 +86,23 @@ class BlendBackgroundView(context: Context, attrs: AttributeSet?, defStyleAttr: 
         }
     }
 
-    private fun startRotationAnimation(imageView: ImageView, fromDegrees: Float, toDegrees: Float, duration: Long) {
+    private fun startRotationAnimation(
+        view: View,
+        fromDegrees: Float,
+        toDegrees: Float,
+        duration: Long,
+        pivotXValue: Float = 0.5f,
+        pivotYValue: Float = 0.5f
+    ) {
         val rotateAnimation = RotateAnimation(
             fromDegrees, toDegrees,
-            Animation.RELATIVE_TO_SELF, 0.5f,
-            Animation.RELATIVE_TO_SELF, 0.5f
+            Animation.RELATIVE_TO_SELF, pivotXValue,
+            Animation.RELATIVE_TO_SELF, pivotYValue
         )
         rotateAnimation.duration = duration
         rotateAnimation.repeatCount = Animation.INFINITE
         rotateAnimation.interpolator = LinearInterpolator()
-        imageView.startAnimation(rotateAnimation)
+        view.startAnimation(rotateAnimation)
     }
 
     private fun getBitmapFromUri(contentResolver: ContentResolver, uri: Uri): Bitmap? {
@@ -101,7 +114,9 @@ class BlendBackgroundView(context: Context, attrs: AttributeSet?, defStyleAttr: 
                 inSampleSize = 2
             }
 
-            return BitmapFactory.decodeStream(inputStream, null, options)
+            val bitmap = BitmapFactory.decodeStream(inputStream, null, options)
+            inputStream?.close()
+            return bitmap
         } catch (e: FileNotFoundException) {
             e.printStackTrace()
         } finally {

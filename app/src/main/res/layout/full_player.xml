@@ -8,9 +8,11 @@
 	android:id="@+id/full_player"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
+	android:background="@color/contrast_colorBackground"
 	android:fitsSystemWindows="true"
 	android:clipToPadding="false"
-	android:clipChildren="false">
+	android:clipChildren="false"
+	tools:background="@color/contrast_colorOnSurface">
 
 	<com.google.android.material.bottomsheet.BottomSheetDragHandleView
 		android:id="@+id/drag"

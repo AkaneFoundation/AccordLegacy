@@ -18,72 +18,75 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:scaleType="centerCrop" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5"/>
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.5"/>
-
-    <ImageView
-        android:id="@+id/type1"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layerType="hardware"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintHeight_percent="0.6"
-        app:layout_constraintBottom_toTopOf="@id/guideline_2"
-        app:layout_constraintEnd_toStartOf="@id/guideline" />
-
-    <ImageView
-        android:id="@+id/type2"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layerType="hardware"
-        app:layout_constraintHeight_percent="0.6"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintBottom_toTopOf="@id/guideline_2"
-        app:layout_constraintStart_toEndOf="@id/guideline" />
-
-    <ImageView
-        android:id="@+id/type3"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layerType="hardware"
-        app:layout_constraintHeight_percent="0.6"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintTop_toBottomOf="@id/guideline_2"
-        app:layout_constraintStart_toEndOf="@id/guideline" />
-
-    <ImageView
-        android:id="@+id/type4"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layerType="hardware"
-        app:layout_constraintTop_toBottomOf="@id/guideline_2"
-        app:layout_constraintHeight_percent="0.6"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintEnd_toStartOf="@id/guideline"/>
-
     <ImageView
         android:id="@+id/type5"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:scaleType="centerCrop"
-        android:layerType="hardware"
         app:layout_constraintHeight_percent="0.40"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/rotate_frame"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5"/>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.5"/>
+
+        <ImageView
+            android:id="@+id/type1"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintHeight_percent="0.6"
+            app:layout_constraintBottom_toTopOf="@id/guideline_2"
+            app:layout_constraintEnd_toStartOf="@id/guideline" />
+
+        <ImageView
+            android:id="@+id/type2"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintHeight_percent="0.6"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintBottom_toTopOf="@id/guideline_2"
+            app:layout_constraintStart_toEndOf="@id/guideline" />
+
+        <ImageView
+            android:id="@+id/type3"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintHeight_percent="0.6"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintTop_toBottomOf="@id/guideline_2"
+            app:layout_constraintStart_toEndOf="@id/guideline" />
+
+        <ImageView
+            android:id="@+id/type4"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toBottomOf="@id/guideline_2"
+            app:layout_constraintHeight_percent="0.6"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@id/guideline"/>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <org.akanework.gramophone.ui.components.blurview.BlurView
         android:id="@+id/blur_view"

@@ -6,11 +6,13 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout"
 	android:id="@+id/full_player"
+	android:background="@color/contrast_colorBackground"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:fitsSystemWindows="true"
 	android:clipToPadding="false"
-	android:clipChildren="false">
+	android:clipChildren="false"
+	tools:background="@color/contrast_colorOnSurface">
 
 	<com.google.android.material.card.MaterialCardView
 		android:id="@+id/album_cover_frame"
@@ -46,6 +48,7 @@
 		android:layout_marginTop="10dp"
 		android:layout_weight="1"
 		android:gravity="center_vertical"
+		android:layout_marginBottom="20dp"
 		app:layout_constraintBottom_toTopOf="@id/actionBar"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintHeight_min="200dp"
@@ -235,10 +238,8 @@
 		android:layout_marginHorizontal="14dp"
 		android:gravity="end"
 		android:paddingStart="24dp"
-		android:paddingTop="4dp"
 		android:paddingEnd="24dp"
-		android:paddingBottom="4dp"
-		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintBottom_toBottomOf="@id/album_cover_frame"
 		app:layout_constraintEnd_toEndOf="@id/controls"
 		app:layout_constraintStart_toStartOf="@id/controls">
 
