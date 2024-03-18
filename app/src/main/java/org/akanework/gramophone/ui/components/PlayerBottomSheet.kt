@@ -34,6 +34,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.Insets
 import androidx.core.view.OnApplyWindowInsetsListener
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.doOnNextLayout
@@ -59,6 +60,7 @@ import org.akanework.gramophone.logic.gramophoneApplication
 import org.akanework.gramophone.logic.playOrPause
 import org.akanework.gramophone.logic.startAnimation
 import org.akanework.gramophone.logic.ui.MyBottomSheetBehavior
+import org.akanework.gramophone.logic.utils.EnvUtils
 import org.akanework.gramophone.ui.MainActivity
 
 
@@ -121,6 +123,10 @@ class PlayerBottomSheet private constructor(
     val actuallyVisible: Boolean
         get() = standardBottomSheetBehavior?.state != BottomSheetBehavior.STATE_HIDDEN
 
+    val isDarkMode: Boolean = EnvUtils.isDarkMode(context)
+
+    val insetController = WindowCompat.getInsetsController(activity.window, this@PlayerBottomSheet)
+
     init {
         inflate(context, R.layout.bottom_sheet, this)
         previewPlayer = findViewById(R.id.preview_player)
@@ -167,16 +173,28 @@ class PlayerBottomSheet private constructor(
                     fullPlayer.alpha = 0f
                     bottomSheetBlendBackgroundView.alpha = 0f
                     bottomSheetBackCallback!!.isEnabled = false
+                    if (!isDarkMode && !insetController.isAppearanceLightStatusBars) {
+                        WindowCompat.getInsetsController(activity.window, this@PlayerBottomSheet)
+                            .isAppearanceLightStatusBars = true
+                    }
                 }
 
                 BottomSheetBehavior.STATE_DRAGGING, BottomSheetBehavior.STATE_SETTLING -> {
                     fullPlayer.visibility = View.VISIBLE
                     previewPlayer.visibility = View.VISIBLE
+                    if (!isDarkMode && !insetController.isAppearanceLightStatusBars) {
+                        WindowCompat.getInsetsController(activity.window, this@PlayerBottomSheet)
+                            .isAppearanceLightStatusBars = true
+                    }
                 }
 
                 BottomSheetBehavior.STATE_EXPANDED, BottomSheetBehavior.STATE_HALF_EXPANDED -> {
                     previewPlayer.visibility = View.GONE
                     fullPlayer.visibility = View.VISIBLE
+                    if (!isDarkMode && insetController.isAppearanceLightStatusBars) {
+                        WindowCompat.getInsetsController(activity.window, this@PlayerBottomSheet)
+                            .isAppearanceLightStatusBars = false
+                    }
                     previewPlayer.alpha = 0f
                     fullPlayer.alpha = 1f
                     bottomSheetBlendBackgroundView.alpha = 1f
@@ -190,6 +208,10 @@ class PlayerBottomSheet private constructor(
                     fullPlayer.alpha = 0f
                     bottomSheetBlendBackgroundView.alpha = 0f
                     bottomSheetBackCallback!!.isEnabled = false
+                    if (!isDarkMode && !insetController.isAppearanceLightStatusBars) {
+                        WindowCompat.getInsetsController(activity.window, this@PlayerBottomSheet)
+                            .isAppearanceLightStatusBars = true
+                    }
                 }
             }
             dispatchBottomSheetInsets()

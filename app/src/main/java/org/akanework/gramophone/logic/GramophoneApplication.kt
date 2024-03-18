@@ -97,14 +97,5 @@ class GramophoneApplication : Application() {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             }
         }
-
-        // Apply dynamic colors.
-        DynamicColors.applyToActivitiesIfAvailable(this)
-
-        // Disk cache has been disabled for Gramophone, so clear out what's left of it
-        // This should be removed in a few months
-        Thread {
-            Glide.get(applicationContext).clearDiskCache()
-        }.start()
     }
 }

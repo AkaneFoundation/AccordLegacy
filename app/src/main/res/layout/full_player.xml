@@ -33,7 +33,8 @@
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toBottomOf="@id/drag"
-		app:strokeWidth="0dp">
+		app:strokeWidth="0.5dp"
+		app:strokeColor="#1A000000">
 
 		<ImageView
 			android:id="@+id/full_sheet_cover"

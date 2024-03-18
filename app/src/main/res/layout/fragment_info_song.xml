@@ -50,6 +50,7 @@
         android:layout_height="match_parent"
         android:id="@+id/scrollView"
         android:clipToPadding="false"
+        android:scrollbars="none"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
         <LinearLayout
@@ -61,9 +62,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/album_cover"
-                android:textColor="?colorPrimary"
+                android:textColor="@color/contrast_colorOnSurface"
                 android:fontFamily="sans-serif"
-                android:textFontWeight="500"
+                android:textFontWeight="700"
                 android:textSize="17sp"
                 android:layout_marginTop="24dp"
                 android:layout_marginStart="24dp"
@@ -96,6 +97,7 @@
                 android:layout_marginStart="24dp"
                 android:layout_marginEnd="24dp"
                 android:layout_marginTop="24dp"
+                app:dividerColor="@color/contrast_colorBackgroundContainer"
                 android:layout_marginBottom="24dp"/>
 
             <LinearLayout
@@ -112,8 +114,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/dialog_title"
                     android:layout_gravity="center_vertical"
-                    android:textColor="?colorPrimary"
-                    android:textFontWeight="500"
+                    android:textColor="@color/contrast_colorOnSurface"
+                    android:textFontWeight="700"
                     android:fontFamily="sans-serif"
                     android:textSize="17sp"
                     tools:targetApi="p" />
@@ -149,8 +151,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/dialog_artist"
                     android:layout_gravity="center_vertical"
-                    android:textColor="?colorPrimary"
-                    android:textFontWeight="500"
+                    android:textColor="@color/contrast_colorOnSurface"
+                    android:textFontWeight="700"
                     android:fontFamily="sans-serif"
                     android:textSize="17sp"
                     tools:targetApi="p" />
@@ -186,8 +188,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/dialog_album"
                     android:layout_gravity="center_vertical"
-                    android:textColor="?colorPrimary"
-                    android:textFontWeight="500"
+                    android:textColor="@color/contrast_colorOnSurface"
+                    android:textFontWeight="700"
                     android:fontFamily="sans-serif"
                     android:textSize="17sp"
                     tools:targetApi="p" />
@@ -223,8 +225,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/dialog_album_artist"
                     android:layout_gravity="center_vertical"
-                    android:textColor="?colorPrimary"
-                    android:textFontWeight="500"
+                    android:textColor="@color/contrast_colorOnSurface"
+                    android:textFontWeight="700"
                     android:fontFamily="sans-serif"
                     android:textSize="17sp"
                     tools:targetApi="p" />
@@ -260,8 +262,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/dialog_disc_number"
                     android:layout_gravity="center_vertical"
-                    android:textColor="?colorPrimary"
-                    android:textFontWeight="500"
+                    android:textColor="@color/contrast_colorOnSurface"
+                    android:textFontWeight="700"
                     android:fontFamily="sans-serif"
                     android:textSize="17sp"
                     tools:targetApi="p" />
@@ -297,8 +299,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/dialog_track_number"
                     android:layout_gravity="center_vertical"
-                    android:textColor="?colorPrimary"
-                    android:textFontWeight="500"
+                    android:textColor="@color/contrast_colorOnSurface"
+                    android:textFontWeight="700"
                     android:fontFamily="sans-serif"
                     android:textSize="17sp"
                     tools:targetApi="p" />
@@ -334,8 +336,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/dialog_genre"
                     android:layout_gravity="center_vertical"
-                    android:textColor="?colorPrimary"
-                    android:textFontWeight="500"
+                    android:textColor="@color/contrast_colorOnSurface"
+                    android:textFontWeight="700"
                     android:fontFamily="sans-serif"
                     android:textSize="17sp"
                     tools:targetApi="p" />
@@ -371,8 +373,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/dialog_year"
                     android:layout_gravity="center_vertical"
-                    android:textColor="?colorPrimary"
-                    android:textFontWeight="500"
+                    android:textColor="@color/contrast_colorOnSurface"
+                    android:textFontWeight="700"
                     android:fontFamily="sans-serif"
                     android:textSize="17sp"
                     tools:targetApi="p" />
@@ -399,6 +401,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:layout_marginEnd="24dp"
+                app:dividerColor="@color/contrast_colorBackgroundContainer"
                 android:layout_marginTop="18dp"
                 android:layout_marginBottom="24dp"/>
 
@@ -416,8 +419,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/dialog_duration"
                     android:layout_gravity="center_vertical"
-                    android:textColor="?colorPrimary"
-                    android:textFontWeight="500"
+                    android:textColor="@color/contrast_colorOnSurface"
+                    android:textFontWeight="700"
                     android:fontFamily="sans-serif"
                     android:textSize="17sp"
                     tools:targetApi="p" />
@@ -452,8 +455,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/dialog_mime"
                     android:layout_gravity="center_vertical"
-                    android:textColor="?colorPrimary"
-                    android:textFontWeight="500"
+                    android:textColor="@color/contrast_colorOnSurface"
+                    android:textFontWeight="700"
                     android:fontFamily="sans-serif"
                     android:textSize="17sp"
                     tools:targetApi="p" />
@@ -488,8 +491,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/dialog_path"
                     android:layout_gravity="center_vertical"
-                    android:textColor="?colorPrimary"
-                    android:textFontWeight="500"
+                    android:textColor="@color/contrast_colorOnSurface"
+                    android:textFontWeight="700"
                     android:fontFamily="sans-serif"
                     android:textSize="17sp"
                     tools:targetApi="p" />
