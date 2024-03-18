@@ -182,10 +182,6 @@ class PlayerBottomSheet private constructor(
                 BottomSheetBehavior.STATE_DRAGGING, BottomSheetBehavior.STATE_SETTLING -> {
                     fullPlayer.visibility = View.VISIBLE
                     previewPlayer.visibility = View.VISIBLE
-                    if (!isDarkMode && !insetController.isAppearanceLightStatusBars) {
-                        WindowCompat.getInsetsController(activity.window, this@PlayerBottomSheet)
-                            .isAppearanceLightStatusBars = true
-                    }
                 }
 
                 BottomSheetBehavior.STATE_EXPANDED, BottomSheetBehavior.STATE_HALF_EXPANDED -> {
