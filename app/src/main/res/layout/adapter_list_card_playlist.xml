@@ -3,12 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="74dp"
+    android:layout_height="wrap_content"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    android:paddingStart="24dp"
-    android:paddingEnd="10dp">
+    android:background="#1A000000"
+    android:paddingStart="30dp"
+    android:paddingEnd="30dp"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,18 +20,20 @@
         android:orientation="horizontal">
 
         <com.google.android.material.card.MaterialCardView
-            style="?materialCardViewFilledStyle"
-            android:layout_width="54dp"
-            android:layout_height="54dp"
+            android:id="@+id/playlist_list_frame"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_gravity="center_vertical"
-            app:cardCornerRadius="@dimen/list_round_corner_size">
+            android:background="@android:color/transparent"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:strokeWidth="0dp"
+            app:cardCornerRadius="4dp">
 
             <ImageView
                 android:id="@+id/cover"
-                android:layout_width="54dp"
-                android:layout_height="54dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
-                android:background="?attr/colorSurfaceContainer"
                 android:importantForAccessibility="no"
                 android:src="@drawable/ic_default_cover" />
 
@@ -48,10 +53,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
-                android:textColor="?attr/colorOnSurface"
+                android:textColor="#EBFFFFFF"
                 android:textFontWeight="400"
                 android:fontFamily="sans-serif"
-                android:textSize="17sp"
+                android:textSize="16sp"
                 tools:targetApi="p"
                 tools:text="Example Title" />
 
@@ -60,42 +65,31 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
-                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textColor="#66FFFFFF"
                 android:textFontWeight="400"
                 android:fontFamily="sans-serif"
-                android:textSize="15sp"
+                android:textSize="14sp"
                 tools:targetApi="p"
                 tools:text="Example Artist" />
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/indicator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:textFontWeight="500"
-            android:fontFamily="sans-serif"
-            tools:targetApi="p"
-            tools:text="3 | Disc 1" />
-
     </LinearLayout>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/close"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
         android:layout_gravity="end|center_vertical"
-        android:background="@drawable/rp_buttons"
+        android:background="@android:color/transparent"
         android:insetLeft="0dp"
         android:insetTop="0dp"
         android:insetRight="0dp"
         android:insetBottom="0dp"
-        app:icon="@drawable/ic_close"
+        app:icon="@drawable/ic_remove"
         app:iconGravity="textStart"
         app:iconPadding="0dp"
-        app:iconSize="24dp"
-        app:iconTint="?attr/colorOnSurface" />
+        app:iconSize="18dp"
+        app:iconTint="#66FFFFFF" />
 
 </FrameLayout>

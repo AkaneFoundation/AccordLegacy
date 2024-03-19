@@ -19,6 +19,7 @@ package org.akanework.gramophone.ui.components
 
 import android.content.ComponentName
 import android.content.Context
+import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -31,6 +32,7 @@ import android.widget.TextView
 import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.Insets
 import androidx.core.view.OnApplyWindowInsetsListener
 import androidx.core.view.ViewCompat
@@ -129,6 +131,7 @@ class PlayerBottomSheet private constructor(
 
     init {
         inflate(context, R.layout.bottom_sheet, this)
+        this.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.contrast_colorBackgroundElevated))
         previewPlayer = findViewById(R.id.preview_player)
         fullPlayer = findViewById(R.id.full_player)
         bottomSheetPreviewTitle = findViewById(R.id.preview_song_name)

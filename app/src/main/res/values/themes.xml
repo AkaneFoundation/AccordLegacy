@@ -81,6 +81,7 @@
 
     <style name="Base.Night.Theme.Splash" parent="Theme.SplashScreen">
         <item name="postSplashScreenTheme">@style/Theme.Gramophone</item>
+        <item name="windowSplashScreenBackground">@color/contrast_colorBackground</item>
     </style>
     <style name="Base.Day.Theme.Splash" parent="Base.Night.Theme.Splash">
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>

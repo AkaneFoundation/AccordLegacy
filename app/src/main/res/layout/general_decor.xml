@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="start|center_vertical"
         android:layout_marginStart="24dp"
-        android:textColor="?attr/colorOnSurface"
+        android:textColor="@color/contrast_colorOnSurface"
         android:textFontWeight="600"
         android:fontFamily="sans-serif"
         android:textSize="15sp"
@@ -39,7 +39,7 @@
             app:iconGravity="textStart"
             app:iconPadding="0dp"
             app:iconSize="14dp"
-            app:iconTint="?attr/colorOnSurface"
+            app:iconTint="@color/contrast_colorOnSurface"
             tools:visibility="visible" />
 
         <com.google.android.material.button.MaterialButton
@@ -56,7 +56,7 @@
             app:iconGravity="textStart"
             app:iconPadding="0dp"
             app:iconSize="22dp"
-            app:iconTint="?attr/colorOnSurface"
+            app:iconTint="@color/contrast_colorOnSurface"
             tools:visibility="visible" />
 
         <com.google.android.material.button.MaterialButton
@@ -72,7 +72,7 @@
             app:iconGravity="textStart"
             app:iconPadding="0dp"
             app:iconSize="22dp"
-            app:iconTint="?attr/colorOnSurface" />
+            app:iconTint="@color/contrast_colorOnSurface" />
 
 
     </LinearLayout>

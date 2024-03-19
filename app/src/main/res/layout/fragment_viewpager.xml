@@ -58,7 +58,7 @@
             app:tabMode="scrollable"
             app:tabRippleColor="@android:color/transparent"
             app:tabSelectedTextColor="@color/contrast_colorOnSurface"
-            app:tabTextColor="?attr/colorOnSurfaceVariant"
+            app:tabTextColor="@color/contrast_colorOnSurfaceFainted"
             app:tabTextAppearance="@style/TabTextAppearance">
 
             <com.google.android.material.tabs.TabItem

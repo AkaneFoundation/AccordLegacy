@@ -16,6 +16,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -32,7 +33,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDragHandleView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.color.MaterialColors
@@ -46,6 +47,8 @@ import kotlinx.coroutines.Job
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.GramophonePlaybackService
 import org.akanework.gramophone.logic.dpToPx
+import org.akanework.gramophone.logic.fadInAnimation
+import org.akanework.gramophone.logic.fadOutAnimation
 import org.akanework.gramophone.logic.getBooleanStrict
 import org.akanework.gramophone.logic.getLyrics
 import org.akanework.gramophone.logic.getTimer
@@ -123,12 +126,22 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private val bottomSheetPlaylistButton: MaterialButton
 	private val bottomSheetTimerButton: MaterialButton
 	private val bottomSheetFavoriteButton: MaterialButton
+	private val bottomSheetInfinityButton: MaterialButton
 	private val bottomSheetFullSlider: Slider
 	private val bottomSheetFullCoverFrame: MaterialCardView
 	val bottomSheetFullLyricRecyclerView: RecyclerView
 	private val bottomSheetFullLyricList: MutableList<MediaStoreUtils.Lyric> = mutableListOf()
 	private val bottomSheetFullLyricAdapter: LyricAdapter = LyricAdapter(bottomSheetFullLyricList)
 	private val bottomSheetFullLyricLinearLayoutManager = LinearLayoutManager(context)
+	private val bottomSheetFullDragHandle: BottomSheetDragHandleView
+	private val bottomSheetFullTextLayout: LinearLayout
+	private val bottomSheetFullHeaderFrame: ConstraintLayout
+	private val bottomSheetFullPlaylistFrame: ConstraintLayout
+	private val bottomSheetFullPlaylistCover: ImageView
+	private val bottomSheetFullPlaylistTitle: TextView
+	private val bottomSheetFullPlaylistSubtitle: TextView
+	private val bottomSheetFullPlaylistRecyclerView: RecyclerView
+	private val bottomSheetFullPlaylistAdapter: PlaylistCardAdapter
 	private var playlistNowPlaying: TextView? = null
 	private var playlistNowPlayingCover: ImageView? = null
 
@@ -150,6 +163,20 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetFavoriteButton = findViewById(R.id.favor)
 		bottomSheetPlaylistButton = findViewById(R.id.playlist)
 		bottomSheetFullLyricRecyclerView = findViewById(R.id.lyric_frame)
+		bottomSheetFullDragHandle = findViewById(R.id.drag)
+		bottomSheetFullTextLayout = findViewById(R.id.textLayout)
+		bottomSheetFullHeaderFrame = findViewById(R.id.playlist_frame)
+		bottomSheetFullPlaylistFrame = findViewById(R.id.playlist_content)
+		bottomSheetFullPlaylistCover = findViewById(R.id.playlist_demo_cover)
+		bottomSheetFullPlaylistTitle = findViewById(R.id.playlist_song_name)
+		bottomSheetFullPlaylistSubtitle = findViewById(R.id.playlist_song_artist)
+		bottomSheetFullPlaylistRecyclerView = findViewById(R.id.playlist_recyclerview)
+		bottomSheetInfinityButton = findViewById(R.id.sheet_infinity)
+
+		bottomSheetFullPlaylistAdapter = PlaylistCardAdapter(activity)
+		bottomSheetFullPlaylistRecyclerView.layoutManager = LinearLayoutManager(context)
+		bottomSheetFullPlaylistRecyclerView.adapter = bottomSheetFullPlaylistAdapter
+
 		refreshSettings(null)
 		prefs.registerOnSharedPreferenceChangeListener(this)
 
@@ -179,11 +206,31 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			if (Build.VERSION.SDK_INT >= 23) {
 				it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
 			}
-			instance?.repeatMode = when (instance?.repeatMode) {
-				Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
-				Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_ONE
-				Player.REPEAT_MODE_ONE -> Player.REPEAT_MODE_OFF
+			when (instance?.repeatMode) {
+				Player.REPEAT_MODE_OFF -> {
+					bottomSheetInfinityButton.isChecked = false
+					bottomSheetInfinityButton.isEnabled = false
+					instance?.repeatMode = Player.REPEAT_MODE_ALL
+				}
+				Player.REPEAT_MODE_ALL -> {
+					instance?.repeatMode = Player.REPEAT_MODE_ONE
+				}
+				Player.REPEAT_MODE_ONE -> {
+					bottomSheetInfinityButton.isEnabled = true
+					instance?.repeatMode = Player.REPEAT_MODE_OFF
+				}
 				else -> throw IllegalStateException()
+			}
+		}
+
+		bottomSheetInfinityButton.addOnCheckedChangeListener { button, isChecked ->
+			if (isChecked) {
+				bottomSheetLoopButton.isChecked = false
+				bottomSheetLoopButton.isEnabled = false
+				instance?.repeatMode = Player.REPEAT_MODE_ONE
+			} else {
+				bottomSheetLoopButton.isEnabled = true
+				instance?.repeatMode = Player.REPEAT_MODE_OFF
 			}
 		}
 
@@ -200,6 +247,20 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 		 */
 
+		bottomSheetPlaylistButton.addOnCheckedChangeListener { button, isChecked ->
+			if (isChecked) {
+				changeMovableFrame(false)
+				bottomSheetFullPlaylistRecyclerView.scrollToPosition(instance?.currentMediaItemIndex ?: 0)
+				bottomSheetFullHeaderFrame.fadInAnimation(300)
+				bottomSheetFullPlaylistFrame.fadInAnimation(300)
+			} else {
+				changeMovableFrame(true)
+				bottomSheetFullHeaderFrame.fadOutAnimation(300, View.GONE)
+				bottomSheetFullPlaylistFrame.fadOutAnimation(300, View.GONE)
+			}
+		}
+
+		/*
 		bottomSheetPlaylistButton.setOnClickListener {
 			if (Build.VERSION.SDK_INT >= 23) {
 				it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
@@ -230,6 +291,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			}
 			playlistBottomSheet.show()
 		}
+
+		 */
 		bottomSheetFullControllerButton.setOnClickListener {
 			if (Build.VERSION.SDK_INT >= 23) {
 				it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
@@ -275,6 +338,18 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetFullLyricRecyclerView.adapter =
 			bottomSheetFullLyricAdapter
 
+	}
+
+	private fun changeMovableFrame(isVisible: Boolean) {
+		if (isVisible) {
+			bottomSheetFullTextLayout.fadInAnimation(300) {}
+			bottomSheetFullCoverFrame.fadInAnimation(300) {}
+			bottomSheetFullDragHandle.fadInAnimation(300) {}
+		} else {
+			bottomSheetFullTextLayout.fadOutAnimation(300) {}
+			bottomSheetFullCoverFrame.fadOutAnimation(300) {}
+			bottomSheetFullDragHandle.fadOutAnimation(300) {}
+		}
 	}
 
 	val sessionListener: MediaController.Listener = object : MediaController.Listener {
@@ -387,10 +462,12 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 						transition: Transition<in Drawable>?
 					) {
 						bottomSheetFullCover.setImageDrawable(resource)
+						bottomSheetFullPlaylistCover.setImageDrawable(resource)
 					}
 
 					override fun onLoadFailed(errorDrawable: Drawable?) {
 						bottomSheetFullCover.setImageDrawable(errorDrawable)
+						bottomSheetFullPlaylistCover.setImageDrawable(errorDrawable)
 					}
 
 					override fun onLoadCleared(placeholder: Drawable?) {
@@ -399,7 +476,11 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				})
 			lastArtworkUri = artworkUri
 			bottomSheetFullTitle.setTextAnimation(mediaItem?.mediaMetadata?.title, skipAnimation = firstTime)
+			bottomSheetFullPlaylistTitle.setTextAnimation(mediaItem?.mediaMetadata?.title, skipAnimation = firstTime)
 			bottomSheetFullSubtitle.setTextAnimation(
+				mediaItem?.mediaMetadata?.artist ?: context.getString(R.string.unknown_artist), skipAnimation = firstTime
+			)
+			bottomSheetFullPlaylistSubtitle.setTextAnimation(
 				mediaItem?.mediaMetadata?.artist ?: context.getString(R.string.unknown_artist), skipAnimation = firstTime
 			)
 			bottomSheetFullDuration.text =
@@ -425,9 +506,15 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			}
 
 			 */
+			if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED) {
+				bottomSheetFullPlaylistAdapter.updatePlaylist(
+					dumpPlaylist()
+				)
+			}
 		} else {
 			lastArtworkUri = null
 			Glide.with(context.applicationContext).clear(bottomSheetFullCover)
+			Glide.with(context.applicationContext).clear(bottomSheetFullPlaylistCover)
 			if (playlistNowPlaying != null) {
 				Glide.with(context.applicationContext).clear(playlistNowPlayingCover!!)
 			}
@@ -453,18 +540,24 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				bottomSheetLoopButton.isChecked = true
 				bottomSheetLoopButton.icon =
 					AppCompatResources.getDrawable(context, R.drawable.ic_repeat)
+				bottomSheetInfinityButton.isChecked = false
+				bottomSheetInfinityButton.isEnabled = false
 			}
 
 			Player.REPEAT_MODE_ONE -> {
-				bottomSheetLoopButton.isChecked = true
-				bottomSheetLoopButton.icon =
-					AppCompatResources.getDrawable(context, R.drawable.ic_repeat_one)
+				if (!bottomSheetInfinityButton.isChecked) {
+					bottomSheetLoopButton.isChecked = true
+					bottomSheetLoopButton.icon =
+						AppCompatResources.getDrawable(context, R.drawable.ic_repeat_one)
+				}
 			}
 
 			Player.REPEAT_MODE_OFF -> {
 				bottomSheetLoopButton.isChecked = false
 				bottomSheetLoopButton.icon =
 					AppCompatResources.getDrawable(context, R.drawable.ic_repeat)
+				bottomSheetInfinityButton.isChecked = false
+				bottomSheetInfinityButton.isEnabled = true
 			}
 		}
 	}
@@ -660,9 +753,17 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 
 	private class PlaylistCardAdapter(
-		private val playlist: MutableList<MediaItem>,
 		private val activity: MainActivity
-	) : MyRecyclerView.Adapter<PlaylistCardAdapter.ViewHolder>() {
+	) : RecyclerView.Adapter<PlaylistCardAdapter.ViewHolder>() {
+
+		private val playlist: MutableList<MediaItem> = mutableListOf()
+
+		@SuppressLint("NotifyDataSetChanged")
+		fun updatePlaylist(content: MutableList<MediaItem>) {
+			playlist.clear()
+			playlist.addAll(content)
+			notifyDataSetChanged()
+		}
 
 		override fun onCreateViewHolder(
 			parent: ViewGroup,
@@ -677,10 +778,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 			holder.songName.text = playlist[holder.bindingAdapterPosition].mediaMetadata.title
 			holder.songArtist.text = playlist[holder.bindingAdapterPosition].mediaMetadata.artist
-			holder.indicator.text =
-				CalculationUtils.convertDurationToTimeStamp(
-					playlist[holder.bindingAdapterPosition].mediaMetadata.extras?.getLong("Duration")!!
-				)
 			Glide
 				.with(holder.songCover.context)
 				.load(playlist[position].mediaMetadata.artworkUri)
@@ -719,7 +816,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			val songName: TextView = view.findViewById(R.id.title)
 			val songArtist: TextView = view.findViewById(R.id.artist)
 			val songCover: ImageView = view.findViewById(R.id.cover)
-			val indicator: TextView = view.findViewById(R.id.indicator)
 			val closeButton: MaterialButton = view.findViewById(R.id.close)
 		}
 

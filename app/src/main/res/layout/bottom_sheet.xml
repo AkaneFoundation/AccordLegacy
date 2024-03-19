@@ -13,7 +13,6 @@
         android:alpha="0"
         android:orientation="horizontal"
         android:visibility="gone"
-        android:background="@color/contrast_colorBackgroundElevated"
         tools:alpha="1"
         tools:visibility="visible">
 

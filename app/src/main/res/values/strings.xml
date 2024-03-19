@@ -172,4 +172,5 @@
 	<string name="crash_clipboard">Copied crash log to clipboard</string>
 	<string name="crash_thread" translatable="false">Thread</string>
 	<string name="settings_trim_lyrics">Remove spaces around lyrics</string>
+    <string name="playlist">Playlist</string>
 </resources>
