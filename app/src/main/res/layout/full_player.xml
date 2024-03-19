@@ -31,7 +31,7 @@
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toTopOf="parent"
 			app:strokeWidth="1dp"
-			app:strokeColor="#1AFFFFFF">
+			app:strokeColor="#0DFFFFFF">
 
 			<ImageView
 				android:id="@+id/playlist_demo_cover"
@@ -197,15 +197,15 @@
 		android:layout_height="0dp"
 		android:layout_marginHorizontal="26dp"
 		android:layout_marginTop="8dp"
-		android:background="?attr/colorSurfaceVariant"
+		android:background="@color/contrast_colorBackgroundContainer"
 		app:cardBackgroundColor="@android:color/transparent"
 		app:cardCornerRadius="10dp"
 		app:layout_constraintDimensionRatio="1:1"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toBottomOf="@id/drag"
-		app:strokeWidth="1.5dp"
-		app:strokeColor="#1AFFFFFF">
+		app:strokeWidth="1.2dp"
+		app:strokeColor="#0DFFFFFF">
 
 		<ImageView
 			android:id="@+id/full_sheet_cover"
@@ -292,13 +292,14 @@
 				android:layout_gravity="center"
 				android:value="0"
 				app:labelBehavior="gone"
-				app:thumbHeight="0dp"
-				app:thumbTrackGapSize="2dp"
-				app:thumbWidth="0dp"
 				app:trackColorActive="#EBFFFFFF"
 				app:trackColorInactive="#1AFFFFFF"
+				app:haloRadius="0dp"
+				app:haloColor="@android:color/transparent"
+				app:thumbRadius="0dp"
+				app:thumbColor="@android:color/transparent"
+				app:thumbElevation="0dp"
 				app:trackHeight="6dp"
-				app:trackStopIndicatorSize="0dp"
 				tools:value="0.5"
 				tools:visibility="visible" />
 

@@ -32,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:elevation="0dp"
-            android:paddingStart="4dp"
+            android:paddingStart="6dp"
             android:paddingEnd="8dp"
             app:title="@string/home_menu_settings"
             app:titleCentered="true"

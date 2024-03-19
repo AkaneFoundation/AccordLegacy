@@ -5,6 +5,4 @@
     <color name="contrast_colorBackgroundContainer">#F0F0F0</color>
     <color name="contrast_colorOnSurfaceFainted">#80000000</color>
     <color name="contrast_colorOnSurfaceSecondary">#B3000000</color>
-
-    <color name="colorAccent">#DA5E7C</color>
 </resources>

@@ -33,7 +33,7 @@
                 android:id="@+id/preview_album_cover"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="?attr/colorSurfaceContainer"
+                android:background="@color/contrast_colorBackgroundContainer"
                 android:contentDescription="@string/dialog_album"
                 android:src="@drawable/ic_default_cover" />
 
@@ -79,7 +79,7 @@
             app:iconGravity="textStart"
             app:iconPadding="0dp"
             app:iconSize="16dp"
-            app:iconTint="?attr/colorOnSurface"
+            app:iconTint="@color/contrast_colorOnSurface"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/preview_next"
             app:layout_constraintTop_toTopOf="parent" />
@@ -99,7 +99,7 @@
             app:iconGravity="textStart"
             app:iconPadding="0dp"
             app:iconSize="24dp"
-            app:iconTint="?attr/colorOnSurface"
+            app:iconTint="@color/contrast_colorOnSurface"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

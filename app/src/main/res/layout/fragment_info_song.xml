@@ -34,7 +34,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:elevation="0dp"
-                android:paddingStart="4dp"
+                android:paddingStart="6dp"
                 android:paddingEnd="8dp"
                 app:layout_collapseMode="pin"
                 android:background="@color/contrast_colorBackground"

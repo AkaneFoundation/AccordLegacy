@@ -42,8 +42,8 @@ android {
         // additionally, we (ab)use WindowInsets for bottom sheet padding which won't work on KK
         minSdk = 21 // Android 5.0
         targetSdk = 34 // Android 14.0
-        versionCode = 10
-        versionName = "alpha05"
+        versionCode = 11
+        versionName = "alpha06"
         buildConfigField(
             "String",
             "MY_VERSION_NAME",
@@ -134,7 +134,7 @@ dependencies {
     implementation("androidx.media3:media3-session:$media3Version")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("com.github.bumptech.glide:glide:$glideVersion")
-    implementation("com.google.android.material:material:1.12.0-alpha03")
+    implementation("com.google.android.material:material:1.11.0")
     implementation("me.zhanghai.android.fastscroll:library:1.3.0")
     implementation("com.mikepenz:aboutlibraries:$aboutLibsVersion")
     ksp("com.github.bumptech.glide:ksp:$glideVersion")

@@ -3,6 +3,7 @@ package org.akanework.gramophone.ui.components
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -29,6 +30,7 @@ import androidx.media3.session.SessionResult
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.TransitionManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.target.CustomTarget
@@ -40,6 +42,7 @@ import com.google.android.material.color.MaterialColors
 import com.google.android.material.slider.Slider
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
+import com.google.android.material.transition.MaterialContainerTransform
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
@@ -138,6 +141,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private val bottomSheetFullPlaylistSubtitle: TextView
 	private val bottomSheetFullPlaylistRecyclerView: RecyclerView
 	private val bottomSheetFullPlaylistAdapter: PlaylistCardAdapter
+	private val bottomSheetFullPlaylistCoverFrame: MaterialCardView
 	private var playlistNowPlaying: TextView? = null
 	private var playlistNowPlayingCover: ImageView? = null
 
@@ -164,6 +168,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetFullHeaderFrame = findViewById(R.id.playlist_frame)
 		bottomSheetFullPlaylistFrame = findViewById(R.id.playlist_content)
 		bottomSheetFullPlaylistCover = findViewById(R.id.playlist_demo_cover)
+		bottomSheetFullPlaylistCoverFrame = findViewById(R.id.playlist_cover_frame)
 		bottomSheetFullPlaylistTitle = findViewById(R.id.playlist_song_name)
 		bottomSheetFullPlaylistSubtitle = findViewById(R.id.playlist_song_artist)
 		bottomSheetFullPlaylistRecyclerView = findViewById(R.id.playlist_recyclerview)
@@ -336,15 +341,35 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 	}
 
+	private val transformIn = MaterialContainerTransform().apply {
+		startView = bottomSheetFullCoverFrame
+		endView = bottomSheetFullPlaylistCoverFrame
+		addTarget(bottomSheetFullPlaylistCoverFrame)
+		scrimColor = Color.TRANSPARENT
+		duration = 300
+	}
+
+	private val transformOut = MaterialContainerTransform().apply {
+		startView = bottomSheetFullPlaylistCoverFrame
+		endView = bottomSheetFullCoverFrame
+		addTarget(bottomSheetFullCoverFrame)
+		scrimColor = Color.TRANSPARENT
+		duration = 300
+	}
+
 	private fun changeMovableFrame(isVisible: Boolean) {
 		if (isVisible) {
 			bottomSheetFullTextLayout.fadInAnimation(300) {}
-			bottomSheetFullCoverFrame.fadInAnimation(300) {}
 			bottomSheetFullDragHandle.fadInAnimation(300) {}
+			TransitionManager.beginDelayedTransition(this, transformOut)
+			bottomSheetFullPlaylistCoverFrame.visibility = View.INVISIBLE
+			bottomSheetFullCoverFrame.visibility = View.VISIBLE
 		} else {
 			bottomSheetFullTextLayout.fadOutAnimation(300) {}
-			bottomSheetFullCoverFrame.fadOutAnimation(300) {}
 			bottomSheetFullDragHandle.fadOutAnimation(300) {}
+			TransitionManager.beginDelayedTransition(this, transformIn)
+			bottomSheetFullPlaylistCoverFrame.visibility = View.VISIBLE
+			bottomSheetFullCoverFrame.visibility = View.INVISIBLE
 		}
 	}
 
@@ -828,6 +853,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			val songName: TextView = view.findViewById(R.id.title)
 			val songArtist: TextView = view.findViewById(R.id.artist)
 			val songCover: ImageView = view.findViewById(R.id.cover)
+			val songCoverFrame: MaterialCardView = view.findViewById(R.id.playlist_list_frame)
 			val closeButton: MaterialButton = view.findViewById(R.id.close)
 		}
 
