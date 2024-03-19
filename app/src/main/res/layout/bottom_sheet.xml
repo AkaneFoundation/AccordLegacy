@@ -19,15 +19,20 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/preview_album_frame"
             style="?materialCardViewFilledStyle"
-            android:layout_width="58dp"
-            android:layout_height="58dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_marginBottom="8dp"
             android:layout_marginTop="12dp"
             android:layout_marginStart="24dp"
-            app:cardCornerRadius="6dp"
+            android:background="@android:color/transparent"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardCornerRadius="4dp"
+            app:strokeWidth="0.7dp"
+            app:strokeColor="#0DFFFFFF"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            >
 
             <ImageView
                 android:id="@+id/preview_album_cover"
@@ -57,12 +62,6 @@
                 android:textSize="16sp"
                 tools:text="Example title" />
 
-            <org.akanework.gramophone.ui.components.MarqueeTextView
-                android:id="@+id/preview_artist_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/contrast_colorOnSurfaceSecondary"
-                tools:text="Example Artist" />
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton

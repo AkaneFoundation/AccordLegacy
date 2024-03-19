@@ -80,7 +80,6 @@ class PlayerBottomSheet private constructor(
     private val previewPlayer: View
     private val bottomSheetPreviewCover: ImageView
     private val bottomSheetPreviewTitle: TextView
-    private val bottomSheetPreviewSubtitle: TextView
     private val bottomSheetPreviewControllerButton: MaterialButton
     private val bottomSheetPreviewNextButton: MaterialButton
     private val bottomSheetBlendBackgroundView: BlendBackgroundView
@@ -134,7 +133,6 @@ class PlayerBottomSheet private constructor(
         previewPlayer = findViewById(R.id.preview_player)
         fullPlayer = findViewById(R.id.full_player)
         bottomSheetPreviewTitle = findViewById(R.id.preview_song_name)
-        bottomSheetPreviewSubtitle = findViewById(R.id.preview_artist_name)
         bottomSheetPreviewCover = findViewById(R.id.preview_album_cover)
         bottomSheetPreviewControllerButton = findViewById(R.id.preview_control)
         bottomSheetPreviewNextButton = findViewById(R.id.preview_next)
@@ -383,8 +381,6 @@ class PlayerBottomSheet private constructor(
                 )
             }
             bottomSheetPreviewTitle.text = mediaItem?.mediaMetadata?.title
-            bottomSheetPreviewSubtitle.text =
-                mediaItem?.mediaMetadata?.artist ?: context.getString(R.string.unknown_artist)
         } else {
             Glide.with(context.applicationContext).clear(bottomSheetPreviewCover)
         }
