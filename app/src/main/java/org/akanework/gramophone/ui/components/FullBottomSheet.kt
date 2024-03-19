@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.AttributeSet
+import android.util.Log
 import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
@@ -23,6 +24,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.Timeline
+import androidx.media3.common.Tracks
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
@@ -530,6 +533,20 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		updateLyric(duration)
 	}
 
+	override fun onEvents(player: Player, events: Player.Events) {
+		super.onEvents(player, events)
+		if (events.size() == 2 &&
+			events[0] == Player.EVENT_TIMELINE_CHANGED &&
+			events[1] == Player.EVENT_POSITION_DISCONTINUITY &&
+			instance != null &&
+			instance!!.mediaItemCount > bottomSheetFullPlaylistAdapter.getPlaylistSize()
+			) {
+			bottomSheetFullPlaylistAdapter.updatePlaylist(
+				dumpPlaylist()
+			)
+		}
+	}
+
 	override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
 		bottomSheetShuffleButton.isChecked = shuffleModeEnabled
 	}
@@ -764,6 +781,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			playlist.addAll(content)
 			notifyDataSetChanged()
 		}
+
+		fun getPlaylistSize() = playlist.size
 
 		override fun onCreateViewHolder(
 			parent: ViewGroup,
