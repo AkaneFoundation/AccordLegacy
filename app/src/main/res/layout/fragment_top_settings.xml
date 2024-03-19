@@ -25,21 +25,37 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/contrast_colorBackground"
-        app:liftOnScroll="false">
+        app:liftOnScroll="false"
+        app:liftOnScrollColor="@color/contrast_colorBackground">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/topAppBar"
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsingtoolbar"
+            style="?attr/collapsingToolbarLayoutLargeStyle"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:elevation="0dp"
-            android:paddingStart="6dp"
-            android:paddingEnd="8dp"
+            android:layout_height="?attr/collapsingToolbarLayoutLargeSize"
+            app:collapsedTitleTextColor="@color/contrast_colorOnSurface"
+            app:collapsedTitleTextAppearance="?textAppearanceTitleLarge"
+            app:expandedTitleTextColor="@color/contrast_colorOnSurface"
+            app:expandedTitleTextAppearance="?textAppearanceHeadlineLarge"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:title="@string/home_menu_settings"
-            app:titleCentered="true"
+            app:contentScrim="@color/contrast_colorBackground"
             android:background="@color/contrast_colorBackground"
-            app:layout_collapseMode="pin"
-            app:navigationIcon="@drawable/ic_arrow_back"
-            app:navigationIconTint="?colorOnSurface" />
+            app:expandedTitleMarginStart="24dp">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/topAppBar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:elevation="0dp"
+                android:paddingStart="6dp"
+                android:paddingEnd="8dp"
+                android:background="@color/contrast_colorBackground"
+                app:layout_collapseMode="pin"
+                app:navigationIcon="@drawable/ic_arrow_back"
+                app:navigationIconTint="@color/contrast_colorOnSurface" />
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -47,7 +63,6 @@
         android:id="@+id/settings"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/contrast_colorBackground"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
         />
 

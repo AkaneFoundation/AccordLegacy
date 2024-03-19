@@ -21,8 +21,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -126,7 +124,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private val bottomSheetLoopButton: MaterialButton
 	private val bottomSheetPlaylistButton: MaterialButton
 	private val bottomSheetTimerButton: MaterialButton
-	private val bottomSheetFavoriteButton: MaterialButton
 	private val bottomSheetInfinityButton: MaterialButton
 	private val bottomSheetFullSlider: Slider
 	private val bottomSheetFullCoverFrame: MaterialCardView
@@ -162,7 +159,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetShuffleButton = findViewById(R.id.sheet_random)
 		bottomSheetLoopButton = findViewById(R.id.sheet_loop)
 		bottomSheetTimerButton = findViewById(R.id.timer)
-		bottomSheetFavoriteButton = findViewById(R.id.favor)
 		bottomSheetPlaylistButton = findViewById(R.id.playlist)
 		bottomSheetFullLyricRecyclerView = findViewById(R.id.lyric_frame)
 		bottomSheetFullDragHandle = findViewById(R.id.drag)
@@ -237,19 +233,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			}
 		}
 
-		/*
-		bottomSheetFavoriteButton.addOnCheckedChangeListener { _, isChecked ->
-			/*
-			if (isChecked) {
-				instance.currentMediaItem?.let { insertIntoPlaylist(it) }
-			} else {
-				instance.currentMediaItem?.let { removeFromPlaylist(it) }
-			}
-			 */
-		}
-
-		 */
-
 		bottomSheetPlaylistButton.addOnCheckedChangeListener { _, isChecked ->
 			if (isChecked) {
 				changeMovableFrame(false)
@@ -263,45 +246,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			}
 		}
 
-		/*
-		bottomSheetPlaylistButton.setOnClickListener {
-			if (Build.VERSION.SDK_INT >= 23) {
-				it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-			}
-			val playlistBottomSheet = BottomSheetDialog(context)
-			playlistBottomSheet.setContentView(R.layout.playlist_bottom_sheet)
-			val recyclerView = playlistBottomSheet.findViewById<MyRecyclerView>(R.id.recyclerview)!!
-			ViewCompat.setOnApplyWindowInsetsListener(recyclerView) { v, ic ->
-				val i = ic.getInsets(WindowInsetsCompat.Type.systemBars()
-						or WindowInsetsCompat.Type.displayCutout())
-				v.setPadding(i.left, 0, i.right, i.bottom)
-				return@setOnApplyWindowInsetsListener ic
-			}
-			val playlistAdapter = PlaylistCardAdapter(dumpPlaylist(), activity)
-			playlistNowPlaying = playlistBottomSheet.findViewById(R.id.now_playing)
-			playlistNowPlaying!!.text = instance?.currentMediaItem?.mediaMetadata?.title
-			playlistNowPlayingCover = playlistBottomSheet.findViewById(R.id.now_playing_cover)
-			Glide
-				.with(context)
-				.load(instance?.currentMediaItem?.mediaMetadata?.artworkUri)
-				.transition(DrawableTransitionOptions.withCrossFade())
-				.placeholder(R.drawable.ic_default_cover)
-				.into(playlistNowPlayingCover!!)
-			recyclerView.layoutManager = LinearLayoutManager(context)
-			recyclerView.adapter = playlistAdapter
-			recyclerView.scrollToPosition(instance?.currentMediaItemIndex ?: 0)
-			recyclerView.fastScroll(null, null)
-			playlistBottomSheet.setOnDismissListener {
-				if (playlistNowPlaying != null) {
-					Glide.with(context.applicationContext).clear(playlistNowPlayingCover!!)
-					playlistNowPlayingCover = null
-					playlistNowPlaying = null
-				}
-			}
-			playlistBottomSheet.show()
-		}
-
-		 */
 		bottomSheetFullControllerButton.setOnClickListener {
 			if (Build.VERSION.SDK_INT >= 23) {
 				it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
@@ -444,17 +388,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED
 			)
 			firstTime = false
-			/*
-			if (activity.libraryViewModel.playlistList.value!![MediaStoreUtils.favPlaylistPosition]
-					.songList.contains(instance.currentMediaItem)) {
-				bottomSheetFavoriteButton.isChecked = true
-				// TODO
-			} else {
-				bottomSheetFavoriteButton.isChecked = false
-				// TODO
-			}
-
-			 */
 		}, MoreExecutors.directExecutor())
 	}
 
@@ -524,17 +457,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 					.placeholder(R.drawable.ic_default_cover)
 					.into(playlistNowPlayingCover!!)
 			}
-
-			/*
-			if (activity.libraryViewModel.playlistList.value!![MediaStoreUtils.favPlaylistPosition]
-					.songList.contains(instance.currentMediaItem)
-			) {
-				// TODO
-			} else {
-				// TODO
-			}
-
-			 */
 			if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED) {
 				bottomSheetFullPlaylistAdapter.updatePlaylist(
 					dumpPlaylist()
@@ -759,13 +681,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			val lyricCard: MaterialCardView = view.findViewById(R.id.cardview)
 		}
 
-		@SuppressLint("NotifyDataSetChanged")
-		fun updateTextColor(newColor: Int, newHighlightColor: Int) {
-			defaultTextColor = newColor
-			highlightTextColor = newHighlightColor
-			notifyDataSetChanged()
-		}
-
 		fun updateHighlight(position: Int) {
 			if (currentFocusPos == position) return
 			if (position >= 0) {
@@ -827,7 +742,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				.with(holder.songCover.context)
 				.load(playlist[position].mediaMetadata.artworkUri)
 				.transition(DrawableTransitionOptions.withCrossFade())
-				.placeholder(R.drawable.ic_default_cover)
+				.placeholder(R.drawable.ic_default_cover_locked)
 				.into(holder.songCover)
 			holder.closeButton.setOnClickListener {
 				if (Build.VERSION.SDK_INT >= 23) {
@@ -861,45 +776,10 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			val songName: TextView = view.findViewById(R.id.title)
 			val songArtist: TextView = view.findViewById(R.id.artist)
 			val songCover: ImageView = view.findViewById(R.id.cover)
-			val songCoverFrame: MaterialCardView = view.findViewById(R.id.playlist_list_frame)
 			val closeButton: MaterialButton = view.findViewById(R.id.close)
 		}
 
 	}
-
-	/*
-	@Suppress("DEPRECATION")
-	private fun insertIntoPlaylist(song: MediaItem) {
-		val playlistEntry = ContentValues()
-		val playlistId = activity.libraryViewModel.playlistList.value!![MediaStoreUtils.favPlaylistPosition].id
-		playlistEntry.put(MediaStore.Audio.Playlists.Members.PLAYLIST_ID, playlistId)
-		playlistEntry.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, song.mediaId)
-
-		context.contentResolver.insert(
-			MediaStore.Audio.Playlists.Members.getContentUri(
-				"external",
-				playlistId
-			), playlistEntry
-		)
-		activity.libraryViewModel.playlistList.value!![MediaStoreUtils.favPlaylistPosition].songList.add(song)
-	}
-
-	@Suppress("DEPRECATION")
-	private fun removeFromPlaylist(song: MediaItem) {
-		val selection = "${MediaStore.Audio.Playlists.Members.AUDIO_ID} = ?"
-		val selectionArgs = arrayOf(song.mediaId)
-		val playlistId = activity.libraryViewModel.playlistList.value!![MediaStoreUtils.favPlaylistPosition].id
-
-		context.contentResolver.delete(
-			MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId),
-			selection,
-			selectionArgs
-		)
-		activity.libraryViewModel.playlistList.value!![MediaStoreUtils.favPlaylistPosition].songList.remove(song)
-	}
-
-	 */
-
 
 	fun updateLyric(duration: Long?) {
 		if (bottomSheetFullLyricList.isNotEmpty()) {

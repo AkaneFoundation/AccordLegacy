@@ -423,25 +423,6 @@
 		app:layout_constraintStart_toStartOf="@id/controls">
 
 		<com.google.android.material.button.MaterialButton
-			android:id="@+id/favor"
-			android:layout_width="48dp"
-			android:layout_height="48dp"
-			android:layout_weight="1"
-			android:background="@drawable/rp_buttons"
-			android:checkable="true"
-			android:insetLeft="0dp"
-			android:insetTop="0dp"
-			android:insetRight="0dp"
-			android:insetBottom="0dp"
-			android:saveEnabled="false"
-			android:visibility="gone"
-			app:icon="@drawable/sl_check_fav"
-			app:iconGravity="textStart"
-			app:iconPadding="0dp"
-			app:iconSize="24dp"
-			app:iconTint="@color/sl_fav_button" />
-
-		<com.google.android.material.button.MaterialButton
 			android:id="@+id/timer"
 			android:layout_width="48dp"
 			android:layout_height="48dp"
