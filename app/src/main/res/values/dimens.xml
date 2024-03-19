@@ -4,8 +4,8 @@
     <dimen name="media_seekbar_progress_amplitude">2.7dp</dimen>
     <dimen name="media_seekbar_progress_phase">8dp</dimen>
     <dimen name="media_seekbar_progress_stroke_width">3.4dp</dimen>
-    <dimen name="list_round_corner_size">6dp</dimen>
-    <dimen name="grid_round_corner_size">6dp</dimen>
+    <dimen name="list_round_corner_size">0dp</dimen>
+    <dimen name="grid_round_corner_size">0dp</dimen>
     <dimen name="tab_layout_content_padding">12dp</dimen>
     <dimen name="grid_card_side_padding">12dp</dimen>
     <!-- https://github.com/zhanghai/AndroidFastScroll/issues/3 -->

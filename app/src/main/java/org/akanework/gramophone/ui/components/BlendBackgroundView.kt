@@ -1,5 +1,6 @@
 package org.akanework.gramophone.ui.components
 
+import android.animation.ObjectAnimator
 import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
@@ -9,20 +10,15 @@ import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
 import android.graphics.Rect
-import android.graphics.drawable.Drawable
-import android.graphics.drawable.RippleDrawable
 import android.net.Uri
 import android.os.Build
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
-import android.view.animation.RotateAnimation
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import org.akanework.gramophone.R
 import org.akanework.gramophone.ui.components.blurview.BlurView
 import org.akanework.gramophone.ui.components.blurview.RenderEffectBlur
@@ -47,6 +43,8 @@ class BlendBackgroundView(context: Context, attrs: AttributeSet?, defStyleAttr: 
     private val rotateFrame: ConstraintLayout
     private val blurView: BlurView
 
+    private val objectAnimatorList: MutableList<ObjectAnimator> = mutableListOf()
+
     init {
         inflate(context, R.layout.blend_background, this)
         imageViewTS = findViewById(R.id.type1)
@@ -57,12 +55,12 @@ class BlendBackgroundView(context: Context, attrs: AttributeSet?, defStyleAttr: 
         imageViewBG = findViewById(R.id.bg)
         rotateFrame = findViewById(R.id.rotate_frame)
         blurView = findViewById(R.id.blur_view)
-        startRotationAnimation(imageViewTS, 0f, 360f, 29000)
-        startRotationAnimation(imageViewTE, 40f, 400f, 32000)
-        startRotationAnimation(imageViewBS, 120f, 480f, 27000)
-        startRotationAnimation(imageViewBE, 80f, 440f, 35000)
-        startRotationAnimation(imageViewC, 360f, 0f, 44000)
-        startRotationAnimation(rotateFrame, 360f, 0f, 54000)
+        initializeRotationAnimation(imageViewTS, 0f, 360f, 34000)
+        initializeRotationAnimation(imageViewTE, 40f, 400f, 37000)
+        initializeRotationAnimation(imageViewBS, 120f, 480f, 32000)
+        initializeRotationAnimation(imageViewBE, 80f, 440f, 40000)
+        initializeRotationAnimation(imageViewC, 360f, 0f, 49000)
+        initializeRotationAnimation(rotateFrame, 360f, 0f, 59000)
         setUpBlurView(blurView, this, 80f)
     }
 
@@ -86,23 +84,35 @@ class BlendBackgroundView(context: Context, attrs: AttributeSet?, defStyleAttr: 
         }
     }
 
-    private fun startRotationAnimation(
+    private fun initializeRotationAnimation(
         view: View,
         fromDegrees: Float,
         toDegrees: Float,
-        duration: Long,
-        pivotXValue: Float = 0.5f,
-        pivotYValue: Float = 0.5f
+        duration: Long
     ) {
-        val rotateAnimation = RotateAnimation(
-            fromDegrees, toDegrees,
-            Animation.RELATIVE_TO_SELF, pivotXValue,
-            Animation.RELATIVE_TO_SELF, pivotYValue
-        )
-        rotateAnimation.duration = duration
-        rotateAnimation.repeatCount = Animation.INFINITE
-        rotateAnimation.interpolator = LinearInterpolator()
-        view.startAnimation(rotateAnimation)
+        val objectAnimator = ObjectAnimator.ofFloat(view, "rotation", fromDegrees, toDegrees)
+        objectAnimator.duration = duration
+        objectAnimator.repeatCount = Animation.INFINITE
+        objectAnimator.interpolator = LinearInterpolator()
+        objectAnimator.start()
+        objectAnimator.pause()
+        objectAnimatorList.add(objectAnimator)
+    }
+
+    fun startRotationAnimation() {
+        objectAnimatorList.forEach {
+            if (it.isStarted) {
+                it.resume()
+            } else {
+                it.start()
+            }
+        }
+    }
+
+    fun stopRotationAnimation() {
+        objectAnimatorList.forEach {
+            it.pause()
+        }
     }
 
     private fun getBitmapFromUri(contentResolver: ContentResolver, uri: Uri): Bitmap? {

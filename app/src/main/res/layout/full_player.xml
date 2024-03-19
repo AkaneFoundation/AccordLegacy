@@ -30,7 +30,8 @@
 			app:cardCornerRadius="5dp"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toTopOf="parent"
-			app:strokeWidth="0dp">
+			app:strokeWidth="1dp"
+			app:strokeColor="#1AFFFFFF">
 
 			<ImageView
 				android:id="@+id/playlist_demo_cover"
@@ -173,6 +174,10 @@
 			android:layout_width="match_parent"
 			android:layout_height="0dp"
 			android:scrollbars="none"
+			android:background="#1A000000"
+			android:paddingTop="4dp"
+			android:paddingBottom="4dp"
+			android:clipToPadding="false"
 			app:layout_constraintTop_toBottomOf="@id/playlist_title"
 			app:layout_constraintBottom_toBottomOf="parent" />
 
@@ -199,7 +204,8 @@
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toBottomOf="@id/drag"
-		app:strokeWidth="0dp">
+		app:strokeWidth="1.5dp"
+		app:strokeColor="#1AFFFFFF">
 
 		<ImageView
 			android:id="@+id/full_sheet_cover"

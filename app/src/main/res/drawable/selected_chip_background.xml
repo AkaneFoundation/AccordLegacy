@@ -3,6 +3,7 @@
     <item
         android:width="5dp"
         android:height="5dp"
+        android:bottom="3dp"
         android:gravity="center_horizontal">
 
         <shape android:shape="rectangle">

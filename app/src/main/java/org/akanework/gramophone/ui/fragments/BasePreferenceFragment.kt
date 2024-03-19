@@ -26,7 +26,6 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceFragmentCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.color.MaterialColors
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.dpToPx
 import org.akanework.gramophone.logic.enableEdgeToEdgePaddingListener

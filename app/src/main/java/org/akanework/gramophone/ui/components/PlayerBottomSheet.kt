@@ -60,7 +60,6 @@ import org.akanework.gramophone.logic.fadOutAnimation
 import org.akanework.gramophone.logic.getBooleanStrict
 import org.akanework.gramophone.logic.gramophoneApplication
 import org.akanework.gramophone.logic.playOrPause
-import org.akanework.gramophone.logic.startAnimation
 import org.akanework.gramophone.logic.ui.MyBottomSheetBehavior
 import org.akanework.gramophone.logic.utils.EnvUtils
 import org.akanework.gramophone.ui.MainActivity
@@ -417,12 +416,14 @@ class PlayerBottomSheet private constructor(
                 bottomSheetPreviewControllerButton.icon =
                     AppCompatResources.getDrawable(context, R.drawable.ic_apple_pause)
                 bottomSheetPreviewControllerButton.setTag(R.id.play_next, 1)
+                bottomSheetBlendBackgroundView.startRotationAnimation()
             }
         } else if (playbackState != Player.STATE_BUFFERING) {
             if (bottomSheetPreviewControllerButton.getTag(R.id.play_next) as Int? != 2) {
                 bottomSheetPreviewControllerButton.icon =
                     AppCompatResources.getDrawable(context, R.drawable.ic_apple_play)
                 bottomSheetPreviewControllerButton.setTag(R.id.play_next, 2)
+                bottomSheetBlendBackgroundView.stopRotationAnimation()
             }
         }
     }

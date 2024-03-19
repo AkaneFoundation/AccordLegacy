@@ -7,7 +7,6 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    android:background="#1A000000"
     android:paddingStart="30dp"
     android:paddingEnd="30dp"
     android:paddingTop="4dp"
@@ -26,8 +25,9 @@
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
             app:cardBackgroundColor="@android:color/transparent"
-            app:strokeWidth="0dp"
-            app:cardCornerRadius="4dp">
+            app:cardCornerRadius="4dp"
+            app:strokeWidth="0.7dp"
+            app:strokeColor="#1AFFFFFF">
 
             <ImageView
                 android:id="@+id/cover"

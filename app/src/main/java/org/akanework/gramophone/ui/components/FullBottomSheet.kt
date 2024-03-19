@@ -9,7 +9,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.AttributeSet
-import android.util.Log
 import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
@@ -24,8 +23,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
-import androidx.media3.common.Timeline
-import androidx.media3.common.Tracks
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
@@ -46,7 +43,6 @@ import com.google.android.material.timepicker.TimeFormat
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
-import kotlinx.coroutines.Job
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.GramophonePlaybackService
 import org.akanework.gramophone.logic.dpToPx
@@ -83,7 +79,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	var minimize: (() -> Unit)? = null
 
 	private var wrappedContext: Context? = null
-	private var currentJob: Job? = null
 	private var isUserTracking = false
 	private var runnableRunning = false
 	private var firstTime = false
@@ -93,8 +88,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 	companion object {
 		const val SLIDER_UPDATE_INTERVAL: Long = 100
-		const val BACKGROUND_COLOR_TRANSITION_SEC: Long = 300
-		const val FOREGROUND_COLOR_TRANSITION_SEC: Long = 150
 		const val LYRIC_FADE_TRANSITION_SEC: Long = 125
 	}
 
@@ -226,7 +219,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			}
 		}
 
-		bottomSheetInfinityButton.addOnCheckedChangeListener { button, isChecked ->
+		bottomSheetInfinityButton.addOnCheckedChangeListener { _, isChecked ->
 			if (isChecked) {
 				bottomSheetLoopButton.isChecked = false
 				bottomSheetLoopButton.isEnabled = false
@@ -250,7 +243,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 		 */
 
-		bottomSheetPlaylistButton.addOnCheckedChangeListener { button, isChecked ->
+		bottomSheetPlaylistButton.addOnCheckedChangeListener { _, isChecked ->
 			if (isChecked) {
 				changeMovableFrame(false)
 				bottomSheetFullPlaylistRecyclerView.scrollToPosition(instance?.currentMediaItemIndex ?: 0)

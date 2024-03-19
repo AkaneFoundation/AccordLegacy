@@ -31,8 +31,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.DefaultMediaNotificationProvider
 import androidx.preference.PreferenceManager
-import com.bumptech.glide.Glide
-import com.google.android.material.color.DynamicColors
 import org.akanework.gramophone.BuildConfig
 import org.akanework.gramophone.logic.ui.BugHandlerActivity
 import kotlin.system.exitProcess

@@ -21,7 +21,6 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
 import org.akanework.gramophone.R
-import org.akanework.gramophone.logic.utils.ColorUtils
 import org.akanework.gramophone.ui.fragments.BasePreferenceFragment
 import org.akanework.gramophone.ui.fragments.BaseSettingFragment
 

@@ -24,7 +24,7 @@
             android:layout_marginBottom="8dp"
             android:layout_marginTop="12dp"
             android:layout_marginStart="24dp"
-            app:cardCornerRadius="@dimen/list_round_corner_size"
+            app:cardCornerRadius="6dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -53,7 +53,7 @@
                 android:id="@+id/preview_song_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="?attr/colorOnSurface"
+                android:textColor="@color/contrast_colorOnSurface"
                 android:textSize="16sp"
                 tools:text="Example title" />
 
@@ -61,7 +61,7 @@
                 android:id="@+id/preview_artist_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textColor="@color/contrast_colorOnSurfaceSecondary"
                 tools:text="Example Artist" />
         </LinearLayout>
 

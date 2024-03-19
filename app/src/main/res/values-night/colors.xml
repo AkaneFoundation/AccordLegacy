@@ -4,4 +4,7 @@
     <color name="contrast_colorBackgroundElevated">#070707</color>
     <color name="contrast_colorBackgroundContainer">#0F0F0F</color>
     <color name="contrast_colorOnSurfaceFainted">#80FFFFFF</color>
+    <color name="contrast_colorOnSurfaceSecondary">#B3FFFFFF</color>
+
+    <color name="colorAccent">#FF2D55</color>
 </resources>
