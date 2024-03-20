@@ -1,7 +1,8 @@
 <resources>
     <color name="contrast_colorOnSurface">#000000</color>
     <color name="contrast_colorBackground">#FFFFFF</color>
-    <color name="contrast_colorBackgroundElevated">#F8F8F8</color>
+    <color name="contrast_colorBackgroundElevated">#FAFAFA</color>
+    <color name="contrast_colorBackgroundElevatedAlpha">#F2FAFAFA</color>
     <color name="contrast_colorBackgroundContainer">#F0F0F0</color>
     <color name="contrast_colorOnSurfaceFainted">#80000000</color>
     <color name="contrast_colorOnSurfaceSecondary">#B3000000</color>

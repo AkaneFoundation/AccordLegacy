@@ -20,19 +20,21 @@ package org.akanework.gramophone.ui.components
 import android.content.ComponentName
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
 import android.view.HapticFeedbackConstants
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.content.ContextCompat
 import androidx.core.graphics.Insets
 import androidx.core.view.OnApplyWindowInsetsListener
 import androidx.core.view.ViewCompat
@@ -63,6 +65,9 @@ import org.akanework.gramophone.logic.playOrPause
 import org.akanework.gramophone.logic.ui.MyBottomSheetBehavior
 import org.akanework.gramophone.logic.utils.EnvUtils
 import org.akanework.gramophone.ui.MainActivity
+import org.akanework.gramophone.ui.components.blurview.BlurView
+import org.akanework.gramophone.ui.components.blurview.RenderEffectBlur
+import org.akanework.gramophone.ui.components.blurview.RenderScriptBlur
 
 
 class PlayerBottomSheet private constructor(
@@ -83,6 +88,7 @@ class PlayerBottomSheet private constructor(
     private val bottomSheetPreviewControllerButton: MaterialButton
     private val bottomSheetPreviewNextButton: MaterialButton
     private val bottomSheetBlendBackgroundView: BlendBackgroundView
+    private val externalBlurView: BlurView
 
     private val activity
         get() = context as MainActivity
@@ -129,7 +135,7 @@ class PlayerBottomSheet private constructor(
 
     init {
         inflate(context, R.layout.bottom_sheet, this)
-        this.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.contrast_colorBackgroundElevated))
+        this.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
         previewPlayer = findViewById(R.id.preview_player)
         fullPlayer = findViewById(R.id.full_player)
         bottomSheetPreviewTitle = findViewById(R.id.preview_song_name)
@@ -137,6 +143,7 @@ class PlayerBottomSheet private constructor(
         bottomSheetPreviewControllerButton = findViewById(R.id.preview_control)
         bottomSheetPreviewNextButton = findViewById(R.id.preview_next)
         bottomSheetBlendBackgroundView = findViewById(R.id.blend)
+        externalBlurView = findViewById(R.id.external_blurview)
         ViewCompat.setOnApplyWindowInsetsListener(this, this)
 
         setOnClickListener {
@@ -160,6 +167,22 @@ class PlayerBottomSheet private constructor(
         }
     }
 
+    private fun setUpBlurView(
+        blurView: BlurView,
+        rootView: ViewGroup,
+        blurRadius: Float,
+        frameClearDrawable: Drawable) {
+        blurView.setupWith(
+            rootView,
+            if (Build.VERSION.SDK_INT >= 31)
+                RenderEffectBlur()
+            else
+                RenderScriptBlur(context)
+        )
+            .setBlurRadius(blurRadius)
+            .setFrameClearDrawable(frameClearDrawable)
+    }
+
     private val bottomSheetCallback = object : BottomSheetCallback() {
         override fun onStateChanged(
             bottomSheet: View,
@@ -169,7 +192,9 @@ class PlayerBottomSheet private constructor(
                 BottomSheetBehavior.STATE_COLLAPSED -> {
                     fullPlayer.visibility = View.GONE
                     previewPlayer.visibility = View.VISIBLE
+                    externalBlurView.visibility = View.VISIBLE
                     previewPlayer.alpha = 1f
+                    externalBlurView.alpha = 1f
                     fullPlayer.alpha = 0f
                     bottomSheetBlendBackgroundView.alpha = 0f
                     bottomSheetBackCallback!!.isEnabled = false
@@ -182,16 +207,19 @@ class PlayerBottomSheet private constructor(
                 BottomSheetBehavior.STATE_DRAGGING, BottomSheetBehavior.STATE_SETTLING -> {
                     fullPlayer.visibility = View.VISIBLE
                     previewPlayer.visibility = View.VISIBLE
+                    externalBlurView.visibility = View.VISIBLE
                 }
 
                 BottomSheetBehavior.STATE_EXPANDED, BottomSheetBehavior.STATE_HALF_EXPANDED -> {
                     previewPlayer.visibility = View.GONE
                     fullPlayer.visibility = View.VISIBLE
+                    externalBlurView.visibility = View.GONE
                     if (!isDarkMode && insetController.isAppearanceLightStatusBars) {
                         WindowCompat.getInsetsController(activity.window, this@PlayerBottomSheet)
                             .isAppearanceLightStatusBars = false
                     }
                     previewPlayer.alpha = 0f
+                    externalBlurView.alpha = 0f
                     fullPlayer.alpha = 1f
                     bottomSheetBlendBackgroundView.alpha = 1f
                     bottomSheetBackCallback!!.isEnabled = true
@@ -200,8 +228,10 @@ class PlayerBottomSheet private constructor(
                 BottomSheetBehavior.STATE_HIDDEN -> {
                     previewPlayer.visibility = View.GONE
                     fullPlayer.visibility = View.GONE
+                    externalBlurView.visibility = View.GONE
                     previewPlayer.alpha = 0f
                     fullPlayer.alpha = 0f
+                    externalBlurView.alpha = 0f
                     bottomSheetBlendBackgroundView.alpha = 0f
                     bottomSheetBackCallback!!.isEnabled = false
                     if (!isDarkMode && !insetController.isAppearanceLightStatusBars) {
@@ -220,11 +250,13 @@ class PlayerBottomSheet private constructor(
             if (slideOffset < 0) {
                 // hidden state
                 previewPlayer.alpha = 1 - (-1 * slideOffset)
+                externalBlurView.alpha = 1 - (-1 * slideOffset)
                 fullPlayer.alpha = 0f
                 bottomSheetBlendBackgroundView.alpha = 0f
                 return
             }
             previewPlayer.alpha = 1 - (slideOffset)
+            externalBlurView.alpha = 1 - (slideOffset)
             fullPlayer.alpha = slideOffset
             bottomSheetBlendBackgroundView.alpha = slideOffset
         }
@@ -297,6 +329,8 @@ class PlayerBottomSheet private constructor(
             lifecycleOwner.lifecycle.addObserver(this)
             updatePeekHeight()
             dispatchBottomSheetInsets()
+            val windowBackground: Drawable = activity.window.decorView.background
+            setUpBlurView(externalBlurView, activity.window.decorView.findViewById(android.R.id.content), 12f, windowBackground)
         }
     }
 

@@ -75,9 +75,11 @@ class MainActivity : AppCompatActivity() {
     private var ready = false
     lateinit var playerBottomSheet: PlayerBottomSheet
         private set
-    lateinit var intentSender: ActivityResultLauncher<IntentSenderRequest>
+    private lateinit var intentSender: ActivityResultLauncher<IntentSenderRequest>
         private set
-    var intentSenderAction: (() -> Boolean)? = null
+    private var intentSenderAction: (() -> Boolean)? = null
+
+    private lateinit var container: FragmentContainerView
 
     /**
      * updateLibrary:
@@ -130,7 +132,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         window.decorView.setBackgroundColor(ContextCompat.getColor(this, R.color.contrast_colorBackground))
         playerBottomSheet = findViewById(R.id.player_layout)
-        val container = findViewById<FragmentContainerView>(R.id.container)
+        container = findViewById(R.id.container)
         // Modifies FragmentContainerView's insets to account for bottom sheet size.
         ViewCompat.setOnApplyWindowInsetsListener(container) { _, insets ->
             playerBottomSheet.generateBottomSheetInsets(insets)
