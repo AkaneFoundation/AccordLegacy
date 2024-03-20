@@ -6,8 +6,6 @@
 	android:id="@+id/full_player"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:clipChildren="false"
-	android:clipToPadding="false"
 	android:fitsSystemWindows="true"
 	tools:background="@color/contrast_colorOnSurface"
 	tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
@@ -217,6 +215,31 @@
 
 	</com.google.android.material.card.MaterialCardView>
 
+	<org.akanework.gramophone.ui.components.FadingEdgeLayout
+		android:layout_width="0dp"
+		android:layout_height="0dp"
+		app:layout_constraintTop_toBottomOf="@id/playlist_frame"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintBottom_toBottomOf="@id/actionBar"
+		app:fel_edge="top|bottom"
+		app:fel_size_bottom="200dp"
+		app:fel_size_top="40dp">
+
+		<androidx.recyclerview.widget.RecyclerView
+			android:id="@+id/lyric_frame"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:background="@android:color/transparent"
+			android:scrollbars="none"
+			android:paddingTop="36dp"
+			android:paddingBottom="200dp"
+			android:clipToPadding="false"
+			tools:listitem="@layout/lyrics"
+			android:visibility="gone" />
+
+	</org.akanework.gramophone.ui.components.FadingEdgeLayout>
+
 	<androidx.constraintlayout.widget.ConstraintLayout
 		android:id="@+id/controls"
 		android:layout_width="0dp"
@@ -423,6 +446,24 @@
 		app:layout_constraintStart_toStartOf="@id/controls">
 
 		<com.google.android.material.button.MaterialButton
+			android:id="@+id/lyric_btn"
+			android:layout_width="48dp"
+			android:layout_height="48dp"
+			android:layout_weight="1"
+			android:background="@drawable/rp_buttons"
+			android:checkable="true"
+			android:insetLeft="0dp"
+			android:insetTop="0dp"
+			android:insetRight="0dp"
+			android:insetBottom="0dp"
+			android:saveEnabled="false"
+			app:icon="@drawable/ic_lyrics"
+			app:iconGravity="textStart"
+			app:iconPadding="0dp"
+			app:iconSize="24dp"
+			app:iconTint="@color/sl_check_button" />
+
+		<com.google.android.material.button.MaterialButton
 			android:id="@+id/timer"
 			android:layout_width="48dp"
 			android:layout_height="48dp"
@@ -460,21 +501,11 @@
 	</LinearLayout>
 
 	<com.google.android.material.divider.MaterialDivider
+		android:id="@+id/divider"
 		android:layout_height="wrap_content"
 		android:layout_width="match_parent"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:dividerColor="#1AFFFFFF"
 		app:dividerThickness="0.5dp"/>
-
-	<org.akanework.gramophone.logic.ui.MyRecyclerView
-		android:id="@+id/lyric_frame"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:background="?attr/colorSurface"
-		android:clipChildren="false"
-		android:clipToPadding="false"
-		android:scrollbars="none"
-		android:visibility="gone"
-		tools:listitem="@layout/lyrics" />
 
 </merge>

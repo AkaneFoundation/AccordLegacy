@@ -95,8 +95,6 @@
     </style>
 
     <style name="BottomPlayerSheetStyle" parent="Widget.Material3.BottomSheet">
-        <item name="android:clipChildren">false</item>
-        <item name="android:clipToPadding">false</item>
         <item name="shapeAppearance">@style/BottomPlayerCornerShape</item>
         <item name="marginLeftSystemWindowInsets">false</item>
         <item name="marginRightSystemWindowInsets">false</item>

@@ -91,6 +91,6 @@
         app:iconGravity="textStart"
         app:iconPadding="0dp"
         app:iconSize="18dp"
-        app:iconTint="#66FFFFFF" />
+        app:iconTint="#57FFFFFF" />
 
 </FrameLayout>

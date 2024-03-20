@@ -1,10 +1,9 @@
 package org.akanework.gramophone.ui.components
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.SharedPreferences
 import android.graphics.Color
-import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -16,12 +15,12 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.updateLayoutParams
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
@@ -38,7 +37,7 @@ import com.bumptech.glide.request.transition.Transition
 import com.google.android.material.bottomsheet.BottomSheetDragHandleView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
-import com.google.android.material.color.MaterialColors
+import com.google.android.material.divider.MaterialDivider
 import com.google.android.material.slider.Slider
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
@@ -51,23 +50,19 @@ import org.akanework.gramophone.logic.GramophonePlaybackService
 import org.akanework.gramophone.logic.dpToPx
 import org.akanework.gramophone.logic.fadInAnimation
 import org.akanework.gramophone.logic.fadOutAnimation
-import org.akanework.gramophone.logic.getBooleanStrict
 import org.akanework.gramophone.logic.getLyrics
 import org.akanework.gramophone.logic.getTimer
-import org.akanework.gramophone.logic.gramophoneApplication
 import org.akanework.gramophone.logic.hasTimer
 import org.akanework.gramophone.logic.playOrPause
 import org.akanework.gramophone.logic.setTextAnimation
 import org.akanework.gramophone.logic.setTimer
-import org.akanework.gramophone.logic.ui.MyRecyclerView
 import org.akanework.gramophone.logic.utils.CalculationUtils
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
 import org.akanework.gramophone.ui.MainActivity
 import kotlin.math.min
 
 class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
-	ConstraintLayout(context, attrs, defStyleAttr, defStyleRes), Player.Listener,
-	SharedPreferences.OnSharedPreferenceChangeListener {
+	ConstraintLayout(context, attrs, defStyleAttr, defStyleRes), Player.Listener {
 	constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
 		this(context, attrs, defStyleAttr, 0)
 	constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -87,11 +82,13 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private var firstTime = false
 	private var lastArtworkUri: Uri? = null
 
-	private val prefs = context.gramophoneApplication.prefs
+	val interpolator = AccelerateDecelerateInterpolator()
 
 	companion object {
 		const val SLIDER_UPDATE_INTERVAL: Long = 100
-		const val LYRIC_FADE_TRANSITION_SEC: Long = 125
+		const val LYRIC_TRANSIT_DURATION: Long = 500
+		const val LYRIC_REMOVE_HIGHLIGHT: Int = 0
+		const val LYRIC_SET_HIGHLIGHT: Int = 1
 	}
 
 	private val touchListener = object : Slider.OnSliderTouchListener {
@@ -125,9 +122,12 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private val bottomSheetPlaylistButton: MaterialButton
 	private val bottomSheetTimerButton: MaterialButton
 	private val bottomSheetInfinityButton: MaterialButton
+	private val bottomSheetFullLyricButton: MaterialButton
 	private val bottomSheetFullSlider: Slider
 	private val bottomSheetFullCoverFrame: MaterialCardView
-	val bottomSheetFullLyricRecyclerView: RecyclerView
+	private val bottomSheetFullControllerFrame: ConstraintLayout
+	private val bottomSheetFullLyricRecyclerView: RecyclerView
+	private val bottomSheetFullBottomDivider: MaterialDivider
 	private val bottomSheetFullLyricList: MutableList<MediaStoreUtils.Lyric> = mutableListOf()
 	private val bottomSheetFullLyricAdapter: LyricAdapter = LyricAdapter(bottomSheetFullLyricList)
 	private val bottomSheetFullLyricLinearLayoutManager = LinearLayoutManager(context)
@@ -141,8 +141,10 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private val bottomSheetFullPlaylistRecyclerView: RecyclerView
 	private val bottomSheetFullPlaylistAdapter: PlaylistCardAdapter
 	private val bottomSheetFullPlaylistCoverFrame: MaterialCardView
+	private val bottomSheetActionBar: LinearLayout
 	private var playlistNowPlaying: TextView? = null
 	private var playlistNowPlayingCover: ImageView? = null
+	private var triggerLock: Boolean = false
 
 	init {
 		inflate(context, R.layout.full_player, this)
@@ -156,6 +158,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetFullPosition = findViewById(R.id.position)
 		bottomSheetFullDuration = findViewById(R.id.duration)
 		bottomSheetFullSlider = findViewById(R.id.slider_vert)
+		bottomSheetFullLyricButton = findViewById(R.id.lyric_btn)
 		bottomSheetShuffleButton = findViewById(R.id.sheet_random)
 		bottomSheetLoopButton = findViewById(R.id.sheet_loop)
 		bottomSheetTimerButton = findViewById(R.id.timer)
@@ -167,17 +170,17 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetFullPlaylistFrame = findViewById(R.id.playlist_content)
 		bottomSheetFullPlaylistCover = findViewById(R.id.playlist_demo_cover)
 		bottomSheetFullPlaylistCoverFrame = findViewById(R.id.playlist_cover_frame)
+		bottomSheetFullControllerFrame = findViewById(R.id.controls)
 		bottomSheetFullPlaylistTitle = findViewById(R.id.playlist_song_name)
 		bottomSheetFullPlaylistSubtitle = findViewById(R.id.playlist_song_artist)
 		bottomSheetFullPlaylistRecyclerView = findViewById(R.id.playlist_recyclerview)
+		bottomSheetFullBottomDivider = findViewById(R.id.divider)
 		bottomSheetInfinityButton = findViewById(R.id.sheet_infinity)
+		bottomSheetActionBar = findViewById(R.id.actionBar)
 
 		bottomSheetFullPlaylistAdapter = PlaylistCardAdapter(activity)
 		bottomSheetFullPlaylistRecyclerView.layoutManager = LinearLayoutManager(context)
 		bottomSheetFullPlaylistRecyclerView.adapter = bottomSheetFullPlaylistAdapter
-
-		refreshSettings(null)
-		prefs.registerOnSharedPreferenceChangeListener(this)
 
 		bottomSheetTimerButton.setOnClickListener {
 			if (Build.VERSION.SDK_INT >= 23) {
@@ -233,16 +236,63 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			}
 		}
 
+		bottomSheetFullPlaylistCoverFrame.setOnClickListener {
+			if (bottomSheetFullLyricButton.isChecked) {
+				bottomSheetFullLyricButton.isChecked = false
+			}
+		}
+
 		bottomSheetPlaylistButton.addOnCheckedChangeListener { _, isChecked ->
-			if (isChecked) {
+			if (triggerLock) {
+				triggerLock = false
+				return@addOnCheckedChangeListener
+			}
+			if (isChecked && !bottomSheetFullLyricButton.isChecked) {
 				changeMovableFrame(false)
 				bottomSheetFullPlaylistRecyclerView.scrollToPosition(instance?.currentMediaItemIndex ?: 0)
 				bottomSheetFullHeaderFrame.fadInAnimation(300)
 				bottomSheetFullPlaylistFrame.fadInAnimation(300)
+			} else if (bottomSheetFullLyricButton.isChecked) {
+				triggerLock = true
+				bottomSheetFullLyricButton.isChecked = false
+				bottomSheetFullLyricRecyclerView.fadOutAnimation(300)
+				bottomSheetFullControllerFrame.fadInAnimation(300)
+				bottomSheetFullPlaylistFrame.fadInAnimation(300)
+				bottomSheetFullBottomDivider.fadInAnimation(300)
 			} else {
 				changeMovableFrame(true)
 				bottomSheetFullHeaderFrame.fadOutAnimation(300, View.GONE)
 				bottomSheetFullPlaylistFrame.fadOutAnimation(300, View.GONE)
+			}
+		}
+
+		bottomSheetFullLyricButton.addOnCheckedChangeListener { _, isChecked ->
+			if (triggerLock) {
+				triggerLock = false
+				return@addOnCheckedChangeListener
+			}
+			if (isChecked && !bottomSheetPlaylistButton.isChecked) {
+				changeMovableFrame(false)
+				bottomSheetFullHeaderFrame.fadInAnimation(300)
+				bottomSheetFullLyricRecyclerView.fadInAnimation(300)
+				bottomSheetFullBottomDivider.fadOutAnimation(300)
+				bottomSheetFullControllerFrame.fadOutAnimation(300)
+				bottomSheetActionBar.fadOutAnimation(300)
+			} else if (bottomSheetPlaylistButton.isChecked) {
+				triggerLock = true
+				bottomSheetPlaylistButton.isChecked = false
+				bottomSheetFullPlaylistFrame.fadOutAnimation(300)
+				bottomSheetFullControllerFrame.fadOutAnimation(300)
+				bottomSheetFullLyricRecyclerView.fadInAnimation(300)
+				bottomSheetFullBottomDivider.fadOutAnimation(300)
+				bottomSheetActionBar.fadOutAnimation(300)
+			} else {
+				changeMovableFrame(true)
+				bottomSheetFullHeaderFrame.fadOutAnimation(300, View.GONE)
+				bottomSheetFullLyricRecyclerView.fadOutAnimation(300, View.GONE)
+				bottomSheetFullControllerFrame.fadInAnimation(300)
+				bottomSheetFullBottomDivider.fadInAnimation(300)
+				bottomSheetActionBar.fadInAnimation(300)
 			}
 		}
 
@@ -360,20 +410,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		}
 	}
 
-	override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-		refreshSettings(key)
-		if (key == "lyric_center" || key == "lyric_bold") {
-			@Suppress("NotifyDataSetChanged")
-			bottomSheetFullLyricAdapter.notifyDataSetChanged()
-		}
-	}
-
-	private fun refreshSettings(key: String?) {
-		if (key == null || key == "lyric_center" || key == "lyric_bold") {
-			bottomSheetFullLyricAdapter.updateLyricStatus()
-		}
-	}
-
 	fun onStart(cf: ListenableFuture<MediaController>) {
 		controllerFuture = cf
 		controllerFuture!!.addListener({
@@ -395,16 +431,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		runnableRunning = false
 		instance?.removeListener(this)
 		controllerFuture = null
-	}
-
-	override fun setPadding(left: Int, top: Int, right: Int, bottom: Int) {
-		super.setPadding(left, top, right, bottom)
-		// this is to enable edge to edge for lyric view with some trickery
-		bottomSheetFullLyricRecyclerView.updateLayoutParams<MarginLayoutParams> {
-			topMargin = -top
-			bottomMargin = -bottom
-		}
-		bottomSheetFullLyricRecyclerView.setPadding(0, top, 0, bottom)
 	}
 
 	@SuppressLint("NotifyDataSetChanged")
@@ -586,23 +612,16 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 	private inner class LyricAdapter(
 		private val lyricList: MutableList<MediaStoreUtils.Lyric>
-	) : MyRecyclerView.Adapter<LyricAdapter.ViewHolder>() {
+	) : RecyclerView.Adapter<LyricAdapter.ViewHolder>() {
 
-		private var defaultTextColor = MaterialColors.getColor(
-			activity,
-			com.google.android.material.R.attr.colorPrimaryVariant,
-			-1
-		)
+		private var defaultTextColor =
+			Color.parseColor("#33FFFFFF")
 
-		private var highlightTextColor = MaterialColors.getColor(
-			activity,
-			com.google.android.material.R.attr.colorPrimary,
-			-1
-		)
+		private var highlightTextColor =
+			Color.parseColor("#FFFFFF")
 
 		var currentFocusPos = -1
 		private var currentTranslationPos = -1
-		private var isBoldEnabled = false
 		private var isLyricCentered = false
 
 		override fun onCreateViewHolder(
@@ -615,7 +634,15 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 					.inflate(R.layout.lyrics, parent, false),
 			)
 
-		override fun onBindViewHolder(holder: LyricAdapter.ViewHolder, position: Int) {
+		override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+		}
+
+		override fun onBindViewHolder(
+			holder: LyricAdapter.ViewHolder,
+			position: Int,
+			payloads: MutableList<Any>
+		) {
+
 			val lyric = lyricList[position]
 
 			with(holder.lyricCard) {
@@ -635,19 +662,13 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				visibility = if (lyric.content.isNotEmpty()) View.VISIBLE else View.GONE
 				text = lyric.content
 
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && isBoldEnabled) {
-					this.typeface = Typeface.create(null, 700, false)
-				} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-					this.typeface = Typeface.create(null, 500, false)
-				}
-
 				if (isLyricCentered) {
 					this.gravity = Gravity.CENTER
 				} else {
 					this.gravity = Gravity.START
 				}
 
-				val textSize = if (lyric.isTranslation) 20f else 28f
+				val textSize = if (lyric.isTranslation) 20f else 32f
 				val paddingTop = (if (lyric.isTranslation) 2 else 18).dpToPx(context)
 				val paddingBottom = (if (position + 1 < lyricList.size &&
 					lyricList[position + 1].isTranslation
@@ -656,20 +677,63 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				this.textSize = textSize
 				setPadding(10.dpToPx(context), paddingTop, 10.dpToPx(context), paddingBottom)
 
-				val isFocus = position == currentFocusPos || position == currentTranslationPos
-				setTextColor(if (isFocus) highlightTextColor else defaultTextColor)
+				this.pivotX = 0f
+				this.pivotY = this.height.toFloat()
+
+				val sizeFactor = 1.03f
+
+				if (payloads.isNotEmpty() && payloads[0] == LYRIC_SET_HIGHLIGHT) {
+					val animator = ValueAnimator.ofFloat(1f, sizeFactor)
+
+					animator.addUpdateListener { animation ->
+						val animatedValue = animation.animatedValue as Float
+						this.scaleX = animatedValue
+						this.scaleY = animatedValue
+					}
+
+					animator.duration = LYRIC_TRANSIT_DURATION
+					animator.interpolator = interpolator
+					animator.start()
+
+					val animator1 = ValueAnimator.ofArgb(defaultTextColor, highlightTextColor)
+					animator1.addUpdateListener { animation ->
+						val animatedValue = animation.animatedValue as Int
+						this.setTextColor(animatedValue)
+					}
+					animator1.duration = LYRIC_TRANSIT_DURATION
+					animator1.interpolator = interpolator
+					animator1.start()
+				} else if (payloads.isNotEmpty() && payloads[0] == LYRIC_REMOVE_HIGHLIGHT) {
+					val animator = ValueAnimator.ofFloat(sizeFactor, 1f)
+
+					animator.addUpdateListener { animation ->
+						val animatedValue = animation.animatedValue as Float
+						this.scaleX = animatedValue
+						this.scaleY = animatedValue
+					}
+
+					animator.duration = LYRIC_TRANSIT_DURATION
+					animator.interpolator = interpolator
+					animator.start()
+
+					val animator1 = ValueAnimator.ofArgb(highlightTextColor, defaultTextColor)
+					animator1.addUpdateListener { animation ->
+						val animatedValue = animation.animatedValue as Int
+						this.setTextColor(animatedValue)
+					}
+					animator1.duration = LYRIC_TRANSIT_DURATION
+					animator1.interpolator = interpolator
+					animator1.start()
+				} else if (position == currentFocusPos || position == currentTranslationPos) {
+					this.scaleX = sizeFactor
+					this.scaleY = sizeFactor
+					this.setTextColor(highlightTextColor)
+				} else {
+					this.scaleX = 1.0f
+					this.scaleY = 1.0f
+					this.setTextColor(defaultTextColor)
+				}
 			}
-		}
-
-		override fun onAttachedToRecyclerView(recyclerView: MyRecyclerView) {
-			super.onAttachedToRecyclerView(recyclerView)
-			updateLyricStatus()
-		}
-
-		fun updateLyricStatus() {
-			isBoldEnabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P &&
-					prefs.getBooleanStrict("lyric_bold", false)
-			isLyricCentered = prefs.getBooleanStrict("lyric_center", false)
 		}
 
 		override fun getItemCount(): Int = lyricList.size
@@ -685,21 +749,21 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			if (currentFocusPos == position) return
 			if (position >= 0) {
 				currentFocusPos.let {
-					notifyItemChanged(it)
+					notifyItemChanged(it, LYRIC_REMOVE_HIGHLIGHT)
 					currentFocusPos = position
-					notifyItemChanged(currentFocusPos)
+					notifyItemChanged(currentFocusPos, LYRIC_SET_HIGHLIGHT)
 				}
 
 				if (position + 1 < lyricList.size &&
 					lyricList[position + 1].isTranslation
 				) {
 					currentTranslationPos.let {
-						notifyItemChanged(it)
+						notifyItemChanged(it, LYRIC_REMOVE_HIGHLIGHT)
 						currentTranslationPos = position + 1
-						notifyItemChanged(currentTranslationPos)
+						notifyItemChanged(currentTranslationPos, LYRIC_SET_HIGHLIGHT)
 					}
 				} else if (currentTranslationPos != -1) {
-					notifyItemChanged(currentTranslationPos)
+					notifyItemChanged(currentTranslationPos, LYRIC_REMOVE_HIGHLIGHT)
 					currentTranslationPos = -1
 				}
 			} else {
@@ -806,6 +870,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				bottomSheetFullLyricLinearLayoutManager.startSmoothScroll(
 					smoothScroller
 				)
+
 				bottomSheetFullLyricAdapter.updateHighlight(newIndex)
 			}
 		}
@@ -820,13 +885,13 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				boxEnd: Int,
 				snapPreference: Int
 			): Int {
-				return (super.calculateDtToFit(
+				return super.calculateDtToFit(
 					viewStart,
 					viewEnd,
 					boxStart,
 					boxEnd,
 					snapPreference
-				) + context.resources.displayMetrics.heightPixels / 3).coerceAtMost(viewEnd)
+				) + 36.dpToPx(context)
 			}
 
 			override fun getVerticalSnapPreference(): Int {

@@ -128,8 +128,6 @@
         android:id="@+id/blend"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:clipChildren="false"
         android:scrollbars="none" />
 
     <!-- Full Player -->
@@ -139,8 +137,6 @@
         android:layout_height="match_parent"
         android:alpha="0"
         android:visibility="gone"
-        android:fitsSystemWindows="true"
-        android:clipToPadding="false"
-        android:clipChildren="false"/>
+        android:fitsSystemWindows="true" />
 
 </merge>

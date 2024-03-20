@@ -57,8 +57,6 @@ import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.GramophonePlaybackService
-import org.akanework.gramophone.logic.fadInAnimation
-import org.akanework.gramophone.logic.fadOutAnimation
 import org.akanework.gramophone.logic.getBooleanStrict
 import org.akanework.gramophone.logic.gramophoneApplication
 import org.akanework.gramophone.logic.playOrPause
@@ -270,43 +268,19 @@ class PlayerBottomSheet private constructor(
                 standardBottomSheetBehavior!!.state = BottomSheetBehavior.STATE_COLLAPSED }
             bottomSheetBackCallback = object : OnBackPressedCallback(enabled = false) {
                 override fun handleOnBackStarted(backEvent: BackEventCompat) {
-                    if (fullPlayer.bottomSheetFullLyricRecyclerView.visibility ==
-                        View.VISIBLE
-                    ) {
-                        fullPlayer.bottomSheetFullLyricRecyclerView.fadOutAnimation(FullBottomSheet.LYRIC_FADE_TRANSITION_SEC)
-                    } else {
-                        standardBottomSheetBehavior!!.startBackProgress(backEvent)
-                    }
+                    standardBottomSheetBehavior!!.startBackProgress(backEvent)
                 }
 
                 override fun handleOnBackProgressed(backEvent: BackEventCompat) {
-                    if (fullPlayer.bottomSheetFullLyricRecyclerView.visibility ==
-                        View.VISIBLE
-                    ) {
-                        // TODO
-                    } else {
-                        standardBottomSheetBehavior!!.updateBackProgress(backEvent)
-                    }
+                    standardBottomSheetBehavior!!.updateBackProgress(backEvent)
                 }
 
                 override fun handleOnBackPressed() {
-                    if (fullPlayer.bottomSheetFullLyricRecyclerView.visibility ==
-                        View.VISIBLE
-                    ) {
-                        fullPlayer.bottomSheetFullLyricRecyclerView.fadOutAnimation(FullBottomSheet.LYRIC_FADE_TRANSITION_SEC)
-                    } else {
-                        standardBottomSheetBehavior!!.handleBackInvoked()
-                    }
+                    standardBottomSheetBehavior!!.handleBackInvoked()
                 }
 
                 override fun handleOnBackCancelled() {
-                    if (fullPlayer.bottomSheetFullLyricRecyclerView.visibility ==
-                        View.VISIBLE
-                    ) {
-                        fullPlayer.bottomSheetFullLyricRecyclerView.fadInAnimation(FullBottomSheet.LYRIC_FADE_TRANSITION_SEC)
-                    } else {
-                        standardBottomSheetBehavior!!.cancelBackProgress()
-                    }
+                    standardBottomSheetBehavior!!.cancelBackProgress()
                 }
             }
             /*
