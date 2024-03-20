@@ -2,7 +2,8 @@
     android:width="32dp"
     android:height="32dp"
     android:viewportWidth="32"
-    android:viewportHeight="32">
+    android:viewportHeight="32"
+    android:tint="@color/contrast_colorOnSurface">
   <group>
     <clip-path
         android:pathData="M4.193,7.416h23.965v17.145h-23.965z"/>
