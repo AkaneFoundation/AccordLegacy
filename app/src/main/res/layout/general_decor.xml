@@ -71,7 +71,7 @@
             app:icon="@drawable/ic_apple_sort"
             app:iconGravity="textStart"
             app:iconPadding="0dp"
-            app:iconSize="22dp"
+            app:iconSize="24dp"
             app:iconTint="@color/contrast_colorOnSurface" />
 
 

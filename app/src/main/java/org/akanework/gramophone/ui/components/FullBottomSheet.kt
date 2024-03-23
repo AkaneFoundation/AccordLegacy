@@ -240,6 +240,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			if (bottomSheetFullLyricButton.isChecked) {
 				bottomSheetFullLyricButton.isChecked = false
 			}
+			if (bottomSheetPlaylistButton.isChecked) {
+				bottomSheetPlaylistButton.isChecked = false
+			}
 		}
 
 		bottomSheetPlaylistButton.addOnCheckedChangeListener { _, isChecked ->
@@ -620,6 +623,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		private var highlightTextColor =
 			Color.parseColor("#FFFFFF")
 
+		private val sizeFactor = 1.03f
+
 		var currentFocusPos = -1
 		private var currentTranslationPos = -1
 		private var isLyricCentered = false
@@ -679,8 +684,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 				this.pivotX = 0f
 				this.pivotY = this.height.toFloat()
-
-				val sizeFactor = 1.03f
 
 				if (payloads.isNotEmpty() && payloads[0] == LYRIC_SET_HIGHLIGHT) {
 					val animator = ValueAnimator.ofFloat(1f, sizeFactor)

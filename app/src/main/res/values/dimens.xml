@@ -7,18 +7,20 @@
     <dimen name="list_round_corner_size">0dp</dimen>
     <dimen name="grid_round_corner_size">0dp</dimen>
     <dimen name="tab_layout_content_padding">12dp</dimen>
-    <dimen name="grid_card_side_padding">12dp</dimen>
+    <dimen name="grid_card_side_padding">10dp</dimen>
     <!-- https://github.com/zhanghai/AndroidFastScroll/issues/3 -->
     <dimen name="afs_min_touch_target_size">24dp</dimen>
     <dimen name="decor_height">48dp</dimen>
-    <dimen name="list_height">76dp</dimen>
+    <dimen name="list_height">66dp</dimen>
+    <dimen name="list_height_larger">80dp</dimen>
     <dimen name="grid_card_label_height">45dp</dimen>
     <dimen name="grid_card_margin_top">8dp</dimen>
-    <dimen name="grid_card_margin_label">12.5dp</dimen>
-    <dimen name="grid_card_padding_bottom">24dp</dimen>
+    <dimen name="grid_card_margin_label">7.5dp</dimen>
+    <dimen name="grid_card_padding_bottom">12dp</dimen>
     <dimen name="afs_md2_popup_min_width">78dp</dimen>
     <dimen name="afs_md2_popup_min_height">64dp</dimen>
     <dimen name="afs_md2_popup_margin_end">14dp</dimen>
     <dimen name="afs_md2_popup_elevation">3dp</dimen>
     <dimen name="afs_md2_popup_text_size">34dp</dimen>
+    <dimen name="list_height_artist">60dp</dimen>
 </resources>

@@ -39,7 +39,8 @@ import kotlin.random.Random
 open class BaseDecorAdapter<T : BaseAdapter<*>>(
     protected val adapter: T,
     private val pluralStr: Int,
-    private val isSubFragment: Boolean = false
+    private val isSubFragment: Boolean = false,
+    private val isPrivateLayout: Boolean = false,
 ) : MyRecyclerView.Adapter<BaseDecorAdapter<T>.ViewHolder>(), ItemHeightHelper {
 
     protected val context: Context = adapter.context
@@ -80,15 +81,16 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
             )
             val layoutMap = mapOf(
                 Pair(R.id.compact_list, BaseAdapter.LayoutType.COMPACT_LIST),
+                Pair(R.id.list, BaseAdapter.LayoutType.LIST),
                 Pair(R.id.grid, BaseAdapter.LayoutType.GRID)
             )
             buttonMap.forEach {
                 popupMenu.menu.findItem(it.key).isVisible = adapter.sortTypes.contains(it.value)
             }
             layoutMap.forEach {
-                popupMenu.menu.findItem(it.key).isVisible = adapter.ownsView
+                popupMenu.menu.findItem(it.key).isVisible = adapter.ownsView && !isPrivateLayout
             }
-            popupMenu.menu.findItem(R.id.display).isVisible = adapter.ownsView
+            popupMenu.menu.findItem(R.id.display).isVisible = adapter.ownsView && !isPrivateLayout
             if (adapter.sortType != Sorter.Type.None) {
                 when (adapter.sortType) {
                     in buttonMap.values -> {
@@ -101,7 +103,7 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
                     else -> throw IllegalStateException("Invalid sortType ${adapter.sortType.name}")
                 }
             }
-            if (adapter.ownsView) {
+            if (adapter.ownsView && !isPrivateLayout) {
                 when (adapter.layoutType) {
                     in layoutMap.values -> {
                         popupMenu.menu.findItem(

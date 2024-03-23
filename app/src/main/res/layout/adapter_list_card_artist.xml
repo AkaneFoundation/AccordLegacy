@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/list_height"
+    android:layout_height="@dimen/list_height_artist"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
@@ -21,9 +21,9 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_gravity="center_vertical"
-            app:cardCornerRadius="4dp"
+            app:cardCornerRadius="128dp"
             app:strokeWidth="1dp"
-            app:strokeColor="@color/contrast_colorOutline">
+            app:strokeColor="#0DFFFFFF">
 
             <ImageView
                 android:id="@+id/cover"
@@ -55,18 +55,6 @@
                 android:textSize="17sp"
                 tools:targetApi="p"
                 tools:text="Example Title" />
-
-            <TextView
-                android:id="@+id/artist"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:textColor="@color/contrast_colorOnSurfaceSecondary"
-                android:textFontWeight="400"
-                android:fontFamily="sans-serif"
-                android:textSize="12sp"
-                tools:targetApi="p"
-                tools:text="Example Artist" />
 
         </LinearLayout>
 

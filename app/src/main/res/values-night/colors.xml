@@ -6,6 +6,7 @@
     <color name="contrast_colorBackgroundContainer">#0F0F0F</color>
     <color name="contrast_colorOnSurfaceFainted">#80FFFFFF</color>
     <color name="contrast_colorOnSurfaceSecondary">#B3FFFFFF</color>
+    <color name="contrast_colorOutline">#0DFFFFFF</color>
 
     <!-- Fallback -->
     <color name="md_theme_primary">#C6C6C6</color>

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/list_height"
+    android:layout_height="@dimen/list_height_larger"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
@@ -18,8 +18,8 @@
 
         <com.google.android.material.card.MaterialCardView
             style="?materialCardViewFilledStyle"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
             android:layout_gravity="center_vertical"
             app:cardCornerRadius="4dp"
             app:strokeWidth="1dp"
@@ -56,18 +56,6 @@
                 tools:targetApi="p"
                 tools:text="Example Title" />
 
-            <TextView
-                android:id="@+id/artist"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:textColor="@color/contrast_colorOnSurfaceSecondary"
-                android:textFontWeight="400"
-                android:fontFamily="sans-serif"
-                android:textSize="12sp"
-                tools:targetApi="p"
-                tools:text="Example Artist" />
-
         </LinearLayout>
 
     </LinearLayout>
@@ -95,7 +83,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_marginStart="90dp"
+        android:layout_marginStart="106dp"
         app:dividerThickness="0.5dp"
         app:dividerColor="@color/contrast_colorBackgroundContainer" />
 

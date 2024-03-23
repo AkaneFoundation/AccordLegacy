@@ -20,12 +20,14 @@
         android:layout_height="0dp"
         android:layout_marginTop="@dimen/grid_card_margin_top"
         android:layout_marginHorizontal="@dimen/grid_card_side_padding"
-        app:cardCornerRadius="@dimen/grid_round_corner_size"
+        app:cardCornerRadius="6dp"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/linearLayout">
+        app:layout_constraintBottom_toTopOf="@id/linearLayout"
+        app:strokeWidth="1.2dp"
+        app:strokeColor="@color/contrast_colorOutline">
 
         <ImageView
             android:id="@+id/cover"

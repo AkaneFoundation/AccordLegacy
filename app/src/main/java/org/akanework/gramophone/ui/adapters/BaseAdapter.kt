@@ -42,6 +42,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.divider.MaterialDivider
 import kotlinx.coroutines.sync.Semaphore
 import me.zhanghai.android.fastscroll.PopupTextProvider
 import org.akanework.gramophone.R
@@ -70,7 +71,8 @@ abstract class BaseAdapter<T>(
     private val rawOrderExposed: Boolean = false,
     private val allowDiffUtils: Boolean = false,
     private val canSort: Boolean = true,
-    private val fallbackSpans: Int = 1
+    private val fallbackSpans: Int = 1,
+    val isPrivateLayout: Boolean = false,
 ) : AdapterFragment.BaseInterface<BaseAdapter<T>.ViewHolder>(), Observer<List<T>>,
     PopupTextProvider, ItemHeightHelper {
 
@@ -80,6 +82,8 @@ abstract class BaseAdapter<T>(
         private var gridHeightCache = 0
     }
     private val listHeight = context.resources.getDimensionPixelSize(R.dimen.list_height)
+    private val listHeightLarger = context.resources.getDimensionPixelSize(R.dimen.list_height_larger)
+    private val listHeightArtist = context.resources.getDimensionPixelSize(R.dimen.list_height_artist)
     private var gridHeight: Int? = null
     private val sorter = Sorter(sortHelper, naturalOrderHelper, rawOrderExposed)
     val decorAdapter by lazy { createDecorAdapter() }
@@ -179,8 +183,9 @@ abstract class BaseAdapter<T>(
     ) : RecyclerView.ViewHolder(view) {
         val songCover: ImageView = view.findViewById(R.id.cover)
         val title: TextView = view.findViewById(R.id.title)
-        val subTitle: TextView = view.findViewById(R.id.artist)
+        val subTitle: TextView? = view.findViewById(R.id.artist)
         val moreButton: MaterialButton = view.findViewById(R.id.more)
+        val divider: MaterialDivider? = view.findViewById(R.id.divider_list)
     }
 
     fun getFrozenList(): List<T> {
@@ -328,13 +333,15 @@ abstract class BaseAdapter<T>(
     }
 
     protected open fun createDecorAdapter(): BaseDecorAdapter<out BaseAdapter<T>> {
-        return BaseDecorAdapter(this, pluralStr, isSubFragment)
+        return BaseDecorAdapter(this, pluralStr, isSubFragment, isPrivateLayout)
     }
 
     override fun getItemViewType(position: Int): Int {
         return when (layoutType) {
             LayoutType.GRID -> R.layout.adapter_grid_card
             LayoutType.COMPACT_LIST -> R.layout.adapter_list_card
+            LayoutType.ARTIST_LIST -> R.layout.adapter_list_card_artist
+            LayoutType.LIST -> R.layout.adapter_list_card_larger
             else -> throw IllegalArgumentException()
         }
     }
@@ -350,7 +357,7 @@ abstract class BaseAdapter<T>(
         }
         val item = list[position]
         holder.title.text = titleOf(item) ?: virtualTitleOf(item)
-        holder.subTitle.text = subTitleOf(item)
+        holder.subTitle?.text = subTitleOf(item)
         Glide
             .with(holder.songCover.context)
             .load(coverOf(item))
@@ -362,6 +369,9 @@ abstract class BaseAdapter<T>(
             val popupMenu = PopupMenu(it.context, it)
             onMenu(item, popupMenu)
             popupMenu.show()
+        }
+        if (layoutType == LayoutType.COMPACT_LIST && (this.itemCount == 1 || position == itemCount - 1)) {
+            holder.divider!!.visibility = View.GONE
         }
     }
 
@@ -465,7 +475,7 @@ abstract class BaseAdapter<T>(
     }
 
     enum class LayoutType {
-        NONE, COMPACT_LIST, GRID
+        NONE, COMPACT_LIST, GRID, ARTIST_LIST, LIST
     }
 
     open class StoreItemHelper<T : MediaStoreUtils.Item>(
@@ -496,6 +506,8 @@ abstract class BaseAdapter<T>(
         return count.toInt() * when (layoutType) {
             LayoutType.GRID -> gridHeight ?: gridHeightCache
             LayoutType.COMPACT_LIST -> listHeight
+            LayoutType.ARTIST_LIST -> listHeightArtist
+            LayoutType.LIST -> listHeightLarger
             else -> throw IllegalArgumentException()
         }
     }

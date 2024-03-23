@@ -43,7 +43,8 @@ class ArtistAdapter(
     initialSortType = Sorter.Type.ByTitleAscending,
     pluralStr = R.plurals.artists,
     ownsView = true,
-    defaultLayoutType = LayoutType.COMPACT_LIST
+    defaultLayoutType = LayoutType.ARTIST_LIST,
+    isPrivateLayout = true
 ) {
 
     override fun virtualTitleOf(item: MediaStoreUtils.Artist): String {
@@ -117,7 +118,7 @@ class ArtistAdapter(
 
     private class ArtistDecorAdapter(
         artistAdapter: ArtistAdapter
-    ) : BaseDecorAdapter<ArtistAdapter>(artistAdapter, R.plurals.artists) {
+    ) : BaseDecorAdapter<ArtistAdapter>(artistAdapter, R.plurals.artists, isPrivateLayout = true) {
 
         override fun onSortButtonPressed(popupMenu: PopupMenu) {
             popupMenu.menu.findItem(R.id.album_artist).isVisible = true

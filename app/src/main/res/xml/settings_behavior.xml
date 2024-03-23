@@ -22,14 +22,13 @@
         android:layout="@layout/preference_category_md">
         <SeekBarPreference
             android:defaultValue="@integer/filter_default_sec"
-            android:icon="@drawable/filter_art"
+            android:icon="@drawable/ic_filter_alt"
             android:key="mediastore_filter"
             android:layout="@layout/preference_seekbar"
             android:max="120"
             android:title="@string/settings_mediastore_filter"
             app:showSeekBarValue="true" />
         <Preference
-            android:icon="@drawable/ic_filter_none"
             android:key="blacklist"
             android:layout="@layout/basic_preference_iconless"
             android:title="@string/settings_blacklist_folder"
