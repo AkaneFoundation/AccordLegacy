@@ -1,6 +1,7 @@
 package org.akanework.gramophone.ui.components
 
 import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
@@ -55,13 +56,13 @@ class BlendBackgroundView(context: Context, attrs: AttributeSet?, defStyleAttr: 
         imageViewBG = findViewById(R.id.bg)
         rotateFrame = findViewById(R.id.rotate_frame)
         blurView = findViewById(R.id.blur_view)
-        initializeRotationAnimation(imageViewTS, 0f, 360f, 84000)
-        initializeRotationAnimation(imageViewTE, 40f, 400f, 910000)
-        initializeRotationAnimation(imageViewBS, 120f, 480f, 88000)
-        initializeRotationAnimation(imageViewBE, 80f, 440f, 970000)
-        initializeRotationAnimation(imageViewC, 360f, 0f, 127000)
-        initializeRotationAnimation(rotateFrame, 360f, 0f, 127000)
-        setUpBlurView(blurView, this, 80f)
+        initializeRotationAnimation(imageViewTS, 0f, 360f, 64000)
+        initializeRotationAnimation(imageViewTE, 40f, 400f, 60000)
+        initializeRotationAnimation(imageViewBS, 120f, 480f, 68000)
+        initializeRotationAnimation(imageViewBE, 80f, 440f, 70000)
+        initializeRotationAnimation(imageViewC, 360f, 0f, 107000)
+        initializeRotationAnimation(rotateFrame, 360f, 0f, 107000)
+        setUpBlurView(blurView, this, 128f)
     }
 
     fun setImageUri(uri: Uri) {
@@ -82,6 +83,20 @@ class BlendBackgroundView(context: Context, attrs: AttributeSet?, defStyleAttr: 
                 imageViewBG.scaleType = ImageView.ScaleType.CENTER_CROP
             }
         }
+    }
+
+    fun animateBlurRadius(enlarge: Boolean, duration: Long) {
+        val fromVal = if (enlarge) 80f else 128f
+        val toVal = if (enlarge) 128f else 80f
+        val animator = ValueAnimator.ofFloat(fromVal, toVal)
+        animator.apply {
+            addUpdateListener {
+                val radius = it.animatedValue as Float
+                blurView.setBlurRadius(radius)
+            }
+            this.duration = duration
+        }
+        animator.start()
     }
 
     private fun initializeRotationAnimation(

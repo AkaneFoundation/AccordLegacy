@@ -266,6 +266,7 @@ class PlayerBottomSheet private constructor(
             standardBottomSheetBehavior = MyBottomSheetBehavior.from(this)
             fullPlayer.minimize = {
                 standardBottomSheetBehavior!!.state = BottomSheetBehavior.STATE_COLLAPSED }
+            fullPlayer.bottomSheetFullBlendBackgroundView = bottomSheetBlendBackgroundView
             bottomSheetBackCallback = object : OnBackPressedCallback(enabled = false) {
                 override fun handleOnBackStarted(backEvent: BackEventCompat) {
                     standardBottomSheetBehavior!!.startBackProgress(backEvent)
@@ -311,6 +312,7 @@ class PlayerBottomSheet private constructor(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         fullPlayer.minimize = null
+        fullPlayer.bottomSheetFullBlendBackgroundView = null
         lifecycleOwner.lifecycle.removeObserver(this)
         standardBottomSheetBehavior!!.removeBottomSheetCallback(bottomSheetCallback)
         bottomSheetBackCallback!!.remove()

@@ -87,6 +87,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	companion object {
 		const val SLIDER_UPDATE_INTERVAL: Long = 100
 		const val LYRIC_TRANSIT_DURATION: Long = 500
+		const val VIEW_TRANSIT_DURATION: Long = 350
 		const val LYRIC_REMOVE_HIGHLIGHT: Int = 0
 		const val LYRIC_SET_HIGHLIGHT: Int = 1
 	}
@@ -145,6 +146,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private var playlistNowPlaying: TextView? = null
 	private var playlistNowPlayingCover: ImageView? = null
 	private var triggerLock: Boolean = false
+	var bottomSheetFullBlendBackgroundView: BlendBackgroundView? = null
 
 	init {
 		inflate(context, R.layout.full_player, this)
@@ -253,19 +255,22 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			if (isChecked && !bottomSheetFullLyricButton.isChecked) {
 				changeMovableFrame(false)
 				bottomSheetFullPlaylistRecyclerView.scrollToPosition(instance?.currentMediaItemIndex ?: 0)
-				bottomSheetFullHeaderFrame.fadInAnimation(300)
-				bottomSheetFullPlaylistFrame.fadInAnimation(300)
+				bottomSheetFullHeaderFrame.fadInAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullPlaylistFrame.fadInAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullBlendBackgroundView?.animateBlurRadius(false, VIEW_TRANSIT_DURATION)
 			} else if (bottomSheetFullLyricButton.isChecked) {
 				triggerLock = true
 				bottomSheetFullLyricButton.isChecked = false
-				bottomSheetFullLyricRecyclerView.fadOutAnimation(300)
-				bottomSheetFullControllerFrame.fadInAnimation(300)
-				bottomSheetFullPlaylistFrame.fadInAnimation(300)
-				bottomSheetFullBottomDivider.fadInAnimation(300)
+				bottomSheetFullLyricRecyclerView.fadOutAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullControllerFrame.fadInAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullPlaylistFrame.fadInAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullBottomDivider.fadInAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetActionBar.fadInAnimation(VIEW_TRANSIT_DURATION)
 			} else {
 				changeMovableFrame(true)
-				bottomSheetFullHeaderFrame.fadOutAnimation(300, View.GONE)
-				bottomSheetFullPlaylistFrame.fadOutAnimation(300, View.GONE)
+				bottomSheetFullHeaderFrame.fadOutAnimation(VIEW_TRANSIT_DURATION, View.GONE)
+				bottomSheetFullPlaylistFrame.fadOutAnimation(VIEW_TRANSIT_DURATION, View.GONE)
+				bottomSheetFullBlendBackgroundView?.animateBlurRadius(true, VIEW_TRANSIT_DURATION)
 			}
 		}
 
@@ -276,26 +281,28 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			}
 			if (isChecked && !bottomSheetPlaylistButton.isChecked) {
 				changeMovableFrame(false)
-				bottomSheetFullHeaderFrame.fadInAnimation(300)
-				bottomSheetFullLyricRecyclerView.fadInAnimation(300)
-				bottomSheetFullBottomDivider.fadOutAnimation(300)
-				bottomSheetFullControllerFrame.fadOutAnimation(300)
-				bottomSheetActionBar.fadOutAnimation(300)
+				bottomSheetFullHeaderFrame.fadInAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullLyricRecyclerView.fadInAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullBottomDivider.fadOutAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullControllerFrame.fadOutAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetActionBar.fadOutAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullBlendBackgroundView?.animateBlurRadius(false, VIEW_TRANSIT_DURATION)
 			} else if (bottomSheetPlaylistButton.isChecked) {
 				triggerLock = true
 				bottomSheetPlaylistButton.isChecked = false
-				bottomSheetFullPlaylistFrame.fadOutAnimation(300)
-				bottomSheetFullControllerFrame.fadOutAnimation(300)
-				bottomSheetFullLyricRecyclerView.fadInAnimation(300)
-				bottomSheetFullBottomDivider.fadOutAnimation(300)
-				bottomSheetActionBar.fadOutAnimation(300)
+				bottomSheetFullPlaylistFrame.fadOutAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullControllerFrame.fadOutAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullLyricRecyclerView.fadInAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullBottomDivider.fadOutAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetActionBar.fadOutAnimation(VIEW_TRANSIT_DURATION)
 			} else {
 				changeMovableFrame(true)
-				bottomSheetFullHeaderFrame.fadOutAnimation(300, View.GONE)
-				bottomSheetFullLyricRecyclerView.fadOutAnimation(300, View.GONE)
-				bottomSheetFullControllerFrame.fadInAnimation(300)
-				bottomSheetFullBottomDivider.fadInAnimation(300)
-				bottomSheetActionBar.fadInAnimation(300)
+				bottomSheetFullHeaderFrame.fadOutAnimation(VIEW_TRANSIT_DURATION, View.GONE)
+				bottomSheetFullLyricRecyclerView.fadOutAnimation(VIEW_TRANSIT_DURATION, View.GONE)
+				bottomSheetFullControllerFrame.fadInAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullBottomDivider.fadInAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetActionBar.fadInAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullBlendBackgroundView?.animateBlurRadius(true, VIEW_TRANSIT_DURATION)
 			}
 		}
 
@@ -351,7 +358,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		endView = bottomSheetFullPlaylistCoverFrame
 		addTarget(bottomSheetFullPlaylistCoverFrame)
 		scrimColor = Color.TRANSPARENT
-		duration = 300
+		duration = VIEW_TRANSIT_DURATION
 	}
 
 	private val transformOut = MaterialContainerTransform().apply {
@@ -359,19 +366,19 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		endView = bottomSheetFullCoverFrame
 		addTarget(bottomSheetFullCoverFrame)
 		scrimColor = Color.TRANSPARENT
-		duration = 300
+		duration = VIEW_TRANSIT_DURATION
 	}
 
 	private fun changeMovableFrame(isVisible: Boolean) {
 		if (isVisible) {
-			bottomSheetFullTextLayout.fadInAnimation(300) {}
-			bottomSheetFullDragHandle.fadInAnimation(300) {}
+			bottomSheetFullTextLayout.fadInAnimation(VIEW_TRANSIT_DURATION) {}
+			bottomSheetFullDragHandle.fadInAnimation(VIEW_TRANSIT_DURATION) {}
 			TransitionManager.beginDelayedTransition(this, transformOut)
 			bottomSheetFullPlaylistCoverFrame.visibility = View.INVISIBLE
 			bottomSheetFullCoverFrame.visibility = View.VISIBLE
 		} else {
-			bottomSheetFullTextLayout.fadOutAnimation(300) {}
-			bottomSheetFullDragHandle.fadOutAnimation(300) {}
+			bottomSheetFullTextLayout.fadOutAnimation(VIEW_TRANSIT_DURATION) {}
+			bottomSheetFullDragHandle.fadOutAnimation(VIEW_TRANSIT_DURATION) {}
 			TransitionManager.beginDelayedTransition(this, transformIn)
 			bottomSheetFullPlaylistCoverFrame.visibility = View.VISIBLE
 			bottomSheetFullCoverFrame.visibility = View.INVISIBLE
@@ -809,7 +816,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				.with(holder.songCover.context)
 				.load(playlist[position].mediaMetadata.artworkUri)
 				.transition(DrawableTransitionOptions.withCrossFade())
-				.placeholder(R.drawable.ic_default_cover_locked)
+				.placeholder(R.drawable.ic_default_cover_fixed)
 				.into(holder.songCover)
 			holder.closeButton.setOnClickListener {
 				if (Build.VERSION.SDK_INT >= 23) {
