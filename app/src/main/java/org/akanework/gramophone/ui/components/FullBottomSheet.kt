@@ -61,6 +61,7 @@ import org.akanework.gramophone.logic.utils.MediaStoreUtils
 import org.akanework.gramophone.ui.MainActivity
 import kotlin.math.min
 
+@SuppressLint("SetTextI18n")
 class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
 	ConstraintLayout(context, attrs, defStyleAttr, defStyleRes), Player.Listener {
 	constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
@@ -334,6 +335,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				if (dest != null) {
 					bottomSheetFullPosition.text =
 						CalculationUtils.convertDurationToTimeStamp((value).toLong())
+					bottomSheetFullDuration.text =
+						'-' + CalculationUtils.convertDurationToTimeStamp(dest - (value).toLong())
 				}
 			}
 		}
@@ -351,6 +354,23 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetFullLyricRecyclerView.adapter =
 			bottomSheetFullLyricAdapter
 
+	}
+
+	fun isCoverFrameElevated(): Boolean = bottomSheetFullCoverFrame.elevation == 8.dpToPx(context).toFloat()
+
+	fun applyElevation(remove: Boolean) {
+		val animator = ValueAnimator.ofFloat(
+			if (remove) 8.dpToPx(context).toFloat() else 0f,
+			if (remove) 0f else 8.dpToPx(context).toFloat()
+		)
+		animator.apply {
+			addUpdateListener {
+				val value = it.animatedValue as Float
+				bottomSheetFullCoverFrame.elevation = value
+			}
+			duration = 200
+		}
+		animator.start()
 	}
 
 	private val transformIn = MaterialContainerTransform().apply {
@@ -443,7 +463,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		controllerFuture = null
 	}
 
-	@SuppressLint("NotifyDataSetChanged")
+	@SuppressLint("NotifyDataSetChanged", "SetTextI18n")
 	override fun onMediaItemTransition(
 		mediaItem: MediaItem?,
 		reason: Int
@@ -481,9 +501,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			bottomSheetFullPlaylistSubtitle.setTextAnimation(
 				mediaItem?.mediaMetadata?.artist ?: context.getString(R.string.unknown_artist), skipAnimation = firstTime
 			)
-			bottomSheetFullDuration.text =
-				mediaItem?.mediaMetadata?.extras?.getLong("Duration")
-					?.let { CalculationUtils.convertDurationToTimeStamp(it) }
 			if (playlistNowPlaying != null) {
 				playlistNowPlaying!!.text = mediaItem?.mediaMetadata?.title
 				Glide
@@ -506,13 +523,20 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				Glide.with(context.applicationContext).clear(playlistNowPlayingCover!!)
 			}
 		}
-		val position = CalculationUtils.convertDurationToTimeStamp(instance?.currentPosition ?: 0)
+		val currentPosition = instance?.currentPosition
+		val position = CalculationUtils.convertDurationToTimeStamp(currentPosition ?: 0)
 		val duration = instance?.currentMediaItem?.mediaMetadata?.extras?.getLong("Duration")
 		if (duration != null && !isUserTracking) {
 			bottomSheetFullSlider.valueTo = duration.toFloat()
 			bottomSheetFullSlider.value =
 				min(instance?.currentPosition?.toFloat() ?: 0f, bottomSheetFullSlider.valueTo)
 			bottomSheetFullPosition.text = position
+			bottomSheetFullDuration.text =
+				'-' +
+						CalculationUtils.convertDurationToTimeStamp(
+							instance?.currentMediaItem?.mediaMetadata?.extras?.getLong("Duration")
+								?.minus((currentPosition ?: 0)) ?: 0
+						)
 		}
 		updateLyric(duration)
 	}
@@ -914,16 +938,24 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		}
 
 	private val positionRunnable = object : Runnable {
+		@SuppressLint("SetTextI18n")
 		override fun run() {
 			if (!runnableRunning) return
+			val currentPosition = instance?.currentPosition
 			val position =
-				CalculationUtils.convertDurationToTimeStamp(instance?.currentPosition ?: 0)
+				CalculationUtils.convertDurationToTimeStamp(currentPosition ?: 0)
 			val duration = instance?.currentMediaItem?.mediaMetadata?.extras?.getLong("Duration")
 			if (duration != null && !isUserTracking) {
 				bottomSheetFullSlider.valueTo = duration.toFloat()
 				bottomSheetFullSlider.value =
 					min(instance?.currentPosition?.toFloat() ?: 0f, bottomSheetFullSlider.valueTo)
 				bottomSheetFullPosition.text = position
+				bottomSheetFullDuration.text =
+					'-' +
+					CalculationUtils.convertDurationToTimeStamp(
+						instance?.currentMediaItem?.mediaMetadata?.extras?.getLong("Duration")
+							?.minus((currentPosition ?: 0)) ?: 0
+					)
 			}
 			updateLyric(duration)
 			if (instance?.isPlaying == true) {

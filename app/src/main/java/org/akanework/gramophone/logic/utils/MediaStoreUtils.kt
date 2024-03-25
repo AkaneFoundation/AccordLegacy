@@ -19,7 +19,6 @@ package org.akanework.gramophone.logic.utils
 
 import android.app.RecoverableSecurityException
 import android.content.ContentUris
-import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
@@ -301,7 +300,6 @@ object MediaStoreUtils {
         val genreMap = hashMapOf<Long?, Genre>()
         val dateMap = hashMapOf<Int?, Date>()
         val playlists = mutableListOf<Pair<Playlist, MutableList<Long>>>()
-        var foundFavourites = false
         var foundPlaylistContent = false
         val albumIdToArtistMap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val map = hashMapOf<Long, Pair<Long, String?>>()
@@ -339,10 +337,7 @@ object MediaStoreUtils {
             while (it.moveToNext()) {
                 val playlistId = it.getLong(playlistIdColumn)
                 val playlistName = it.getString(playlistNameColumn)?.ifEmpty { null }.run {
-                    if (!foundFavourites && this == "gramophone_favourite") {
-                        foundFavourites = true
-                        context.getString(R.string.playlist_favourite)
-                    } else this
+                    this
                 }
                 val content = mutableListOf<Long>()
                 context.contentResolver.query(
@@ -609,40 +604,9 @@ object MediaStoreUtils {
                             "song for id $value in map with ${idMap.size} entries") })
             }
         }.toMutableList()
-        if (!foundFavourites) {
-            val values = ContentValues()
-            values.put(
-                @Suppress("DEPRECATION") MediaStore.Audio.Playlists.NAME,
-                "gramophone_favourite"
-            )
-            values.put(
-                @Suppress("DEPRECATION") MediaStore.Audio.Playlists.DATE_ADDED,
-                System.currentTimeMillis()
-            )
-            values.put(
-                @Suppress("DEPRECATION")
-                MediaStore.Audio.Playlists.DATE_MODIFIED,
-                System.currentTimeMillis()
-            )
-            val favPlaylistUri =
-                context.contentResolver.insert(
-                    @Suppress("DEPRECATION") MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
-                    values
-                )
-            if (favPlaylistUri != null) {
-                val playlistId = favPlaylistUri.lastPathSegment!!.toLong()
-                playlistsFinal.add(
-                    Playlist(
-                        playlistId,
-                        context.getString(R.string.playlist_favourite),
-                        mutableListOf()
-                    )
-                )
-            }
-        }
         playlistsFinal.add(RecentlyAdded(
             // TODO setting?
-            (System.currentTimeMillis() / 1000) - (2 * 7 * 24 * 60 * 60),
+            (System.currentTimeMillis() / 1000) - (7 * 24 * 60 * 60),
             recentlyAddedMap
         ))
         folders.addAll(folderFilter)

@@ -200,6 +200,7 @@ class PlayerBottomSheet private constructor(
                         WindowCompat.getInsetsController(activity.window, this@PlayerBottomSheet)
                             .isAppearanceLightStatusBars = true
                     }
+                    fullPlayer.applyElevation(true)
                 }
 
                 BottomSheetBehavior.STATE_DRAGGING, BottomSheetBehavior.STATE_SETTLING -> {
@@ -221,6 +222,9 @@ class PlayerBottomSheet private constructor(
                     fullPlayer.alpha = 1f
                     bottomSheetBlendBackgroundView.alpha = 1f
                     bottomSheetBackCallback!!.isEnabled = true
+                    if (!fullPlayer.isCoverFrameElevated()) {
+                        fullPlayer.applyElevation(false)
+                    }
                 }
 
                 BottomSheetBehavior.STATE_HIDDEN -> {

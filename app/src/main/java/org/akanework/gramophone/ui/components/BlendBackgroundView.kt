@@ -62,13 +62,13 @@ class BlendBackgroundView(context: Context, attrs: AttributeSet?, defStyleAttr: 
         initializeRotationAnimation(imageViewBE, 80f, 440f, 70000)
         initializeRotationAnimation(imageViewC, 360f, 0f, 107000)
         initializeRotationAnimation(rotateFrame, 360f, 0f, 107000)
-        setUpBlurView(blurView, this, 128f)
+        setUpBlurView(blurView, this, 160f)
     }
 
     fun setImageUri(uri: Uri) {
         val originalBitmap = getBitmapFromUri(context.contentResolver, uri)
         if (originalBitmap != null) {
-            enhanceSaturation(originalBitmap, 2f).let {
+            enhanceSaturation(originalBitmap, 3f).let {
                 imageViewTS.setImageBitmap(cropTopLeftQuarter(it))
                 imageViewTS.scaleType = ImageView.ScaleType.CENTER_CROP
                 imageViewTE.setImageBitmap(cropTopRightQuarter(it))
@@ -86,8 +86,8 @@ class BlendBackgroundView(context: Context, attrs: AttributeSet?, defStyleAttr: 
     }
 
     fun animateBlurRadius(enlarge: Boolean, duration: Long) {
-        val fromVal = if (enlarge) 80f else 128f
-        val toVal = if (enlarge) 128f else 80f
+        val fromVal = if (enlarge) 80f else 160f
+        val toVal = if (enlarge) 160f else 80f
         val animator = ValueAnimator.ofFloat(fromVal, toVal)
         animator.apply {
             addUpdateListener {
