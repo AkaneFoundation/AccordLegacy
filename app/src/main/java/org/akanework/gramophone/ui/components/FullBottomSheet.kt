@@ -3,7 +3,10 @@ package org.akanework.gramophone.ui.components
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -37,8 +40,7 @@ import com.bumptech.glide.request.transition.Transition
 import com.google.android.material.bottomsheet.BottomSheetDragHandleView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
-import com.google.android.material.divider.MaterialDivider
-import com.google.android.material.slider.Slider
+import com.google.android.material.slider.OverlaySlider
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import com.google.android.material.transition.MaterialContainerTransform
@@ -93,12 +95,12 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		const val LYRIC_SET_HIGHLIGHT: Int = 1
 	}
 
-	private val touchListener = object : Slider.OnSliderTouchListener {
-		override fun onStartTrackingTouch(slider: Slider) {
+	private val touchListener = object : OverlaySlider.OnSliderTouchListener {
+		override fun onStartTrackingTouch(slider: OverlaySlider) {
 			isUserTracking = true
 		}
 
-		override fun onStopTrackingTouch(slider: Slider) {
+		override fun onStopTrackingTouch(slider: OverlaySlider) {
 			// This value is multiplied by 1000 is because
 			// when the number is too big (like when toValue
 			// used the duration directly) we might encounter
@@ -114,6 +116,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private val bottomSheetFullCover: ImageView
 	private val bottomSheetFullTitle: TextView
 	private val bottomSheetFullSubtitle: TextView
+	private val bottomSheetFullSubtitleUnder: TextView
 	private val bottomSheetFullControllerButton: MaterialButton
 	private val bottomSheetFullNextButton: MaterialButton
 	private val bottomSheetFullPreviousButton: MaterialButton
@@ -125,11 +128,10 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private val bottomSheetTimerButton: MaterialButton
 	private val bottomSheetInfinityButton: MaterialButton
 	private val bottomSheetFullLyricButton: MaterialButton
-	private val bottomSheetFullSlider: Slider
+	private val bottomSheetFullSlider: OverlaySlider
 	private val bottomSheetFullCoverFrame: MaterialCardView
 	private val bottomSheetFullControllerFrame: ConstraintLayout
 	private val bottomSheetFullLyricRecyclerView: RecyclerView
-	private val bottomSheetFullBottomDivider: MaterialDivider
 	private val bottomSheetFullLyricList: MutableList<MediaStoreUtils.Lyric> = mutableListOf()
 	private val bottomSheetFullLyricAdapter: LyricAdapter = LyricAdapter(bottomSheetFullLyricList)
 	private val bottomSheetFullLyricLinearLayoutManager = LinearLayoutManager(context)
@@ -140,6 +142,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private val bottomSheetFullPlaylistCover: ImageView
 	private val bottomSheetFullPlaylistTitle: TextView
 	private val bottomSheetFullPlaylistSubtitle: TextView
+	private val bottomSheetFullPlaylistSubtitleUnder: TextView
 	private val bottomSheetFullPlaylistRecyclerView: RecyclerView
 	private val bottomSheetFullPlaylistAdapter: PlaylistCardAdapter
 	private val bottomSheetFullPlaylistCoverFrame: MaterialCardView
@@ -155,6 +158,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetFullCover = findViewById(R.id.full_sheet_cover)
 		bottomSheetFullTitle = findViewById(R.id.full_song_name)
 		bottomSheetFullSubtitle = findViewById(R.id.full_song_artist)
+		bottomSheetFullSubtitleUnder = findViewById(R.id.full_song_artist_under)
 		bottomSheetFullPreviousButton = findViewById(R.id.sheet_previous_song)
 		bottomSheetFullControllerButton = findViewById(R.id.sheet_mid_button)
 		bottomSheetFullNextButton = findViewById(R.id.sheet_next_song)
@@ -176,14 +180,17 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetFullControllerFrame = findViewById(R.id.controls)
 		bottomSheetFullPlaylistTitle = findViewById(R.id.playlist_song_name)
 		bottomSheetFullPlaylistSubtitle = findViewById(R.id.playlist_song_artist)
+		bottomSheetFullPlaylistSubtitleUnder = findViewById(R.id.playlist_song_artist_under)
 		bottomSheetFullPlaylistRecyclerView = findViewById(R.id.playlist_recyclerview)
-		bottomSheetFullBottomDivider = findViewById(R.id.divider)
 		bottomSheetInfinityButton = findViewById(R.id.sheet_infinity)
 		bottomSheetActionBar = findViewById(R.id.actionBar)
 
 		bottomSheetFullPlaylistAdapter = PlaylistCardAdapter(activity)
 		bottomSheetFullPlaylistRecyclerView.layoutManager = LinearLayoutManager(context)
 		bottomSheetFullPlaylistRecyclerView.adapter = bottomSheetFullPlaylistAdapter
+
+		bottomSheetFullSubtitle.paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
+		bottomSheetFullPlaylistSubtitle.paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
 
 		bottomSheetTimerButton.setOnClickListener {
 			if (Build.VERSION.SDK_INT >= 23) {
@@ -256,20 +263,27 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			if (isChecked && !bottomSheetFullLyricButton.isChecked) {
 				changeMovableFrame(false)
 				bottomSheetFullPlaylistRecyclerView.scrollToPosition(instance?.currentMediaItemIndex ?: 0)
-				bottomSheetFullHeaderFrame.fadInAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullPlaylistSubtitle.setTextColor(Color.parseColor("#33FFFFFF"))
+				bottomSheetFullHeaderFrame.fadInAnimation(VIEW_TRANSIT_DURATION) {
+					bottomSheetFullPlaylistSubtitle.setTextColor(Color.parseColor("#CCFFFFFF"))
+				}
 				bottomSheetFullPlaylistFrame.fadInAnimation(VIEW_TRANSIT_DURATION)
 				bottomSheetFullBlendBackgroundView?.animateBlurRadius(false, VIEW_TRANSIT_DURATION)
 			} else if (bottomSheetFullLyricButton.isChecked) {
 				triggerLock = true
 				bottomSheetFullLyricButton.isChecked = false
 				bottomSheetFullLyricRecyclerView.fadOutAnimation(VIEW_TRANSIT_DURATION)
-				bottomSheetFullControllerFrame.fadInAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullControllerFrame.fadInAnimation(VIEW_TRANSIT_DURATION) {
+					showSliderOverlay()
+				}
 				bottomSheetFullPlaylistFrame.fadInAnimation(VIEW_TRANSIT_DURATION)
-				bottomSheetFullBottomDivider.fadInAnimation(VIEW_TRANSIT_DURATION)
 				bottomSheetActionBar.fadInAnimation(VIEW_TRANSIT_DURATION)
 			} else {
 				changeMovableFrame(true)
-				bottomSheetFullHeaderFrame.fadOutAnimation(VIEW_TRANSIT_DURATION, View.GONE)
+				bottomSheetFullPlaylistSubtitle.setTextColor(Color.parseColor("#33FFFFFF"))
+				bottomSheetFullHeaderFrame.fadOutAnimation(VIEW_TRANSIT_DURATION, View.GONE) {
+					bottomSheetFullPlaylistSubtitle.setTextColor(Color.parseColor("#CCFFFFFF"))
+				}
 				bottomSheetFullPlaylistFrame.fadOutAnimation(VIEW_TRANSIT_DURATION, View.GONE)
 				bottomSheetFullBlendBackgroundView?.animateBlurRadius(true, VIEW_TRANSIT_DURATION)
 			}
@@ -282,9 +296,12 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			}
 			if (isChecked && !bottomSheetPlaylistButton.isChecked) {
 				changeMovableFrame(false)
-				bottomSheetFullHeaderFrame.fadInAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullPlaylistSubtitle.setTextColor(Color.parseColor("#33FFFFFF"))
+				bottomSheetFullHeaderFrame.fadInAnimation(VIEW_TRANSIT_DURATION) {
+					bottomSheetFullPlaylistSubtitle.setTextColor(Color.parseColor("#CCFFFFFF"))
+				}
 				bottomSheetFullLyricRecyclerView.fadInAnimation(VIEW_TRANSIT_DURATION)
-				bottomSheetFullBottomDivider.fadOutAnimation(VIEW_TRANSIT_DURATION)
+				hideSliderOverlay()
 				bottomSheetFullControllerFrame.fadOutAnimation(VIEW_TRANSIT_DURATION)
 				bottomSheetActionBar.fadOutAnimation(VIEW_TRANSIT_DURATION)
 				bottomSheetFullBlendBackgroundView?.animateBlurRadius(false, VIEW_TRANSIT_DURATION)
@@ -292,16 +309,21 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				triggerLock = true
 				bottomSheetPlaylistButton.isChecked = false
 				bottomSheetFullPlaylistFrame.fadOutAnimation(VIEW_TRANSIT_DURATION)
-				bottomSheetFullControllerFrame.fadOutAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullControllerFrame.fadOutAnimation(VIEW_TRANSIT_DURATION) {
+					hideSliderOverlay()
+				}
 				bottomSheetFullLyricRecyclerView.fadInAnimation(VIEW_TRANSIT_DURATION)
-				bottomSheetFullBottomDivider.fadOutAnimation(VIEW_TRANSIT_DURATION)
 				bottomSheetActionBar.fadOutAnimation(VIEW_TRANSIT_DURATION)
 			} else {
 				changeMovableFrame(true)
-				bottomSheetFullHeaderFrame.fadOutAnimation(VIEW_TRANSIT_DURATION, View.GONE)
+				bottomSheetFullPlaylistSubtitle.setTextColor(Color.parseColor("#33FFFFFF"))
+				bottomSheetFullHeaderFrame.fadOutAnimation(VIEW_TRANSIT_DURATION, View.GONE) {
+					bottomSheetFullPlaylistSubtitle.setTextColor(Color.parseColor("#CCFFFFFF"))
+				}
 				bottomSheetFullLyricRecyclerView.fadOutAnimation(VIEW_TRANSIT_DURATION, View.GONE)
-				bottomSheetFullControllerFrame.fadInAnimation(VIEW_TRANSIT_DURATION)
-				bottomSheetFullBottomDivider.fadInAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullControllerFrame.fadInAnimation(VIEW_TRANSIT_DURATION) {
+					showSliderOverlay()
+				}
 				bottomSheetActionBar.fadInAnimation(VIEW_TRANSIT_DURATION)
 				bottomSheetFullBlendBackgroundView?.animateBlurRadius(true, VIEW_TRANSIT_DURATION)
 			}
@@ -356,6 +378,26 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 	}
 
+	fun hideSliderOverlay() {
+		bottomSheetFullSlider.updateBottomTrackColor(Color.parseColor("#00FFFFFF"))
+		bottomSheetFullSlider.trackInactiveTintList = ColorStateList.valueOf(Color.parseColor("#33FFFFFF"))
+	}
+
+	fun showSliderOverlay() {
+		bottomSheetFullSlider.updateBottomTrackColor(Color.parseColor("#80FFFFFF"))
+		bottomSheetFullSlider.trackInactiveTintList = ColorStateList.valueOf(Color.parseColor("#0AFFFFFF"))
+	}
+
+	fun hideSubtitleOverlay() {
+		bottomSheetFullSubtitle.setTextColor(Color.parseColor("#33FFFFFF"))
+		bottomSheetFullPlaylistSubtitle.setTextColor(Color.parseColor("#33FFFFFF"))
+	}
+
+	fun showSubtitleOverlay() {
+		bottomSheetFullSubtitle.setTextColor(Color.parseColor("#CCFFFFFF"))
+		bottomSheetFullPlaylistSubtitle.setTextColor(Color.parseColor("#CCFFFFFF"))
+	}
+
 	fun isCoverFrameElevated(): Boolean = bottomSheetFullCoverFrame.elevation == 8.dpToPx(context).toFloat()
 
 	fun applyElevation(remove: Boolean) {
@@ -391,12 +433,15 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 	private fun changeMovableFrame(isVisible: Boolean) {
 		if (isVisible) {
-			bottomSheetFullTextLayout.fadInAnimation(VIEW_TRANSIT_DURATION) {}
+			bottomSheetFullTextLayout.fadInAnimation(VIEW_TRANSIT_DURATION) {
+				bottomSheetFullSubtitle.setTextColor(Color.parseColor("#CCFFFFFF"))
+			}
 			bottomSheetFullDragHandle.fadInAnimation(VIEW_TRANSIT_DURATION) {}
 			TransitionManager.beginDelayedTransition(this, transformOut)
 			bottomSheetFullPlaylistCoverFrame.visibility = View.INVISIBLE
 			bottomSheetFullCoverFrame.visibility = View.VISIBLE
 		} else {
+			bottomSheetFullSubtitle.setTextColor(Color.parseColor("#33FFFFFF"))
 			bottomSheetFullTextLayout.fadOutAnimation(VIEW_TRANSIT_DURATION) {}
 			bottomSheetFullDragHandle.fadOutAnimation(VIEW_TRANSIT_DURATION) {}
 			TransitionManager.beginDelayedTransition(this, transformIn)
@@ -493,12 +538,22 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 					}
 				})
 			lastArtworkUri = artworkUri
-			bottomSheetFullTitle.setTextAnimation(mediaItem?.mediaMetadata?.title, skipAnimation = firstTime)
+			hideSubtitleOverlay()
+			bottomSheetFullTitle.setTextAnimation(mediaItem?.mediaMetadata?.title, skipAnimation = firstTime,
+				completion = {
+					showSubtitleOverlay()
+				})
 			bottomSheetFullPlaylistTitle.setTextAnimation(mediaItem?.mediaMetadata?.title, skipAnimation = firstTime)
 			bottomSheetFullSubtitle.setTextAnimation(
 				mediaItem?.mediaMetadata?.artist ?: context.getString(R.string.unknown_artist), skipAnimation = firstTime
 			)
+			bottomSheetFullSubtitleUnder.setTextAnimation(
+				mediaItem?.mediaMetadata?.artist ?: context.getString(R.string.unknown_artist), skipAnimation = firstTime
+			)
 			bottomSheetFullPlaylistSubtitle.setTextAnimation(
+				mediaItem?.mediaMetadata?.artist ?: context.getString(R.string.unknown_artist), skipAnimation = firstTime
+			)
+			bottomSheetFullPlaylistSubtitleUnder.setTextAnimation(
 				mediaItem?.mediaMetadata?.artist ?: context.getString(R.string.unknown_artist), skipAnimation = firstTime
 			)
 			if (playlistNowPlaying != null) {

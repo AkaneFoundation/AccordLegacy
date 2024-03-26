@@ -67,20 +67,40 @@
 				tools:targetApi="p"
 				tools:text="Artifiction" />
 
-			<org.akanework.gramophone.ui.components.MarqueeTextView
-				android:id="@+id/playlist_song_artist"
+			<FrameLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_marginTop="2dp"
-				android:fontFamily="sans-serif"
-				android:gravity="start"
-				android:includeFontPadding="false"
-				android:scrollbars="none"
-				android:textColor="#66FFFFFF"
-				android:textFontWeight="400"
-				android:textSize="18sp"
-				tools:targetApi="p"
-				tools:text="Artifiction" />
+				android:layout_marginTop="2dp">
+
+				<org.akanework.gramophone.ui.components.MarqueeTextView
+					android:id="@+id/playlist_song_artist"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:fontFamily="sans-serif"
+					android:gravity="start|center_vertical"
+					android:includeFontPadding="false"
+					android:scrollbars="none"
+					android:textColor="#CCFFFFFF"
+					android:textFontWeight="400"
+					android:textSize="18sp"
+					tools:targetApi="p"
+					tools:text="Artifiction" />
+
+				<org.akanework.gramophone.ui.components.MarqueeTextView
+					android:id="@+id/playlist_song_artist_under"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:fontFamily="sans-serif"
+					android:gravity="start|center_vertical"
+					android:includeFontPadding="false"
+					android:scrollbars="none"
+					android:textColor="#66FFFFFF"
+					android:textFontWeight="400"
+					android:textSize="18sp"
+					tools:targetApi="p"
+					tools:text="Artifiction" />
+
+			</FrameLayout>
 
 		</LinearLayout>
 
@@ -258,7 +278,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginHorizontal="30dp"
-			android:layout_marginBottom="16dp"
+			android:layout_marginBottom="18dp"
 			android:minHeight="60dp"
 			android:gravity="center"
 			android:orientation="vertical"
@@ -272,7 +292,8 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:fontFamily="sans-serif"
-				android:gravity="start"
+				android:minHeight="26dp"
+				android:gravity="start|center_vertical"
 				android:includeFontPadding="false"
 				android:scrollbars="none"
 				android:textColor="#EBFFFFFF"
@@ -281,24 +302,45 @@
 				tools:targetApi="p"
 				tools:text="Artifiction" />
 
-			<org.akanework.gramophone.ui.components.MarqueeTextView
-				android:id="@+id/full_song_artist"
+			<FrameLayout
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginTop="2dp"
-				android:fontFamily="sans-serif"
-				android:gravity="start"
-				android:includeFontPadding="false"
-				android:scrollbars="none"
-				android:textColor="#66FFFFFF"
-				android:textFontWeight="400"
-				android:textSize="20sp"
-				tools:targetApi="p"
-				tools:text="Artifiction" />
+				android:layout_height="wrap_content">
+
+				<org.akanework.gramophone.ui.components.MarqueeTextView
+					android:id="@+id/full_song_artist"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:fontFamily="sans-serif"
+					android:gravity="start|center_vertical"
+					android:includeFontPadding="false"
+					android:minHeight="26dp"
+					android:scrollbars="none"
+					android:textColor="#CCFFFFFF"
+					android:textFontWeight="400"
+					android:textSize="20sp"
+					tools:targetApi="p"
+					tools:text="Artifiction" />
+
+				<org.akanework.gramophone.ui.components.MarqueeTextView
+					android:id="@+id/full_song_artist_under"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:fontFamily="sans-serif"
+					android:gravity="start|center_vertical"
+					android:includeFontPadding="false"
+					android:minHeight="26dp"
+					android:scrollbars="none"
+					android:textColor="#66FFFFFF"
+					android:textFontWeight="400"
+					android:textSize="20sp"
+					tools:targetApi="p"
+					tools:text="Artifiction" />
+
+			</FrameLayout>
 
 		</LinearLayout>
 
-		<com.google.android.material.slider.Slider
+		<com.google.android.material.slider.OverlaySlider
 			android:id="@+id/slider_vert"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
@@ -306,7 +348,7 @@
 			android:value="0"
 			app:labelBehavior="gone"
 			app:trackColorActive="#B3FFFFFF"
-			app:trackColorInactive="#1AFFFFFF"
+			app:trackColorInactive="#0AFFFFFF"
 			app:haloRadius="0dp"
 			app:haloColor="@android:color/transparent"
 			app:thumbRadius="0dp"
@@ -325,7 +367,7 @@
 			android:id="@+id/duration_frame"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_marginTop="6dp"
+			android:layout_marginTop="5dp"
 			android:layout_marginHorizontal="30dp"
 			app:layout_constraintBottom_toTopOf="@id/sheet_mid_button"
 			app:layout_constraintEnd_toEndOf="parent"
@@ -340,7 +382,7 @@
 				android:layout_gravity="start"
 				android:fontFamily="sans-serif"
 				android:text="@string/default_time"
-				android:textColor="#66FFFFFF"
+				android:textColor="#EBFFFFFF"
 				android:textFontWeight="500"
 				android:textSize="12sp"
 				android:letterSpacing="0.05"
@@ -353,7 +395,7 @@
 				android:layout_gravity="end"
 				android:fontFamily="sans-serif"
 				android:text="@string/default_time"
-				android:textColor="#66FFFFFF"
+				android:textColor="#EBFFFFFF"
 				android:textFontWeight="500"
 				android:textSize="12sp"
 				android:letterSpacing="0.05"
@@ -455,7 +497,7 @@
 			android:insetRight="0dp"
 			android:insetBottom="0dp"
 			android:saveEnabled="false"
-			app:icon="@drawable/ic_lyrics"
+			app:icon="@drawable/ic_quote_bubble_24dp"
 			app:iconGravity="textStart"
 			app:iconPadding="0dp"
 			app:iconSize="24dp"
@@ -473,7 +515,7 @@
 			android:insetRight="0dp"
 			android:insetBottom="0dp"
 			android:saveEnabled="false"
-			app:icon="@drawable/sl_check_timer"
+			app:icon="@drawable/ic_timer_24dp"
 			app:iconGravity="textStart"
 			app:iconPadding="0dp"
 			app:iconSize="24dp"
@@ -484,26 +526,18 @@
 			android:layout_width="48dp"
 			android:layout_height="48dp"
 			android:layout_weight="1"
-			android:background="@android:color/transparent"
+			android:background="@drawable/rp_buttons"
 			android:insetLeft="0dp"
 			android:insetTop="0dp"
 			android:insetRight="0dp"
 			android:insetBottom="0dp"
 			android:checkable="true"
 			app:rippleColor="@android:color/transparent"
-			app:icon="@drawable/ic_playlist_play"
+			app:icon="@drawable/ic_bullet_list_24dp"
 			app:iconGravity="textStart"
 			app:iconPadding="0dp"
 			app:iconSize="24dp"
 			app:iconTint="@color/sl_check_button" />
 	</LinearLayout>
-
-	<com.google.android.material.divider.MaterialDivider
-		android:id="@+id/divider"
-		android:layout_height="wrap_content"
-		android:layout_width="match_parent"
-		app:layout_constraintBottom_toBottomOf="parent"
-		app:dividerColor="#1AFFFFFF"
-		app:dividerThickness="0.5dp"/>
 
 </merge>
