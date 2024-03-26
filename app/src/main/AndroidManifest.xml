@@ -45,7 +45,7 @@
         android:windowSoftInputMode="adjustResize"
         tools:targetApi="upside_down_cake">
         <activity
-            android:name=".logic.ui.BugHandlerActivity"
+            android:name=".ui.BugHandlerActivity"
             android:exported="false" />
 
         <service

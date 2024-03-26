@@ -24,6 +24,11 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.graphics.Insets
+import androidx.core.view.OnApplyWindowInsetsListener
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
@@ -65,7 +70,8 @@ import kotlin.math.min
 
 @SuppressLint("SetTextI18n")
 class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
-	ConstraintLayout(context, attrs, defStyleAttr, defStyleRes), Player.Listener {
+	ConstraintLayout(context, attrs, defStyleAttr, defStyleRes), Player.Listener,
+	OnApplyWindowInsetsListener {
 	constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
 		this(context, attrs, defStyleAttr, 0)
 	constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -191,6 +197,26 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 		bottomSheetFullSubtitle.paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
 		bottomSheetFullPlaylistSubtitle.paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
+
+		ViewCompat.setOnApplyWindowInsetsListener(this, this)
+		ViewCompat.setOnApplyWindowInsetsListener(bottomSheetFullLyricRecyclerView) { v, insets ->
+			val myInsets = insets.getInsets(
+				WindowInsetsCompat.Type.systemBars()
+					or WindowInsetsCompat.Type.displayCutout())
+			v.updateLayoutParams<MarginLayoutParams> {
+				leftMargin = -myInsets.left
+				topMargin = -myInsets.top
+				rightMargin = -myInsets.right
+				bottomMargin = -myInsets.bottom
+			}
+			v.setPadding(myInsets.left, myInsets.top, myInsets.right, myInsets.bottom)
+			return@setOnApplyWindowInsetsListener WindowInsetsCompat.Builder(insets)
+				.setInsets(WindowInsetsCompat.Type.systemBars()
+						or WindowInsetsCompat.Type.displayCutout(), Insets.NONE)
+				.setInsetsIgnoringVisibility(WindowInsetsCompat.Type.systemBars()
+						or WindowInsetsCompat.Type.displayCutout(), Insets.NONE)
+				.build()
+		}
 
 		bottomSheetTimerButton.setOnClickListener {
 			if (Build.VERSION.SDK_INT >= 23) {
@@ -506,6 +532,19 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		runnableRunning = false
 		instance?.removeListener(this)
 		controllerFuture = null
+	}
+
+	override fun onApplyWindowInsets(ignored: View, insets: WindowInsetsCompat): WindowInsetsCompat {
+		val myInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars()
+				or WindowInsetsCompat.Type.displayCutout())
+		setPadding(myInsets.left, myInsets.top, myInsets.right, myInsets.bottom)
+		ViewCompat.dispatchApplyWindowInsets(bottomSheetFullLyricRecyclerView, insets)
+		return WindowInsetsCompat.Builder(insets)
+			.setInsets(WindowInsetsCompat.Type.systemBars()
+					or WindowInsetsCompat.Type.displayCutout(), Insets.NONE)
+			.setInsetsIgnoringVisibility(WindowInsetsCompat.Type.systemBars()
+					or WindowInsetsCompat.Type.displayCutout(), Insets.NONE)
+			.build()
 	}
 
 	@SuppressLint("NotifyDataSetChanged", "SetTextI18n")

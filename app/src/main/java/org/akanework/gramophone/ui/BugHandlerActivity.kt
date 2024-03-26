@@ -15,7 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.akanework.gramophone.logic.ui
+package org.akanework.gramophone.ui
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -23,12 +23,16 @@ import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.appbar.MaterialToolbar
 import org.akanework.gramophone.BuildConfig
 import org.akanework.gramophone.R
+import org.akanework.gramophone.logic.enableEdgeToEdgePaddingListener
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -47,6 +51,9 @@ class BugHandlerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_bug_handler)
+        findViewById<View>(R.id.appbarlayout).enableEdgeToEdgePaddingListener()
+        findViewById<MaterialToolbar>(R.id.topAppBar).setNavigationOnClickListener { finish() }
+        onBackPressedDispatcher.addCallback { finish() }
 
         val bugText = findViewById<TextView>(R.id.error)
         val exceptionMessage = intent.getStringExtra("exception_message")
@@ -74,6 +81,7 @@ class BugHandlerActivity : AppCompatActivity() {
 
         bugText.typeface = Typeface.MONOSPACE
         bugText.text = combinedTextBuilder.toString()
+        bugText.enableEdgeToEdgePaddingListener()
 
         // Make our life easier by copying the log to clipboard
         val clipboard: ClipboardManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
