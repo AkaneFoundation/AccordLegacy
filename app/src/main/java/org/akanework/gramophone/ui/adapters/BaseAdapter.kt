@@ -32,6 +32,7 @@ import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.doOnLayout
 import androidx.core.view.updateLayoutParams
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ConcatAdapter
@@ -53,6 +54,7 @@ import org.akanework.gramophone.logic.ui.ItemHeightHelper
 import org.akanework.gramophone.logic.ui.MyRecyclerView
 import org.akanework.gramophone.logic.utils.FileOpUtils
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
+import org.akanework.gramophone.ui.MainActivity
 import org.akanework.gramophone.ui.components.CustomGridLayoutManager
 import org.akanework.gramophone.ui.components.GridPaddingDecoration
 import org.akanework.gramophone.ui.fragments.AdapterFragment
@@ -75,12 +77,45 @@ abstract class BaseAdapter<T>(
     val isPrivateLayout: Boolean = false,
 ) : AdapterFragment.BaseInterface<BaseAdapter<T>.ViewHolder>(), Observer<List<T>>,
     PopupTextProvider, ItemHeightHelper {
+    constructor(
+        fragment: Fragment,
+        liveData: MutableLiveData<List<T>>?,
+        sortHelper: Sorter.Helper<T>,
+        naturalOrderHelper: Sorter.NaturalOrderHelper<T>?,
+        initialSortType: Sorter.Type,
+        pluralStr: Int,
+        ownsView: Boolean,
+        defaultLayoutType: LayoutType,
+        isSubFragment: Boolean = false,
+        rawOrderExposed: Boolean = false,
+        allowDiffUtils: Boolean = false,
+        canSort: Boolean = true,
+        fallbackSpans: Int = 1
+    ) : this(
+        fragment.requireContext(),
+        liveData,
+        sortHelper,
+        naturalOrderHelper,
+        initialSortType,
+        pluralStr,
+        ownsView,
+        defaultLayoutType,
+        isSubFragment,
+        rawOrderExposed,
+        allowDiffUtils,
+        canSort,
+        fallbackSpans
+    ) { this.fragment = fragment }
 
     companion object {
         // this relies on the assumption that all RecyclerViews always have same width
         // (though it does get invalidated if that is not the case, for eg rotation)
         private var gridHeightCache = 0
     }
+    protected var fragment: Fragment? = null
+    protected val mainActivity = context as MainActivity
+    internal val layoutInflater: LayoutInflater
+        get() = fragment?.layoutInflater ?: LayoutInflater.from(context)
     private val listHeight = context.resources.getDimensionPixelSize(R.dimen.list_height)
     private val listHeightLarger = context.resources.getDimensionPixelSize(R.dimen.list_height_larger)
     private val listHeightArtist = context.resources.getDimensionPixelSize(R.dimen.list_height_artist)
@@ -259,9 +294,7 @@ abstract class BaseAdapter<T>(
         viewType: Int,
     ): ViewHolder =
         ViewHolder(
-            LayoutInflater
-                .from(parent.context)
-                .inflate(viewType, parent, false),
+            layoutInflater.inflate(viewType, parent, false),
         )
 
     fun sort(selector: Sorter.Type) {
@@ -350,9 +383,14 @@ abstract class BaseAdapter<T>(
         holder: ViewHolder,
         position: Int,
     ) {
+        // TODO remove below line once root cause is fixed
+        if (holder.itemView.isVerticalScrollBarEnabled && fragment != null) throw IllegalStateException()
         if (layoutType == LayoutType.GRID) {
-            holder.itemView.updateLayoutParams<ViewGroup.LayoutParams> {
-                height = gridHeight ?: gridHeightCache
+            val newHeight = gridHeight ?: gridHeightCache
+            if (holder.itemView.layoutParams.height != newHeight) {
+                holder.itemView.updateLayoutParams<ViewGroup.LayoutParams> {
+                    height = newHeight
+                }
             }
         }
         val item = list[position]

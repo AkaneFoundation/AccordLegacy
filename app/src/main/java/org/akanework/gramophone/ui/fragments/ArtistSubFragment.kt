@@ -35,7 +35,6 @@ import org.akanework.gramophone.logic.enableEdgeToEdgePaddingListener
 import org.akanework.gramophone.logic.ui.DefaultItemHeightHelper
 import org.akanework.gramophone.logic.ui.MyRecyclerView
 import org.akanework.gramophone.ui.LibraryViewModel
-import org.akanework.gramophone.ui.MainActivity
 import org.akanework.gramophone.ui.adapters.AlbumAdapter
 import org.akanework.gramophone.ui.adapters.SongAdapter
 import org.akanework.gramophone.ui.components.GridPaddingDecoration
@@ -83,11 +82,11 @@ class ArtistSubFragment : BaseFragment(true), PopupTextProvider {
         spans = if (requireContext().resources.configuration.orientation
             == Configuration.ORIENTATION_PORTRAIT) 2 else 4
         albumAdapter = AlbumAdapter(
-            requireActivity() as MainActivity, item.albumList.toMutableList(), true,
+            this, item.albumList.toMutableList(), true,
             fallbackSpans = spans
         )
         songAdapter = SongAdapter(
-            requireActivity() as MainActivity,
+            this,
             item.songList, true, null, false,
             isSubFragment = true, fallbackSpans = spans
         )
