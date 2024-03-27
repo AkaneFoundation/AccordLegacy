@@ -75,4 +75,10 @@ abstract class BasePreferenceFragment : PreferenceFragmentCompat(),
         preferenceScreen.sharedPreferences?.unregisterOnSharedPreferenceChangeListener(this)
     }
 
+    override fun onDestroy() {
+        // Work around b/331383944: PreferenceFragmentCompat permanently mutates activity theme (enables vertical scrollbars)
+        requireContext().theme.applyStyle(R.style.Theme_Gramophone, true)
+        super.onDestroy()
+    }
+
 }
