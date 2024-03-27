@@ -17,6 +17,7 @@
 
 package org.akanework.gramophone.logic
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
@@ -32,6 +33,8 @@ import android.os.Looper
 import android.os.Message
 import android.os.StrictMode
 import android.view.View
+import android.view.ViewGroup.MarginLayoutParams
+import android.view.WindowInsets
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -41,6 +44,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.children
+import androidx.core.view.updateLayoutParams
 import androidx.media3.common.MediaItem
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
@@ -232,10 +236,12 @@ fun View.enableEdgeToEdgePaddingListener(ime: Boolean = false, top: Boolean = fa
             )
             (v as AppBarLayout).children.forEach {
                 if (it is CollapsingToolbarLayout) {
-                    it.expandedTitleMarginStart = expandedTitleMarginStart!! + if (it.layoutDirection
+                    val es = expandedTitleMarginStart!! + if (it.layoutDirection
                         == View.LAYOUT_DIRECTION_LTR) cutoutAndBars.left else cutoutAndBars.right
-                    it.expandedTitleMarginEnd = expandedTitleMarginEnd!! + if (it.layoutDirection
+                    if (es != it.expandedTitleMarginStart) it.expandedTitleMarginStart = es
+                    val ee = expandedTitleMarginEnd!! + if (it.layoutDirection
                         == View.LAYOUT_DIRECTION_RTL) cutoutAndBars.left else cutoutAndBars.right
+                    if (ee != it.expandedTitleMarginEnd) it.expandedTitleMarginEnd = ee
                 }
                 it.setPadding(cutoutAndBars.left, 0, cutoutAndBars.right, 0)
             }
@@ -269,6 +275,38 @@ fun View.enableEdgeToEdgePaddingListener(ime: Boolean = false, top: Boolean = fa
     }
 }
 
+data class Margin(var left: Int, var top: Int, var right: Int, var bottom: Int) {
+    companion object {
+        @Suppress("NOTHING_TO_INLINE")
+        internal inline fun fromLayoutParams(marginLayoutParams: MarginLayoutParams): Margin {
+            return Margin(
+                marginLayoutParams.leftMargin, marginLayoutParams.topMargin,
+                marginLayoutParams.rightMargin, marginLayoutParams.bottomMargin
+            )
+        }
+    }
+
+    @Suppress("NOTHING_TO_INLINE")
+    internal inline fun apply(marginLayoutParams: MarginLayoutParams) {
+        marginLayoutParams.leftMargin = left
+        marginLayoutParams.topMargin = top
+        marginLayoutParams.rightMargin = right
+        marginLayoutParams.bottomMargin = bottom
+    }
+}
+
+fun View.updateMargin(
+    block: Margin.() -> Unit
+) {
+    val oldMargin = Margin.fromLayoutParams(layoutParams as MarginLayoutParams)
+    val newMargin = oldMargin.copy().also { it.block() }
+    if (oldMargin != newMargin) {
+        updateLayoutParams<MarginLayoutParams> {
+            newMargin.apply(this)
+        }
+    }
+}
+
 // enableEdgeToEdge() without enforcing contrast, magic based on androidx EdgeToEdge.kt
 fun ComponentActivity.enableEdgeToEdgeProperly() {
     if ((resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
@@ -282,6 +320,33 @@ fun ComponentActivity.enableEdgeToEdgeProperly() {
 
 val Context.gramophoneApplication
     get() = applicationContext as GramophoneApplication
+
+@SuppressLint("DiscouragedPrivateApi")
+private fun WindowInsets.unconsumeIfNeeded() {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+        // Api21Impl of getRootWindowInsets returns already-consumed WindowInsets with correct data
+        // Said consumed insets cannot be dispatched again because well, they are already consumed
+        // Workaround this using some reflection (Api23Impl+ are not affected so this is safe)
+        val mSystemWindowInsetsConsumed = WindowInsets::class.java
+            .getDeclaredField("mSystemWindowInsetsConsumed")
+            .apply { isAccessible = true }
+        val mWindowDecorInsetsConsumed = WindowInsets::class.java
+            .getDeclaredField("mWindowDecorInsetsConsumed")
+            .apply { isAccessible = true }
+        val mStableInsetsConsumed = WindowInsets::class.java
+            .getDeclaredField("mStableInsetsConsumed")
+            .apply { isAccessible = true }
+        mSystemWindowInsetsConsumed.set(this, false)
+        mWindowDecorInsetsConsumed.set(this, false)
+        mStableInsetsConsumed.set(this, false)
+    }
+}
+
+// Pitfall: WindowInsetsCompat.Builder(insets) mutates the platform insets
+fun WindowInsetsCompat.clone(): WindowInsetsCompat =
+    WindowInsetsCompat.toWindowInsetsCompat(WindowInsets(toWindowInsets()).also {
+        it.unconsumeIfNeeded()
+    })
 
 inline fun Semaphore.runInBg(crossinline runnable: suspend () -> Unit) {
     CoroutineScope(Dispatchers.Default).launch {

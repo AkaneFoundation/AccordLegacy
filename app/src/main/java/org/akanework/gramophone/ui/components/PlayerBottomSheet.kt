@@ -25,9 +25,11 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
+import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowInsets
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -36,7 +38,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.Insets
-import androidx.core.view.OnApplyWindowInsetsListener
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -55,8 +56,10 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCa
 import com.google.android.material.button.MaterialButton
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
+import org.akanework.gramophone.BuildConfig
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.GramophonePlaybackService
+import org.akanework.gramophone.logic.clone
 import org.akanework.gramophone.logic.getBooleanStrict
 import org.akanework.gramophone.logic.gramophoneApplication
 import org.akanework.gramophone.logic.playOrPause
@@ -71,9 +74,13 @@ import org.akanework.gramophone.ui.components.blurview.RenderScriptBlur
 class PlayerBottomSheet private constructor(
     context: Context, attributeSet: AttributeSet?, defStyleAttr: Int, defStyleRes: Int
 ) : FrameLayout(context, attributeSet, defStyleAttr, defStyleRes),
-    Player.Listener, DefaultLifecycleObserver, OnApplyWindowInsetsListener {
+    Player.Listener, DefaultLifecycleObserver {
     constructor(context: Context, attributeSet: AttributeSet?)
             : this(context, attributeSet, 0, 0)
+
+    companion object {
+        const val TAG = "PlayerBottomSheet"
+    }
 
     private var sessionToken: SessionToken? = null
     private var controllerFuture: ListenableFuture<MediaController>? = null
@@ -107,6 +114,8 @@ class PlayerBottomSheet private constructor(
             field = value
             if (ready) onUiReadyListener?.run()
         }
+    private var lastActuallyVisible: Boolean? = null
+    private var lastMeasuredHeight: Int? = null
     var visible = false
         set(value) {
             if (field != value) {
@@ -140,7 +149,6 @@ class PlayerBottomSheet private constructor(
         bottomSheetPreviewControllerButton = findViewById(R.id.preview_control)
         bottomSheetPreviewNextButton = findViewById(R.id.preview_next)
         bottomSheetBlendBackgroundView = findViewById(R.id.blend)
-        ViewCompat.setOnApplyWindowInsetsListener(this, this)
 
         setOnClickListener {
             if (standardBottomSheetBehavior!!.state == BottomSheetBehavior.STATE_COLLAPSED) {
@@ -308,6 +316,8 @@ class PlayerBottomSheet private constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        lastActuallyVisible = null
+        lastMeasuredHeight = null
         fullPlayer.minimize = null
         fullPlayer.bottomSheetFullBlendBackgroundView = null
         lifecycleOwner.lifecycle.removeObserver(this)
@@ -317,19 +327,55 @@ class PlayerBottomSheet private constructor(
         onStop(lifecycleOwner)
     }
 
-    override fun onApplyWindowInsets(v: View, insets: WindowInsetsCompat): WindowInsetsCompat {
+    private fun updatePeekHeight() {
+        previewPlayer.measure(
+            MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+            MeasureSpec.UNSPECIFIED
+        )
+        standardBottomSheetBehavior?.setPeekHeight(previewPlayer.measuredHeight, false)
+    }
+
+    fun generateBottomSheetInsets(insets: WindowInsetsCompat): WindowInsetsCompat {
+        val resolvedMeasuredHeight = if (lastActuallyVisible == true) lastMeasuredHeight ?: 0 else 0
+        var navBar1 = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+        var navBar2 = insets.getInsetsIgnoringVisibility(WindowInsetsCompat.Type.navigationBars())
+        val bottomSheetInsets = Insets.of(0, 0, 0, resolvedMeasuredHeight)
+        navBar1 = Insets.max(navBar1, bottomSheetInsets)
+        navBar2 = Insets.max(navBar2, bottomSheetInsets)
+        return WindowInsetsCompat.Builder(insets)
+            .setInsets(WindowInsetsCompat.Type.navigationBars(), navBar1)
+            .setInsetsIgnoringVisibility(WindowInsetsCompat.Type.navigationBars(), navBar2)
+            .build()
+    }
+
+    private fun dispatchBottomSheetInsets() {
+        if (lastMeasuredHeight == previewPlayer.measuredHeight &&
+            lastActuallyVisible == actuallyVisible) return
+        if (BuildConfig.DEBUG) Log.i(TAG, "dispatching bottom sheet insets")
+        lastMeasuredHeight = previewPlayer.measuredHeight
+        lastActuallyVisible = actuallyVisible
+        // This dispatches the last known insets again to force regeneration of
+        // FragmentContainerView's insets which will in turn call generateBottomSheetInsets().
+        val i = ViewCompat.getRootWindowInsets(activity.window.decorView)
+        if (i != null) {
+            ViewCompat.dispatchApplyWindowInsets(activity.window.decorView, i.clone())
+        } else Log.e(TAG, "getRootWindowInsets returned null, this should NEVER happen")
+    }
+
+    override fun dispatchApplyWindowInsets(platformInsets: WindowInsets): WindowInsets {
+        val insets = WindowInsetsCompat.toWindowInsetsCompat(platformInsets)
         val myInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars()
                 or WindowInsetsCompat.Type.displayCutout())
         // We here have to set up inset padding manually as the bottom sheet won't know what
         // View is behind the status bar, paddingTopSystemWindowInsets just allows it to go
         // behind it, which differs from the other padding*SystemWindowInsets. We can't use the
         // other padding*SystemWindowInsets to apply systemBars() because previewPlayer and
-        // fullPlayer should extend into system bars and display cutout. previewPlayer can't use
+        // fullPlayer should extend into system bars AND display cutout. previewPlayer can't use
         // fitsSystemWindows because it doesn't want top padding from status bar.
         // We have to do it manually, duh.
         previewPlayer.setPadding(myInsets.left, 0, myInsets.right, myInsets.bottom)
-        // Let fullPlayer handle insets itself (and discard result as it is not relevant to main UI)
-        ViewCompat.dispatchApplyWindowInsets(fullPlayer, insets)
+        // Let fullPlayer handle insets itself (and discard result as it's irrelevant to hierarchy)
+        ViewCompat.dispatchApplyWindowInsets(fullPlayer, insets.clone())
         // Now make sure BottomSheetBehaviour has the correct View height set.
         if (isLaidOut && !isLayoutRequested) {
             updatePeekHeight()
@@ -347,35 +393,7 @@ class PlayerBottomSheet private constructor(
             .setInsetsIgnoringVisibility(WindowInsetsCompat.Type.systemBars()
                     or WindowInsetsCompat.Type.displayCutout(), Insets.of(0, i.top, 0, 0))
             .build()
-    }
-
-    private fun updatePeekHeight() {
-        previewPlayer.measure(
-            MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-            MeasureSpec.UNSPECIFIED
-        )
-        standardBottomSheetBehavior?.setPeekHeight(previewPlayer.measuredHeight, false)
-    }
-
-    fun generateBottomSheetInsets(insets: WindowInsetsCompat): WindowInsetsCompat {
-        val resolvedMeasuredHeight = if (actuallyVisible) previewPlayer.measuredHeight else 0
-        var navBar1 = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
-        var navBar2 = insets.getInsetsIgnoringVisibility(WindowInsetsCompat.Type.navigationBars())
-        val bottomSheetInsets = Insets.of(0, 0, 0, resolvedMeasuredHeight)
-        navBar1 = Insets.max(navBar1, bottomSheetInsets)
-        navBar2 = Insets.max(navBar2, bottomSheetInsets)
-        return WindowInsetsCompat.Builder(insets)
-            .setInsets(WindowInsetsCompat.Type.navigationBars(), navBar1)
-            .setInsetsIgnoringVisibility(WindowInsetsCompat.Type.navigationBars(), navBar2)
-            .build()
-    }
-
-    private fun dispatchBottomSheetInsets() {
-        // This dispatches the last known insets again to force regeneration of
-        // FragmentContainerView's insets which will in turn call generateBottomSheetInsets().
-        ViewCompat.getRootWindowInsets(activity.window.decorView)?.let {
-            ViewCompat.dispatchApplyWindowInsets(activity.window.decorView, it)
-        }
+            .toWindowInsets()!!
     }
 
     fun getPlayer(): MediaController? = instance

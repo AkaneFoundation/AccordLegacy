@@ -18,6 +18,7 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowInsets
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -25,10 +26,8 @@ import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.Insets
-import androidx.core.view.OnApplyWindowInsetsListener
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updateLayoutParams
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
@@ -54,6 +53,7 @@ import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.GramophonePlaybackService
+import org.akanework.gramophone.logic.clone
 import org.akanework.gramophone.logic.dpToPx
 import org.akanework.gramophone.logic.fadInAnimation
 import org.akanework.gramophone.logic.fadOutAnimation
@@ -63,6 +63,7 @@ import org.akanework.gramophone.logic.hasTimer
 import org.akanework.gramophone.logic.playOrPause
 import org.akanework.gramophone.logic.setTextAnimation
 import org.akanework.gramophone.logic.setTimer
+import org.akanework.gramophone.logic.updateMargin
 import org.akanework.gramophone.logic.utils.CalculationUtils
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
 import org.akanework.gramophone.ui.MainActivity
@@ -70,8 +71,7 @@ import kotlin.math.min
 
 @SuppressLint("SetTextI18n")
 class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
-	ConstraintLayout(context, attrs, defStyleAttr, defStyleRes), Player.Listener,
-	OnApplyWindowInsetsListener {
+	ConstraintLayout(context, attrs, defStyleAttr, defStyleRes), Player.Listener {
 	constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
 		this(context, attrs, defStyleAttr, 0)
 	constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -198,16 +198,15 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetFullSubtitle.paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
 		bottomSheetFullPlaylistSubtitle.paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
 
-		ViewCompat.setOnApplyWindowInsetsListener(this, this)
 		ViewCompat.setOnApplyWindowInsetsListener(bottomSheetFullLyricRecyclerView) { v, insets ->
 			val myInsets = insets.getInsets(
 				WindowInsetsCompat.Type.systemBars()
 					or WindowInsetsCompat.Type.displayCutout())
-			v.updateLayoutParams<MarginLayoutParams> {
-				leftMargin = -myInsets.left
-				topMargin = -myInsets.top
-				rightMargin = -myInsets.right
-				bottomMargin = -myInsets.bottom
+			v.updateMargin {
+				left = -myInsets.left
+				top = -myInsets.top
+				right = -myInsets.right
+				bottom = -myInsets.bottom
 			}
 			v.setPadding(myInsets.left, myInsets.top, myInsets.right, myInsets.bottom)
 			return@setOnApplyWindowInsetsListener WindowInsetsCompat.Builder(insets)
@@ -534,17 +533,19 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		controllerFuture = null
 	}
 
-	override fun onApplyWindowInsets(ignored: View, insets: WindowInsetsCompat): WindowInsetsCompat {
+	override fun dispatchApplyWindowInsets(platformInsets: WindowInsets): WindowInsets {
+		val insets = WindowInsetsCompat.toWindowInsetsCompat(platformInsets)
 		val myInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars()
 				or WindowInsetsCompat.Type.displayCutout())
 		setPadding(myInsets.left, myInsets.top, myInsets.right, myInsets.bottom)
-		ViewCompat.dispatchApplyWindowInsets(bottomSheetFullLyricRecyclerView, insets)
+		ViewCompat.dispatchApplyWindowInsets(bottomSheetFullLyricRecyclerView, insets.clone())
 		return WindowInsetsCompat.Builder(insets)
 			.setInsets(WindowInsetsCompat.Type.systemBars()
 					or WindowInsetsCompat.Type.displayCutout(), Insets.NONE)
 			.setInsetsIgnoringVisibility(WindowInsetsCompat.Type.systemBars()
 					or WindowInsetsCompat.Type.displayCutout(), Insets.NONE)
 			.build()
+			.toWindowInsets()!!
 	}
 
 	@SuppressLint("NotifyDataSetChanged", "SetTextI18n")
