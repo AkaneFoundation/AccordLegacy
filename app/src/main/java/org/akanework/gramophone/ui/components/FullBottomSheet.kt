@@ -538,14 +538,16 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 					}
 				})
 			lastArtworkUri = artworkUri
-			hideSubtitleOverlay()
-			bottomSheetFullTitle.setTextAnimation(mediaItem?.mediaMetadata?.title, skipAnimation = firstTime,
-				completion = {
-					showSubtitleOverlay()
-				})
+			bottomSheetFullTitle.setTextAnimation(mediaItem?.mediaMetadata?.title, skipAnimation = firstTime)
 			bottomSheetFullPlaylistTitle.setTextAnimation(mediaItem?.mediaMetadata?.title, skipAnimation = firstTime)
 			bottomSheetFullSubtitle.setTextAnimation(
-				mediaItem?.mediaMetadata?.artist ?: context.getString(R.string.unknown_artist), skipAnimation = firstTime
+				mediaItem?.mediaMetadata?.artist ?: context.getString(R.string.unknown_artist), skipAnimation = firstTime,
+				startWhenAnimating = {
+					hideSubtitleOverlay()
+				},
+				completionWhenAnimating = {
+					showSubtitleOverlay()
+				}
 			)
 			bottomSheetFullSubtitleUnder.setTextAnimation(
 				mediaItem?.mediaMetadata?.artist ?: context.getString(R.string.unknown_artist), skipAnimation = firstTime

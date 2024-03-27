@@ -2,7 +2,7 @@
     <color name="contrast_colorOnSurface">#FFFFFF</color>
     <color name="contrast_colorBackground">#000000</color>
     <color name="contrast_colorBackgroundElevated">#0A0A0A</color>
-    <color name="contrast_colorBackgroundContainer">#0F0F0F</color>
+    <color name="contrast_colorBackgroundContainer">#191919</color>
     <color name="contrast_colorOnSurfaceFainted">#80FFFFFF</color>
     <color name="contrast_colorOnSurfaceSecondary">#B3FFFFFF</color>
     <color name="contrast_colorOutline">#0DFFFFFF</color>

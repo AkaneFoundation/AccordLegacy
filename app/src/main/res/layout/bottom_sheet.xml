@@ -103,6 +103,13 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:dividerColor="@color/contrast_colorBackgroundContainer"
+            app:dividerThickness="0.5dp"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <org.akanework.gramophone.ui.components.BlendBackgroundView

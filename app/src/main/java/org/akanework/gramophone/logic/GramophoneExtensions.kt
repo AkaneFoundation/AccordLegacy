@@ -109,16 +109,24 @@ fun TextView.setTextAnimation(
     text: CharSequence?,
     duration: Long = 300,
     completion: (() -> Unit)? = null,
+    startWhenAnimating: (() -> Unit)? = null,
+    completionWhenAnimating: (() -> Unit)? = null,
     skipAnimation: Boolean = false
 ) {
     if (skipAnimation) {
         this.text = text
         completion?.let { it() }
     } else if (this.text != text) {
+        startWhenAnimating?.let {
+            it()
+        }
         fadOutAnimation(duration) {
             this.text = text
             fadInAnimation(duration) {
                 completion?.let {
+                    it()
+                }
+                completionWhenAnimating?.let {
                     it()
                 }
             }
