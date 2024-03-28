@@ -74,7 +74,7 @@ abstract class BaseAdapter<T>(
     private val allowDiffUtils: Boolean = false,
     private val canSort: Boolean = true,
     private val fallbackSpans: Int = 1,
-    val isPrivateLayout: Boolean = false,
+    private val isPrivateLayout: Boolean = false,
 ) : AdapterFragment.BaseInterface<BaseAdapter<T>.ViewHolder>(), Observer<List<T>>,
     PopupTextProvider, ItemHeightHelper {
     constructor(
@@ -90,7 +90,8 @@ abstract class BaseAdapter<T>(
         rawOrderExposed: Boolean = false,
         allowDiffUtils: Boolean = false,
         canSort: Boolean = true,
-        fallbackSpans: Int = 1
+        fallbackSpans: Int = 1,
+        isPrivateLayout: Boolean = false
     ) : this(
         fragment.requireContext(),
         liveData,
@@ -104,7 +105,8 @@ abstract class BaseAdapter<T>(
         rawOrderExposed,
         allowDiffUtils,
         canSort,
-        fallbackSpans
+        fallbackSpans,
+        isPrivateLayout
     ) { this.fragment = fragment }
 
     companion object {
