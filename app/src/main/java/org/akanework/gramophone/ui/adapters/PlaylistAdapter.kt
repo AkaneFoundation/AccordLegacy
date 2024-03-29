@@ -17,12 +17,15 @@
 
 package org.akanework.gramophone.ui.adapters
 
+import android.content.Context
+import android.net.Uri
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
 import org.akanework.gramophone.ui.fragments.GeneralSubFragment
+import org.akanework.gramophone.ui.fragments.ManuscriptIntermediateFragment
 
 /**
  * [PlaylistAdapter] is an adapter for displaying artists.
@@ -34,27 +37,42 @@ class PlaylistAdapter(
     (
     fragment,
     liveData = playlistList,
-    sortHelper = StoreItemHelper(),
+    sortHelper = PlaylistItemHelper(fragment.requireContext()),
     naturalOrderHelper = null,
     initialSortType = Sorter.Type.ByTitleAscending,
     pluralStr = R.plurals.items,
     ownsView = true,
-    defaultLayoutType = LayoutType.LIST
+    defaultLayoutType = LayoutType.GRID
 ) {
 
     override val defaultCover = R.drawable.ic_default_cover_playlist
 
     override fun virtualTitleOf(item: MediaStoreUtils.Playlist): String {
         return context.getString(
-            if (item is MediaStoreUtils.RecentlyAdded)
-                R.string.recently_added else R.string.unknown_playlist
+            when (item) {
+                is MediaStoreUtils.RecentlyAdded -> {
+                    R.string.recently_added
+                }
+                is MediaStoreUtils.ManuScript -> {
+                    R.string.manuscript
+                }
+                else -> {
+                    R.string.unknown_playlist
+                }
+            }
         )
     }
 
     override fun onClick(item: MediaStoreUtils.Playlist) {
-        mainActivity.startFragment(GeneralSubFragment()) {
-            putInt("Position", toRawPos(item))
-            putInt("Item", R.id.playlist)
+        if (item is MediaStoreUtils.ManuScript) {
+            mainActivity.startFragment(
+                ManuscriptIntermediateFragment()
+            )
+        } else {
+            mainActivity.startFragment(GeneralSubFragment()) {
+                putInt("Position", toRawPos(item))
+                putInt("Item", R.id.playlist)
+            }
         }
     }
 
@@ -74,6 +92,16 @@ class PlaylistAdapter(
 
                 else -> false
             }
+        }
+    }
+
+    class PlaylistItemHelper(private val context: Context) : StoreItemHelper<MediaStoreUtils.Playlist>() {
+        override fun getCover(item: MediaStoreUtils.Playlist): Uri? {
+            // return if (item is MediaStoreUtils.ManuScript) {
+            //    context.resourceUri(R.drawable.ic_default_cover_manuscript)
+            //} else {
+                return super.getCover(item)
+            //}
         }
     }
 

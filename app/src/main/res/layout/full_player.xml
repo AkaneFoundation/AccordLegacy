@@ -68,8 +68,7 @@
 
 			<FrameLayout
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginTop="2dp">
+				android:layout_height="wrap_content">
 
 				<org.akanework.gramophone.ui.components.MarqueeTextView
 					android:id="@+id/playlist_song_artist"
@@ -206,14 +205,14 @@
 		android:layout_height="wrap_content"
 		android:layout_marginTop="16dp"
 		app:layout_constraintTop_toTopOf="parent"
-		app:tint="#80FFFFFF" />
+		app:tint="#4DFFFFFF" />
 
 	<com.google.android.material.card.MaterialCardView
 		android:id="@+id/album_cover_frame"
 		android:layout_width="0dp"
 		android:layout_height="0dp"
-		android:layout_marginHorizontal="24dp"
-		android:layout_marginTop="8dp"
+		android:layout_marginHorizontal="22dp"
+		android:layout_marginTop="12dp"
 		android:background="@android:color/transparent"
 		app:cardBackgroundColor="@android:color/transparent"
 		app:cardCornerRadius="10dp"
@@ -291,7 +290,6 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:fontFamily="sans-serif"
-				android:minHeight="28dp"
 				android:gravity="start|center_vertical"
 				android:includeFontPadding="false"
 				android:scrollbars="none"
@@ -312,7 +310,6 @@
 					android:fontFamily="sans-serif"
 					android:gravity="start|center_vertical"
 					android:includeFontPadding="false"
-					android:minHeight="28dp"
 					android:scrollbars="none"
 					android:textColor="#CCFFFFFF"
 					android:textFontWeight="400"
@@ -327,7 +324,6 @@
 					android:fontFamily="sans-serif"
 					android:gravity="start|center_vertical"
 					android:includeFontPadding="false"
-					android:minHeight="28dp"
 					android:scrollbars="none"
 					android:textColor="#66FFFFFF"
 					android:textFontWeight="400"
@@ -381,7 +377,20 @@
 				android:layout_gravity="start"
 				android:fontFamily="sans-serif"
 				android:text="@string/default_time"
-				android:textColor="#EBFFFFFF"
+				android:textColor="#0AFFFFFF"
+				android:textFontWeight="500"
+				android:textSize="12sp"
+				android:letterSpacing="0.05"
+				tools:targetApi="p" />
+
+			<TextView
+				android:id="@+id/position_back"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="start"
+				android:fontFamily="sans-serif"
+				android:text="@string/default_time"
+				android:textColor="#80FFFFFF"
 				android:textFontWeight="500"
 				android:textSize="12sp"
 				android:letterSpacing="0.05"
@@ -394,7 +403,20 @@
 				android:layout_gravity="end"
 				android:fontFamily="sans-serif"
 				android:text="@string/default_time"
-				android:textColor="#EBFFFFFF"
+				android:textColor="#0AFFFFFF"
+				android:textFontWeight="500"
+				android:textSize="12sp"
+				android:letterSpacing="0.05"
+				tools:targetApi="p" />
+
+			<TextView
+				android:id="@+id/duration_back"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="end"
+				android:fontFamily="sans-serif"
+				android:text="@string/default_time"
+				android:textColor="#80FFFFFF"
 				android:textFontWeight="500"
 				android:textSize="12sp"
 				android:letterSpacing="0.05"
@@ -499,7 +521,7 @@
 			app:icon="@drawable/ic_quote_bubble_24dp"
 			app:iconGravity="textStart"
 			app:iconPadding="0dp"
-			app:iconSize="24dp"
+			app:iconSize="26dp"
 			app:iconTint="@color/sl_check_button" />
 
 		<com.google.android.material.button.MaterialButton
@@ -517,7 +539,7 @@
 			app:icon="@drawable/ic_timer_24dp"
 			app:iconGravity="textStart"
 			app:iconPadding="0dp"
-			app:iconSize="24dp"
+			app:iconSize="26dp"
 			app:iconTint="@color/sl_check_button" />
 
 		<com.google.android.material.button.MaterialButton
@@ -535,7 +557,7 @@
 			app:icon="@drawable/ic_bullet_list_24dp"
 			app:iconGravity="textStart"
 			app:iconPadding="0dp"
-			app:iconSize="24dp"
+			app:iconSize="26dp"
 			app:iconTint="@color/sl_check_button" />
 	</LinearLayout>
 

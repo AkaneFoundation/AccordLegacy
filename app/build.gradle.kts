@@ -46,8 +46,8 @@ android {
         // Bye bye android 12 - cuz blur
         minSdk = 31
         targetSdk = 34
-        versionCode = 14
-        versionName = "alpha09"
+        versionCode = 15
+        versionName = "alpha10"
         buildConfigField(
             "String",
             "MY_VERSION_NAME",
@@ -90,6 +90,7 @@ android {
             }
         }
         debug {
+            applicationIdSuffix = ".debug"
             if (project.hasProperty("AKANE_RELEASE_KEY_ALIAS")) {
                 signingConfig = signingConfigs["release"]
             }

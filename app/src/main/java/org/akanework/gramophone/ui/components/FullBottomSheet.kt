@@ -53,7 +53,6 @@ import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.GramophonePlaybackService
-import org.akanework.gramophone.logic.clone
 import org.akanework.gramophone.logic.dpToPx
 import org.akanework.gramophone.logic.fadInAnimation
 import org.akanework.gramophone.logic.fadOutAnimation
@@ -95,7 +94,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 	companion object {
 		const val SLIDER_UPDATE_INTERVAL: Long = 100
-		const val LYRIC_TRANSIT_DURATION: Long = 500
+		const val LYRIC_TRANSIT_DURATION: Long = 400
 		const val VIEW_TRANSIT_DURATION: Long = 350
 		const val LYRIC_REMOVE_HIGHLIGHT: Int = 0
 		const val LYRIC_SET_HIGHLIGHT: Int = 1
@@ -127,7 +126,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private val bottomSheetFullNextButton: MaterialButton
 	private val bottomSheetFullPreviousButton: MaterialButton
 	private val bottomSheetFullDuration: TextView
+	private val bottomSheetFullDurationBack: TextView
 	private val bottomSheetFullPosition: TextView
+	private val bottomSheetFullPositionBack: TextView
 	private val bottomSheetShuffleButton: MaterialButton
 	private val bottomSheetLoopButton: MaterialButton
 	private val bottomSheetPlaylistButton: MaterialButton
@@ -169,7 +170,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetFullControllerButton = findViewById(R.id.sheet_mid_button)
 		bottomSheetFullNextButton = findViewById(R.id.sheet_next_song)
 		bottomSheetFullPosition = findViewById(R.id.position)
+		bottomSheetFullPositionBack = findViewById(R.id.position_back)
 		bottomSheetFullDuration = findViewById(R.id.duration)
+		bottomSheetFullDurationBack = findViewById(R.id.duration_back)
 		bottomSheetFullSlider = findViewById(R.id.slider_vert)
 		bottomSheetFullLyricButton = findViewById(R.id.lyric_btn)
 		bottomSheetShuffleButton = findViewById(R.id.sheet_random)
@@ -197,6 +200,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 		bottomSheetFullSubtitle.paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
 		bottomSheetFullPlaylistSubtitle.paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
+		bottomSheetFullDurationBack.paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
+		bottomSheetFullPositionBack.paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
 
 		ViewCompat.setOnApplyWindowInsetsListener(bottomSheetFullLyricRecyclerView) { v, insets ->
 			val myInsets = insets.getInsets(
@@ -382,8 +387,12 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				if (dest != null) {
 					bottomSheetFullPosition.text =
 						CalculationUtils.convertDurationToTimeStamp((value).toLong())
+					bottomSheetFullPositionBack.text =
+						bottomSheetFullPosition.text
 					bottomSheetFullDuration.text =
 						'-' + CalculationUtils.convertDurationToTimeStamp(dest - (value).toLong())
+					bottomSheetFullDurationBack.text =
+						bottomSheetFullDuration.text
 				}
 			}
 		}
@@ -406,11 +415,19 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	fun hideSliderOverlay() {
 		bottomSheetFullSlider.updateBottomTrackColor(Color.parseColor("#00FFFFFF"))
 		bottomSheetFullSlider.trackInactiveTintList = ColorStateList.valueOf(Color.parseColor("#33FFFFFF"))
+		bottomSheetFullDurationBack.setTextColor(Color.parseColor("#00FFFFFF"))
+		bottomSheetFullDuration.setTextColor(Color.parseColor("#33FFFFFF"))
+		bottomSheetFullPositionBack.setTextColor(Color.parseColor("#00FFFFFF"))
+		bottomSheetFullPosition.setTextColor(Color.parseColor("#33FFFFFF"))
 	}
 
 	fun showSliderOverlay() {
 		bottomSheetFullSlider.updateBottomTrackColor(Color.parseColor("#80FFFFFF"))
 		bottomSheetFullSlider.trackInactiveTintList = ColorStateList.valueOf(Color.parseColor("#0AFFFFFF"))
+		bottomSheetFullDurationBack.setTextColor(Color.parseColor("#80FFFFFF"))
+		bottomSheetFullDuration.setTextColor(Color.parseColor("#0AFFFFFF"))
+		bottomSheetFullPositionBack.setTextColor(Color.parseColor("#80FFFFFF"))
+		bottomSheetFullPosition.setTextColor(Color.parseColor("#0AFFFFFF"))
 	}
 
 	fun hideSubtitleOverlay() {
@@ -538,7 +555,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		val myInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars()
 				or WindowInsetsCompat.Type.displayCutout())
 		setPadding(myInsets.left, myInsets.top, myInsets.right, myInsets.bottom)
-		ViewCompat.dispatchApplyWindowInsets(bottomSheetFullLyricRecyclerView, insets.clone())
 		return WindowInsetsCompat.Builder(insets)
 			.setInsets(WindowInsetsCompat.Type.systemBars()
 					or WindowInsetsCompat.Type.displayCutout(), Insets.NONE)
@@ -628,12 +644,15 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			bottomSheetFullSlider.value =
 				min(instance?.currentPosition?.toFloat() ?: 0f, bottomSheetFullSlider.valueTo)
 			bottomSheetFullPosition.text = position
+			bottomSheetFullPositionBack.text = bottomSheetFullPosition.text
 			bottomSheetFullDuration.text =
 				'-' +
 						CalculationUtils.convertDurationToTimeStamp(
 							instance?.currentMediaItem?.mediaMetadata?.extras?.getLong("Duration")
 								?.minus((currentPosition ?: 0)) ?: 0
 						)
+			bottomSheetFullDurationBack.text =
+				bottomSheetFullDuration.text
 		}
 		updateLyric(duration)
 	}
@@ -1047,12 +1066,14 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				bottomSheetFullSlider.value =
 					min(instance?.currentPosition?.toFloat() ?: 0f, bottomSheetFullSlider.valueTo)
 				bottomSheetFullPosition.text = position
+				bottomSheetFullPositionBack.text = bottomSheetFullPosition.text
 				bottomSheetFullDuration.text =
 					'-' +
 					CalculationUtils.convertDurationToTimeStamp(
 						instance?.currentMediaItem?.mediaMetadata?.extras?.getLong("Duration")
 							?.minus((currentPosition ?: 0)) ?: 0
 					)
+				bottomSheetFullDurationBack.text = bottomSheetFullDuration.text
 			}
 			updateLyric(duration)
 			if (instance?.isPlaying == true) {

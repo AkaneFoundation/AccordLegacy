@@ -78,8 +78,7 @@
 
 			<FrameLayout
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginTop="2dp">
+				android:layout_height="wrap_content">
 
 				<org.akanework.gramophone.ui.components.MarqueeTextView
 					android:id="@+id/playlist_song_artist"
@@ -292,7 +291,6 @@
 				android:scrollbars="none"
 				android:textColor="#EBFFFFFF"
 				android:textFontWeight="500"
-				android:minHeight="30dp"
 				android:fontFamily="sans-serif"
 				android:textSize="20sp"
 				tools:targetApi="p"
@@ -309,7 +307,6 @@
 					android:fontFamily="sans-serif"
 					android:gravity="start|center_vertical"
 					android:includeFontPadding="false"
-					android:minHeight="28dp"
 					android:scrollbars="none"
 					android:textColor="#CCFFFFFF"
 					android:textFontWeight="400"
@@ -324,7 +321,6 @@
 					android:fontFamily="sans-serif"
 					android:gravity="start|center_vertical"
 					android:includeFontPadding="false"
-					android:minHeight="28dp"
 					android:scrollbars="none"
 					android:textColor="#66FFFFFF"
 					android:textFontWeight="400"
@@ -377,7 +373,20 @@
 				android:layout_height="wrap_content"
 				android:layout_gravity="start"
 				android:text="@string/default_time"
-				android:textColor="#EBFFFFFF"
+				android:textColor="#0AFFFFFF"
+				android:textFontWeight="500"
+				android:textSize="12sp"
+				android:letterSpacing="0.05"
+				android:fontFamily="sans-serif"
+				tools:targetApi="p" />
+
+			<TextView
+				android:id="@+id/position_back"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="start"
+				android:text="@string/default_time"
+				android:textColor="#80FFFFFF"
 				android:textFontWeight="500"
 				android:textSize="12sp"
 				android:letterSpacing="0.05"
@@ -390,7 +399,20 @@
 				android:layout_height="wrap_content"
 				android:layout_gravity="end"
 				android:text="@string/default_time"
-				android:textColor="#EBFFFFFF"
+				android:textColor="#0AFFFFFF"
+				android:textFontWeight="500"
+				android:textSize="12sp"
+				android:letterSpacing="0.05"
+				android:fontFamily="sans-serif"
+				tools:targetApi="p" />
+
+			<TextView
+				android:id="@+id/duration_back"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="end"
+				android:text="@string/default_time"
+				android:textColor="#80FFFFFF"
 				android:textFontWeight="500"
 				android:textSize="12sp"
 				android:letterSpacing="0.05"

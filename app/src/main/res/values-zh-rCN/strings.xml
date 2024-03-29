@@ -158,4 +158,13 @@
     <string name="crash_clipboard">已将崩溃日志复制到剪贴板</string>
     <string name="settings_trim_lyrics">删除歌词中的空行</string>
     <string name="playlist">播放列表</string>
+    <string name="manuscript">手稿</string>
+    <string name="confirm">确认</string>
+    <string name="manuscript_quote">“手稿”</string>
+    <string name="collect_anytime">随时收藏</string>
+    <string name="collect_anytime_desc">在听到心仪的歌曲时随时收藏，及时保存你所喜爱的旋律，并按需取阅。</string>
+    <string name="add_notes">添加备注</string>
+    <string name="add_notes_desc">为收藏的曲目添加备注，记录您的心情、想法或者属于您的的特殊回忆。</string>
+    <string name="rearrange">重新排序</string>
+    <string name="rearrange_desc">您可以随时回到列表中调整歌曲的顺序，个性化您的音乐体验。</string>
 </resources>

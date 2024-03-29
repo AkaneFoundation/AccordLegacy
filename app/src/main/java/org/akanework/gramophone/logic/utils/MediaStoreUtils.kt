@@ -158,6 +158,10 @@ object MediaStoreUtils {
             }
     }
 
+    class ManuScript(songList: MutableList<MediaItem>) : Playlist(
+        -2, null, mutableListOf()
+    )
+
     /**
      * [LibraryStoreClass] collects above metadata classes
      * together for more convenient reading/writing.
@@ -604,6 +608,7 @@ object MediaStoreUtils {
                             "song for id $value in map with ${idMap.size} entries") })
             }
         }.toMutableList()
+        // playlistsFinal.add(ManuScript(mutableListOf()))
         playlistsFinal.add(RecentlyAdded(
             // TODO setting?
             (System.currentTimeMillis() / 1000) - (7 * 24 * 60 * 60),

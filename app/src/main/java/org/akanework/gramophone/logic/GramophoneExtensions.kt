@@ -19,6 +19,7 @@ package org.akanework.gramophone.logic
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ContentResolver
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
@@ -397,4 +398,13 @@ inline fun SharedPreferences.getBooleanStrict(key: String, defValue: Boolean): B
 @Suppress("NOTHING_TO_INLINE")
 inline fun SharedPreferences.getStringSetStrict(key: String, defValue: Set<String>?): Set<String>? {
     return use { getStringSet(key, defValue) }
+}
+
+fun Context.resourceUri(resourceId: Int): Uri = with(resources) {
+    Uri.Builder()
+        .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+        .authority(getResourcePackageName(resourceId))
+        .appendPath(getResourceTypeName(resourceId))
+        .appendPath(getResourceEntryName(resourceId))
+        .build()
 }

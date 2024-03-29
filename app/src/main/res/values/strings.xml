@@ -173,4 +173,13 @@
 	<string name="crash_thread" translatable="false">Thread</string>
 	<string name="settings_trim_lyrics">Remove spaces around lyrics</string>
     <string name="playlist">Playlist</string>
+    <string name="manuscript">Manuscript</string>
+    <string name="confirm">Confirm</string>
+    <string name="manuscript_quote">\"Manuscript\"</string>
+    <string name="collect_anytime">Collect Anytime</string>
+    <string name="collect_anytime_desc">Collect your favorite melodies whenever you hear a song you love, and access them whenever you want.</string>
+    <string name="add_notes">Add Notes</string>
+    <string name="add_notes_desc">Add notes to your favorite tracks, record your feelings, thoughts, or special memories. Revisit them here at anytime.</string>
+    <string name="rearrange">Rearrange</string>
+    <string name="rearrange_desc">You can revisit the list at any time to rearrange the order of songs, personalizing your music experience.</string>
 </resources>

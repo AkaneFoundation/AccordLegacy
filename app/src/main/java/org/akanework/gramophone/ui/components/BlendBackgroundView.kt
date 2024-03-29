@@ -56,12 +56,12 @@ class BlendBackgroundView(context: Context, attrs: AttributeSet?, defStyleAttr: 
         imageViewBG = findViewById(R.id.bg)
         rotateFrame = findViewById(R.id.rotate_frame)
         blurView = findViewById(R.id.blur_view)
-        initializeRotationAnimation(imageViewTS, 0f, 360f, 64000)
-        initializeRotationAnimation(imageViewTE, 40f, 400f, 60000)
-        initializeRotationAnimation(imageViewBS, 120f, 480f, 68000)
-        initializeRotationAnimation(imageViewBE, 80f, 440f, 70000)
-        initializeRotationAnimation(imageViewC, 360f, 0f, 107000)
-        initializeRotationAnimation(rotateFrame, 360f, 0f, 107000)
+        initializeRotationAnimation(imageViewTS, 0f, 360f, 20000)
+        initializeRotationAnimation(imageViewTE, 40f, 400f, 25000)
+        initializeRotationAnimation(imageViewBS, 120f, 480f, 30000)
+        initializeRotationAnimation(imageViewBE, 80f, 440f, 35000)
+        initializeRotationAnimation(imageViewC, 360f, 0f, 60000)
+        initializeRotationAnimation(rotateFrame, 360f, 0f, 60000)
         setUpBlurView(blurView, this, 160f)
     }
 
