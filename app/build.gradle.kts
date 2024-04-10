@@ -46,8 +46,8 @@ android {
         // Bye bye android 12 - cuz blur
         minSdk = 31
         targetSdk = 34
-        versionCode = 15
-        versionName = "alpha10"
+        versionCode = 16
+        versionName = "alpha11"
         buildConfigField(
             "String",
             "MY_VERSION_NAME",
@@ -126,11 +126,11 @@ android {
 dependencies {
     val glideVersion = "5.0.0-rc01"
     val media3Version = "1.3.0"
-    implementation("androidx.core:core-ktx:1.13.0-beta01")
+    implementation("androidx.core:core-ktx:1.13.0-rc01")
     implementation("androidx.activity:activity-ktx:1.8.2")
     implementation("androidx.concurrent:concurrent-futures-ktx:1.1.0")
-    implementation("androidx.transition:transition-ktx:1.5.0-beta01") // <-- for predictive back
-    implementation("androidx.fragment:fragment-ktx:1.7.0-beta01")
+    implementation("androidx.transition:transition-ktx:1.5.0-rc01") // <-- for predictive back
+    implementation("androidx.fragment:fragment-ktx:1.7.0-rc01")
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     implementation("androidx.appcompat:appcompat:1.7.0-alpha03")

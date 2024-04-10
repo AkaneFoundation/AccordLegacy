@@ -17,9 +17,13 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.view.animation.LinearInterpolator
+import android.widget.FrameLayout
+import android.widget.ImageSwitcher
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.graphics.drawable.toDrawable
 import org.akanework.gramophone.R
 import org.akanework.gramophone.ui.components.blurview.BlurView
 import org.akanework.gramophone.ui.components.blurview.RenderEffectBlur
@@ -35,16 +39,22 @@ class BlendBackgroundView(context: Context, attrs: AttributeSet?, defStyleAttr: 
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context) : this(context, null)
 
-    private val imageViewTS: ImageView
-    private val imageViewTE: ImageView
-    private val imageViewBS: ImageView
-    private val imageViewBE: ImageView
-    private val imageViewC: ImageView
-    private val imageViewBG: ImageView
+    private val imageViewTS: ImageSwitcher
+    private val imageViewTE: ImageSwitcher
+    private val imageViewBS: ImageSwitcher
+    private val imageViewBE: ImageSwitcher
+    private val imageViewC: ImageSwitcher
+    private val imageViewBG: ImageSwitcher
     private val rotateFrame: ConstraintLayout
     private val blurView: BlurView
 
     private val objectAnimatorList: MutableList<ObjectAnimator> = mutableListOf()
+
+    private var previousBitmap: Bitmap? = null
+
+    companion object {
+        const val VIEW_TRANSIT_DURATION: Long = 500
+    }
 
     init {
         inflate(context, R.layout.blend_background, this)
@@ -54,6 +64,27 @@ class BlendBackgroundView(context: Context, attrs: AttributeSet?, defStyleAttr: 
         imageViewBS = findViewById(R.id.type4)
         imageViewC = findViewById(R.id.type5)
         imageViewBG = findViewById(R.id.bg)
+
+        val animationIn = AnimationUtils.loadAnimation(context, android.R.anim.fade_in)
+        animationIn.duration = VIEW_TRANSIT_DURATION
+        val animationOut = AnimationUtils.loadAnimation(context, android.R.anim.fade_out)
+        animationOut.duration = VIEW_TRANSIT_DURATION
+
+        val factoryList = listOf(imageViewTS, imageViewTE, imageViewBE, imageViewBS, imageViewC, imageViewBG)
+        factoryList.forEach {
+            it.setFactory {
+                val imageView = ImageView(context)
+                imageView.scaleType = ImageView.ScaleType.CENTER_CROP
+                imageView.layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT
+                )
+                imageView
+            }
+            it.inAnimation = animationIn
+            it.outAnimation = animationOut
+        }
+
         rotateFrame = findViewById(R.id.rotate_frame)
         blurView = findViewById(R.id.blur_view)
         initializeRotationAnimation(imageViewTS, 0f, 360f, 20000)
@@ -67,21 +98,18 @@ class BlendBackgroundView(context: Context, attrs: AttributeSet?, defStyleAttr: 
 
     fun setImageUri(uri: Uri) {
         val originalBitmap = getBitmapFromUri(context.contentResolver, uri)
-        if (originalBitmap != null) {
+        if (originalBitmap != null &&
+            (previousBitmap == null || !areBitmapsSame(originalBitmap, previousBitmap!!))
+            ) {
             enhanceSaturation(originalBitmap, 3f).let {
-                imageViewTS.setImageBitmap(cropTopLeftQuarter(it))
-                imageViewTS.scaleType = ImageView.ScaleType.CENTER_CROP
-                imageViewTE.setImageBitmap(cropTopRightQuarter(it))
-                imageViewTE.scaleType = ImageView.ScaleType.CENTER_CROP
-                imageViewBS.setImageBitmap(cropBottomLeftQuarter(it))
-                imageViewBS.scaleType = ImageView.ScaleType.CENTER_CROP
-                imageViewBE.setImageBitmap(cropBottomRightQuarter(it))
-                imageViewBE.scaleType = ImageView.ScaleType.CENTER_CROP
-                imageViewC.setImageBitmap(cropCenterHalf(it))
-                imageViewC.scaleType = ImageView.ScaleType.CENTER_CROP
-                imageViewBG.setImageBitmap(it)
-                imageViewBG.scaleType = ImageView.ScaleType.CENTER_CROP
+                imageViewTS.setImageDrawable(cropTopLeftQuarter(it).toDrawable(resources))
+                imageViewTE.setImageDrawable(cropTopRightQuarter(it).toDrawable(resources))
+                imageViewBS.setImageDrawable(cropBottomLeftQuarter(it).toDrawable(resources))
+                imageViewBE.setImageDrawable(cropBottomRightQuarter(it).toDrawable(resources))
+                imageViewC.setImageDrawable(cropCenterHalf(it).toDrawable(resources))
+                imageViewBG.setImageDrawable(it.toDrawable(resources))
             }
+            previousBitmap = originalBitmap
         }
     }
 
@@ -136,7 +164,7 @@ class BlendBackgroundView(context: Context, attrs: AttributeSet?, defStyleAttr: 
             inputStream = contentResolver.openInputStream(uri)
 
             val options = BitmapFactory.Options().apply {
-                inSampleSize = 2
+                inSampleSize = 4
             }
 
             val bitmap = BitmapFactory.decodeStream(inputStream, null, options)
@@ -246,6 +274,38 @@ class BlendBackgroundView(context: Context, attrs: AttributeSet?, defStyleAttr: 
         val destRect = Rect(0, 0, quarterWidth, quarterHeight)
         canvas.drawBitmap(bitmap, srcRect, destRect, null)
         return croppedBitmap
+    }
+
+    private fun areBitmapsSame(bitmap1: Bitmap, bitmap2: Bitmap): Boolean {
+        val width = bitmap1.width
+        val height = bitmap1.height
+
+        if (width != bitmap2.width || height != bitmap2.height) {
+            return false
+        }
+
+        if (bitmap1.config != bitmap2.config) {
+            return false
+        }
+
+        val cornerPixels1 = intArrayOf(
+            bitmap1.getPixel(0, 0),
+            bitmap1.getPixel(width - 1, 0),
+            bitmap1.getPixel(0, height - 1),
+            bitmap1.getPixel(width - 1, height - 1)
+        )
+
+        val cornerPixels2 = intArrayOf(
+            bitmap2.getPixel(0, 0),
+            bitmap2.getPixel(width - 1, 0),
+            bitmap2.getPixel(0, height - 1),
+            bitmap2.getPixel(width - 1, height - 1)
+        )
+
+        val centerPixel1 = bitmap1.getPixel(width / 2, height / 2)
+        val centerPixel2 = bitmap2.getPixel(width / 2, height / 2)
+
+        return cornerPixels1 contentEquals cornerPixels2 && centerPixel1 == centerPixel2
     }
 
 }

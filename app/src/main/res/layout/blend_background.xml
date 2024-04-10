@@ -8,7 +8,7 @@
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout"
     android:id="@+id/blend_background">
 
-    <ImageView
+    <ImageSwitcher
         android:id="@+id/bg"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -19,7 +19,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:scaleType="centerCrop" />
 
-    <ImageView
+    <ImageSwitcher
         android:id="@+id/type5"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -33,8 +33,14 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/rotate_frame"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent">
+        android:layout_height="0dp"
+        android:layout_width="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHeight_percent="1.2"
+        app:layout_constraintDimensionRatio="1:1">
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline"
@@ -50,7 +56,7 @@
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="0.5"/>
 
-        <ImageView
+        <ImageSwitcher
             android:id="@+id/type1"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -59,7 +65,7 @@
             app:layout_constraintBottom_toTopOf="@id/guideline_2"
             app:layout_constraintEnd_toStartOf="@id/guideline" />
 
-        <ImageView
+        <ImageSwitcher
             android:id="@+id/type2"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -68,7 +74,7 @@
             app:layout_constraintBottom_toTopOf="@id/guideline_2"
             app:layout_constraintStart_toEndOf="@id/guideline" />
 
-        <ImageView
+        <ImageSwitcher
             android:id="@+id/type3"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -77,7 +83,7 @@
             app:layout_constraintTop_toBottomOf="@id/guideline_2"
             app:layout_constraintStart_toEndOf="@id/guideline" />
 
-        <ImageView
+        <ImageSwitcher
             android:id="@+id/type4"
             android:layout_width="0dp"
             android:layout_height="0dp"

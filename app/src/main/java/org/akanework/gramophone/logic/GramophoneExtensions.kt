@@ -177,6 +177,10 @@ fun View.fadInAnimation(duration: Long = 300, completion: (() -> Unit)? = null) 
 inline fun Int.dpToPx(context: Context): Int =
     (this.toFloat() * context.resources.displayMetrics.density).toInt()
 
+@Suppress("NOTHING_TO_INLINE")
+inline fun Int.pxToDp(context: Context): Int =
+    (this.toFloat() / context.resources.displayMetrics.density).toInt()
+
 fun MediaController.getTimer(): Int =
     sendCustomCommand(
         SessionCommand(SERVICE_QUERY_TIMER, Bundle.EMPTY),

@@ -12,6 +12,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.AttributeSet
+import android.util.DisplayMetrics
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
@@ -19,7 +21,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
-import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -34,7 +36,6 @@ import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.TransitionManager
 import com.bumptech.glide.Glide
@@ -66,7 +67,9 @@ import org.akanework.gramophone.logic.updateMargin
 import org.akanework.gramophone.logic.utils.CalculationUtils
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
 import org.akanework.gramophone.ui.MainActivity
+import kotlin.math.ceil
 import kotlin.math.min
+import kotlin.math.pow
 
 @SuppressLint("SetTextI18n")
 class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
@@ -90,14 +93,18 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private var firstTime = false
 	private var lastArtworkUri: Uri? = null
 
-	val interpolator = AccelerateDecelerateInterpolator()
+	val interpolator = DecelerateInterpolator()
 
 	companion object {
 		const val SLIDER_UPDATE_INTERVAL: Long = 100
-		const val LYRIC_TRANSIT_DURATION: Long = 400
 		const val VIEW_TRANSIT_DURATION: Long = 350
 		const val LYRIC_REMOVE_HIGHLIGHT: Int = 0
 		const val LYRIC_SET_HIGHLIGHT: Int = 1
+		const val LYRIC_TRANSIT_DURATION: Long = 400                     // Lyric size animate duration
+		const val LYRIC_SMOOTH_SCROLL_MAX_DIST: Int = 250                // Lyric scroll 1st phase distance
+		const val LYRIC_SMOOTH_SCROLL_MINIMUM_SCROLL_TIME: Int = 600     // Lyric scroll accelerate limit
+		const val LYRIC_SMOOTH_SCROLL_SPEED_KEY: Float = 300f            // Lyric scroll general speed
+		const val LYRIC_SMOOTH_SCROLL_SQUARE_FACTOR: Double = 1.2
 	}
 
 	private val touchListener = object : OverlaySlider.OnSliderTouchListener {
@@ -265,7 +272,10 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			}
 		}
 
-		bottomSheetInfinityButton.addOnCheckedChangeListener { _, isChecked ->
+		bottomSheetInfinityButton.addOnCheckedChangeListener { it, isChecked ->
+			if (Build.VERSION.SDK_INT >= 23) {
+				it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+			}
 			if (isChecked) {
 				bottomSheetLoopButton.isChecked = false
 				bottomSheetLoopButton.isEnabled = false
@@ -794,96 +804,77 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			position: Int,
 			payloads: MutableList<Any>
 		) {
-
 			val lyric = lyricList[position]
+			val isHighlightPayload = payloads.isNotEmpty() && (payloads[0] == LYRIC_SET_HIGHLIGHT || payloads[0] == LYRIC_REMOVE_HIGHLIGHT)
 
 			with(holder.lyricCard) {
 				setOnClickListener {
 					if (Build.VERSION.SDK_INT >= 23) {
 						performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
 					}
-					val instance = activity.getPlayer()
-					if (instance?.isPlaying == false) {
-						instance.play()
+					activity.getPlayer()?.apply {
+						if (!isPlaying) play()
+						seekTo(lyric.timeStamp)
 					}
-					instance?.seekTo(lyric.timeStamp)
 				}
 			}
 
 			with(holder.lyricTextView) {
 				visibility = if (lyric.content.isNotEmpty()) View.VISIBLE else View.GONE
 				text = lyric.content
-
-				if (isLyricCentered) {
-					this.gravity = Gravity.CENTER
-				} else {
-					this.gravity = Gravity.START
-				}
+				gravity = if (isLyricCentered) Gravity.CENTER else Gravity.START
 
 				val textSize = if (lyric.isTranslation) 20f else 32f
-				val paddingTop = (if (lyric.isTranslation) 2 else 18).dpToPx(context)
-				val paddingBottom = (if (position + 1 < lyricList.size &&
-					lyricList[position + 1].isTranslation
-				) 2 else 18).dpToPx(context)
+				val paddingTop = if (lyric.isTranslation) 2 else 18
+				val paddingBottom = if (position + 1 < lyricList.size && lyricList[position + 1].isTranslation) 2 else 18
 
-				this.textSize = textSize
-				setPadding(10.dpToPx(context), paddingTop, 10.dpToPx(context), paddingBottom)
+				setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
+				setPadding(10.dpToPx(context), paddingTop.dpToPx(context), 10.dpToPx(context), paddingBottom.dpToPx(context))
+				pivotX = 0f
+				pivotY = height.toFloat() / 2
 
-				this.pivotX = 0f
-				this.pivotY = this.height.toFloat()
-
-				if (payloads.isNotEmpty() && payloads[0] == LYRIC_SET_HIGHLIGHT) {
-					val animator = ValueAnimator.ofFloat(1f, sizeFactor)
-
-					animator.addUpdateListener { animation ->
-						val animatedValue = animation.animatedValue as Float
-						this.scaleX = animatedValue
-						this.scaleY = animatedValue
+				when {
+					isHighlightPayload -> {
+						val targetScale = if (payloads[0] == LYRIC_SET_HIGHLIGHT) sizeFactor else 1f
+						val targetColor = if (payloads[0] == LYRIC_SET_HIGHLIGHT) highlightTextColor else defaultTextColor
+						animateText(targetScale, targetColor)
 					}
-
-					animator.duration = LYRIC_TRANSIT_DURATION
-					animator.interpolator = interpolator
-					animator.start()
-
-					val animator1 = ValueAnimator.ofArgb(defaultTextColor, highlightTextColor)
-					animator1.addUpdateListener { animation ->
-						val animatedValue = animation.animatedValue as Int
-						this.setTextColor(animatedValue)
+					position == currentFocusPos || position == currentTranslationPos -> {
+						scaleText(sizeFactor)
+						setTextColor(highlightTextColor)
 					}
-					animator1.duration = LYRIC_TRANSIT_DURATION
-					animator1.interpolator = interpolator
-					animator1.start()
-				} else if (payloads.isNotEmpty() && payloads[0] == LYRIC_REMOVE_HIGHLIGHT) {
-					val animator = ValueAnimator.ofFloat(sizeFactor, 1f)
-
-					animator.addUpdateListener { animation ->
-						val animatedValue = animation.animatedValue as Float
-						this.scaleX = animatedValue
-						this.scaleY = animatedValue
+					else -> {
+						scaleText(1f)
+						setTextColor(defaultTextColor)
 					}
-
-					animator.duration = LYRIC_TRANSIT_DURATION
-					animator.interpolator = interpolator
-					animator.start()
-
-					val animator1 = ValueAnimator.ofArgb(highlightTextColor, defaultTextColor)
-					animator1.addUpdateListener { animation ->
-						val animatedValue = animation.animatedValue as Int
-						this.setTextColor(animatedValue)
-					}
-					animator1.duration = LYRIC_TRANSIT_DURATION
-					animator1.interpolator = interpolator
-					animator1.start()
-				} else if (position == currentFocusPos || position == currentTranslationPos) {
-					this.scaleX = sizeFactor
-					this.scaleY = sizeFactor
-					this.setTextColor(highlightTextColor)
-				} else {
-					this.scaleX = 1.0f
-					this.scaleY = 1.0f
-					this.setTextColor(defaultTextColor)
 				}
 			}
+		}
+
+		private fun TextView.animateText(targetScale: Float, targetColor: Int) {
+			val animator = ValueAnimator.ofFloat(scaleX, targetScale)
+			animator.addUpdateListener { animation ->
+				val animatedValue = animation.animatedValue as Float
+				scaleX = animatedValue
+				scaleY = animatedValue
+			}
+			animator.duration = LYRIC_TRANSIT_DURATION
+			animator.interpolator = interpolator
+			animator.start()
+
+			val colorAnimator = ValueAnimator.ofArgb(textColors.defaultColor, targetColor)
+			colorAnimator.addUpdateListener { animation ->
+				val animatedValue = animation.animatedValue as Int
+				setTextColor(animatedValue)
+			}
+			colorAnimator.duration = LYRIC_TRANSIT_DURATION
+			colorAnimator.interpolator = interpolator
+			colorAnimator.start()
+		}
+
+		private fun TextView.scaleText(scale: Float) {
+			scaleX = scale
+			scaleY = scale
 		}
 
 		override fun getItemCount(): Int = lyricList.size
@@ -1026,8 +1017,12 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		}
 	}
 
-	private fun createSmoothScroller() =
-		object : LinearSmoothScroller(context) {
+	private fun createSmoothScroller(): RecyclerView.SmoothScroller {
+		val smoothScrollLimit = LYRIC_SMOOTH_SCROLL_MAX_DIST.dpToPx(context)
+		val speedPerPixel = LYRIC_SMOOTH_SCROLL_SPEED_KEY / context.resources.displayMetrics.densityDpi
+
+		return object : CustomLinearSmoothScroller(context) {
+
 			override fun calculateDtToFit(
 				viewStart: Int,
 				viewEnd: Int,
@@ -1035,13 +1030,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				boxEnd: Int,
 				snapPreference: Int
 			): Int {
-				return super.calculateDtToFit(
-					viewStart,
-					viewEnd,
-					boxStart,
-					boxEnd,
-					snapPreference
-				) + 36.dpToPx(context)
+				return super.calculateDtToFit(viewStart, viewEnd, boxStart, boxEnd, snapPreference) + 36.dpToPx(context)
 			}
 
 			override fun getVerticalSnapPreference(): Int {
@@ -1049,9 +1038,21 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			}
 
 			override fun calculateTimeForDeceleration(dx: Int): Int {
-				return 500
+				val timeForScrolling = calculateTimeForScrolling(dx)
+				val calculatedTime = ceil(timeForScrolling / .3356).toInt()
+				return if (dx <= smoothScrollLimit) calculatedTime else {
+					val maximumTime = ceil(calculateTimeForScrolling(smoothScrollLimit) / .3356).toInt()
+					val finalFactor = maximumTime * (smoothScrollLimit / dx).toDouble().pow(LYRIC_SMOOTH_SCROLL_SQUARE_FACTOR).toInt()
+					if (finalFactor > LYRIC_SMOOTH_SCROLL_MINIMUM_SCROLL_TIME) finalFactor else LYRIC_SMOOTH_SCROLL_MINIMUM_SCROLL_TIME
+				}
+			}
+
+			override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float {
+				return speedPerPixel
 			}
 		}
+	}
+
 
 	private val positionRunnable = object : Runnable {
 		@SuppressLint("SetTextI18n")
@@ -1075,7 +1076,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 					)
 				bottomSheetFullDurationBack.text = bottomSheetFullDuration.text
 			}
-			updateLyric(duration)
+			if (duration != null && duration >= LYRIC_TRANSIT_DURATION) {
+				updateLyric(duration - LYRIC_TRANSIT_DURATION)
+			}
 			if (instance?.isPlaying == true) {
 				handler.postDelayed(this, SLIDER_UPDATE_INTERVAL)
 			} else {
