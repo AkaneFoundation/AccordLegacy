@@ -49,8 +49,9 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import coil.dispose
+import coil.imageLoader
+import coil.request.ImageRequest
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.button.MaterialButton
@@ -403,12 +404,16 @@ class PlayerBottomSheet private constructor(
         reason: Int,
     ) {
         if ((instance?.mediaItemCount ?: 0) > 0) {
-            Glide
-                .with(context)
-                .load(mediaItem?.mediaMetadata?.artworkUri)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .placeholder(R.drawable.ic_default_cover)
-                .into(bottomSheetPreviewCover)
+            context.imageLoader.enqueue(ImageRequest.Builder(context).apply {
+                target(onSuccess = {
+                    bottomSheetPreviewCover.setImageDrawable(it)
+                }, onError = {
+                    bottomSheetPreviewCover.setImageDrawable(it)
+                }) // do not react to onStart() which sets placeholder
+                data(mediaItem?.mediaMetadata?.artworkUri)
+                crossfade(true)
+                error(R.drawable.ic_default_cover)
+            }.build())
             mediaItem?.mediaMetadata?.artworkUri?.let {
                 bottomSheetBlendBackgroundView.setImageUri(
                     it
@@ -416,7 +421,7 @@ class PlayerBottomSheet private constructor(
             }
             bottomSheetPreviewTitle.text = mediaItem?.mediaMetadata?.title
         } else {
-            Glide.with(context.applicationContext).clear(bottomSheetPreviewCover)
+            bottomSheetPreviewCover.dispose()
         }
         var newState = standardBottomSheetBehavior!!.state
         if ((instance?.mediaItemCount ?: 0) > 0 && visible) {

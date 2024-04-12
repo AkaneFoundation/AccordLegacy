@@ -40,8 +40,8 @@ import androidx.fluidrecyclerview.widget.DiffUtil
 import androidx.fluidrecyclerview.widget.GridLayoutManager
 import androidx.fluidrecyclerview.widget.LinearLayoutManager
 import androidx.fluidrecyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import coil.dispose
+import coil.load
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.divider.MaterialDivider
 import kotlinx.coroutines.sync.Semaphore
@@ -396,12 +396,11 @@ abstract class BaseAdapter<T>(
         val item = list[position]
         holder.title.text = titleOf(item) ?: virtualTitleOf(item)
         holder.subTitle?.text = subTitleOf(item)
-        Glide
-            .with(holder.songCover.context)
-            .load(coverOf(item))
-            .transition(DrawableTransitionOptions.withCrossFade())
-            .placeholder(defaultCover)
-            .into(holder.songCover)
+        holder.songCover.load(coverOf(item)) {
+            crossfade(true)
+            placeholder(defaultCover)
+            error(defaultCover)
+        }
         holder.itemView.setOnClickListener { onClick(item) }
         holder.moreButton.setOnClickListener {
             val popupMenu = PopupMenu(it.context, it)
@@ -445,7 +444,7 @@ abstract class BaseAdapter<T>(
 
     override fun onViewRecycled(holder: ViewHolder) {
         super.onViewRecycled(holder)
-        Glide.with(context.applicationContext).clear(holder.songCover)
+        holder.songCover.dispose()
     }
 
     private fun toId(item: T): String {

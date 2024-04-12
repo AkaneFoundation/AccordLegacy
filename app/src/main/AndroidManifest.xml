@@ -30,7 +30,7 @@
         tools:node="remove" />
 
     <application
-        android:name=".logic.GramophoneApplication"
+        android:name=".ui.GramophoneApplication"
         android:allowBackup="true"
         android:appCategory="audio"
         android:dataExtractionRules="@xml/data_extraction_rules"

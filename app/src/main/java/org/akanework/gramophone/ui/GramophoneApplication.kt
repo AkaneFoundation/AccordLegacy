@@ -15,7 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.akanework.gramophone.logic
+package org.akanework.gramophone.ui
 
 import android.app.Application
 import android.app.NotificationManager
@@ -31,19 +31,19 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.DefaultMediaNotificationProvider
 import androidx.preference.PreferenceManager
-import com.google.android.material.color.DynamicColors
+import org.akanework.gramophone.logic.getStringStrict
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import coil.util.DebugLogger
 import org.akanework.gramophone.BuildConfig
-import org.akanework.gramophone.ui.BugHandlerActivity
 import kotlin.system.exitProcess
 
 /**
- * GramophoneApplication:
- *   We recover some configuration and apply dynamic color
- * here.
+ * GramophoneApplication
  *
  * @author AkaneTan, nift4
  */
-class GramophoneApplication : Application() {
+class GramophoneApplication : Application(), ImageLoaderFactory {
 
     lateinit var prefs: SharedPreferences
         private set
@@ -96,7 +96,15 @@ class GramophoneApplication : Application() {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             }
         }
+    }
 
-        DynamicColors.applyToActivitiesIfAvailable(this)
+    override fun newImageLoader(): ImageLoader {
+        return ImageLoader.Builder(this)
+            .diskCache(null)
+            .run {
+                if (!BuildConfig.DEBUG) this else
+                logger(DebugLogger())
+            }
+            .build()
     }
 }

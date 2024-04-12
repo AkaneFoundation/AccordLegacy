@@ -38,10 +38,10 @@ import androidx.media3.session.SessionResult
 import androidx.fluidrecyclerview.widget.LinearLayoutManager
 import androidx.fluidrecyclerview.widget.RecyclerView
 import androidx.transition.TransitionManager
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
+import coil.dispose
+import coil.imageLoader
+import coil.load
+import coil.request.ImageRequest
 import com.google.android.material.bottomsheet.BottomSheetDragHandleView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
@@ -91,7 +91,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private var isUserTracking = false
 	private var runnableRunning = false
 	private var firstTime = false
-	private var lastArtworkUri: Uri? = null
 
 	val interpolator = DecelerateInterpolator()
 
@@ -580,30 +579,18 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		reason: Int
 	) {
 		if (instance?.mediaItemCount != 0) {
-			val artworkUri = mediaItem?.mediaMetadata?.artworkUri
-			Glide
-				.with(context)
-				.load(artworkUri)
-				.error(R.drawable.ic_default_cover)
-				.into(object : CustomTarget<Drawable>() {
-					override fun onResourceReady(
-						resource: Drawable,
-						transition: Transition<in Drawable>?
-					) {
-						bottomSheetFullCover.setImageDrawable(resource)
-						bottomSheetFullPlaylistCover.setImageDrawable(resource)
-					}
-
-					override fun onLoadFailed(errorDrawable: Drawable?) {
-						bottomSheetFullCover.setImageDrawable(errorDrawable)
-						bottomSheetFullPlaylistCover.setImageDrawable(errorDrawable)
-					}
-
-					override fun onLoadCleared(placeholder: Drawable?) {
-						// TODO
-					}
-				})
-			lastArtworkUri = artworkUri
+			context.imageLoader.enqueue(ImageRequest.Builder(context).apply {
+				target(onSuccess = {
+					bottomSheetFullCover.setImageDrawable(it)
+					bottomSheetFullPlaylistCover.setImageDrawable(it)
+				}, onError = {
+					bottomSheetFullCover.setImageDrawable(it)
+					bottomSheetFullPlaylistCover.setImageDrawable(it)
+				}) // do not react to onStart() which sets placeholder
+				data(mediaItem?.mediaMetadata?.artworkUri)
+				error(R.drawable.ic_default_cover)
+				crossfade(true)
+			}.build())
 			bottomSheetFullTitle.setTextAnimation(mediaItem?.mediaMetadata?.title, skipAnimation = firstTime)
 			bottomSheetFullPlaylistTitle.setTextAnimation(mediaItem?.mediaMetadata?.title, skipAnimation = firstTime)
 			bottomSheetFullSubtitle.setTextAnimation(
@@ -626,12 +613,11 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			)
 			if (playlistNowPlaying != null) {
 				playlistNowPlaying!!.text = mediaItem?.mediaMetadata?.title
-				Glide
-					.with(context)
-					.load(mediaItem?.mediaMetadata?.artworkUri)
-					.transition(DrawableTransitionOptions.withCrossFade())
-					.placeholder(R.drawable.ic_default_cover)
-					.into(playlistNowPlayingCover!!)
+				playlistNowPlayingCover!!.load(mediaItem?.mediaMetadata?.artworkUri) {
+					crossfade(true)
+					placeholder(R.drawable.ic_default_cover)
+					error(R.drawable.ic_default_cover)
+				}
 			}
 			if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED) {
 				bottomSheetFullPlaylistAdapter.updatePlaylist(
@@ -639,12 +625,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				)
 			}
 		} else {
-			lastArtworkUri = null
-			Glide.with(context.applicationContext).clear(bottomSheetFullCover)
-			Glide.with(context.applicationContext).clear(bottomSheetFullPlaylistCover)
-			if (playlistNowPlaying != null) {
-				Glide.with(context.applicationContext).clear(playlistNowPlayingCover!!)
-			}
+			bottomSheetFullCover.dispose()
+			playlistNowPlayingCover?.dispose()
 		}
 		val currentPosition = instance?.currentPosition
 		val position = CalculationUtils.convertDurationToTimeStamp(currentPosition ?: 0)
@@ -943,12 +925,11 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 			holder.songName.text = playlist[holder.bindingAdapterPosition].mediaMetadata.title
 			holder.songArtist.text = playlist[holder.bindingAdapterPosition].mediaMetadata.artist
-			Glide
-				.with(holder.songCover.context)
-				.load(playlist[position].mediaMetadata.artworkUri)
-				.transition(DrawableTransitionOptions.withCrossFade())
-				.placeholder(R.drawable.ic_default_cover_fixed)
-				.into(holder.songCover)
+			holder.songCover.load(playlist[position].mediaMetadata.artworkUri) {
+				crossfade(true)
+				placeholder(R.drawable.ic_default_cover)
+				error(R.drawable.ic_default_cover)
+			}
 			holder.closeButton.setOnClickListener {
 				if (Build.VERSION.SDK_INT >= 23) {
 					it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
@@ -970,7 +951,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 		override fun onViewRecycled(holder: ViewHolder) {
 			super.onViewRecycled(holder)
-			Glide.with(activity.applicationContext).clear(holder.songCover)
+			holder.songCover.dispose()
 		}
 
 		override fun getItemCount(): Int = playlist.size
