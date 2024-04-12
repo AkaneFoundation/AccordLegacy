@@ -72,6 +72,26 @@ android {
         }
     }
 
+    splits {
+        abi {
+
+            // Enables building multiple APKs per ABI.
+            isEnable = true
+
+            // By default all ABIs are included, so use reset() and include to specify that you only
+            // want APKs for x86 and x86_64.
+
+            // Resets the list of ABIs for Gradle to create APKs for to none.
+            reset()
+
+            // Specifies a list of ABIs for Gradle to create APKs for.
+            include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+
+            // Specifies that you don't want to also generate a universal APK that includes all ABIs.
+            isUniversalApk = false
+        }
+    }
+
     buildTypes {
         release {
             if (releaseType != "Profile") {
@@ -116,6 +136,11 @@ android {
         includeInApk = false
         includeInBundle = false
     }
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
 
     // https://stackoverflow.com/a/77745844
     tasks.withType<PackageAndroidArtifact> {
@@ -125,7 +150,7 @@ android {
 
 dependencies {
     val glideVersion = "5.0.0-rc01"
-    val media3Version = "1.3.0"
+    val media3Version = "1.3.1"
     implementation("androidx.core:core-ktx:1.13.0-rc01")
     implementation("androidx.activity:activity-ktx:1.8.2")
     implementation("androidx.concurrent:concurrent-futures-ktx:1.1.0")
@@ -142,6 +167,7 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:$glideVersion")
     implementation("com.google.android.material:material:1.11.0")
     implementation("me.zhanghai.android.fastscroll:library:1.3.0")
+    implementation(files("../libs/lib-decoder-ffmpeg-release.aar"))
     ksp("com.github.bumptech.glide:ksp:$glideVersion")
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.13")
     // Note: JAudioTagger is not compatible with Android 5, we can't ship it in app

@@ -100,11 +100,11 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		const val VIEW_TRANSIT_DURATION: Long = 350
 		const val LYRIC_REMOVE_HIGHLIGHT: Int = 0
 		const val LYRIC_SET_HIGHLIGHT: Int = 1
-		const val LYRIC_TRANSIT_DURATION: Long = 400                     // Lyric size animate duration
+		const val LYRIC_TRANSIT_DURATION: Long = 500                     // Lyric size animate duration
 		const val LYRIC_SMOOTH_SCROLL_MAX_DIST: Int = 250                // Lyric scroll 1st phase distance
 		const val LYRIC_SMOOTH_SCROLL_MINIMUM_SCROLL_TIME: Int = 600     // Lyric scroll accelerate limit
-		const val LYRIC_SMOOTH_SCROLL_SPEED_KEY: Float = 300f            // Lyric scroll general speed
-		const val LYRIC_SMOOTH_SCROLL_SQUARE_FACTOR: Double = 1.2
+		const val LYRIC_SMOOTH_SCROLL_SPEED_KEY: Float = 280f            // Lyric scroll general speed
+		const val LYRIC_SMOOTH_SCROLL_SQUARE_FACTOR: Double = 1.06
 	}
 
 	private val touchListener = object : OverlaySlider.OnSliderTouchListener {
