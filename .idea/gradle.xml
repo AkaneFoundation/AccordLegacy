@@ -10,6 +10,8 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/fastscroll" />
+            <option value="$PROJECT_DIR$/fluidrecyclerview" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

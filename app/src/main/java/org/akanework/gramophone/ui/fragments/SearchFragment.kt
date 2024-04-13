@@ -28,7 +28,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.MediaItem
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.fluidrecyclerview.widget.LinearLayoutManager
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.Dispatchers

@@ -24,9 +24,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.media3.common.util.UnstableApi
-import androidx.recyclerview.widget.ConcatAdapter
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
+import androidx.fluidrecyclerview.widget.ConcatAdapter
+import androidx.fluidrecyclerview.widget.GridLayoutManager
+import androidx.fluidrecyclerview.widget.GridLayoutManager.SpanSizeLookup
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import me.zhanghai.android.fastscroll.PopupTextProvider

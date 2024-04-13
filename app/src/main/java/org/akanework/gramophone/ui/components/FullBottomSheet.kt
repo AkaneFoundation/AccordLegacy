@@ -35,8 +35,8 @@ import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.fluidrecyclerview.widget.LinearLayoutManager
+import androidx.fluidrecyclerview.widget.RecyclerView
 import androidx.transition.TransitionManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -103,7 +103,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		const val LYRIC_TRANSIT_DURATION: Long = 500                     // Lyric size animate duration
 		const val LYRIC_SMOOTH_SCROLL_MAX_DIST: Int = 250                // Lyric scroll 1st phase distance
 		const val LYRIC_SMOOTH_SCROLL_MINIMUM_SCROLL_TIME: Int = 600     // Lyric scroll accelerate limit
-		const val LYRIC_SMOOTH_SCROLL_SPEED_KEY: Float = 280f            // Lyric scroll general speed
+		const val LYRIC_SMOOTH_SCROLL_SPEED_KEY: Float = 300f            // Lyric scroll general speed
 		const val LYRIC_SMOOTH_SCROLL_SQUARE_FACTOR: Double = 1.06
 	}
 

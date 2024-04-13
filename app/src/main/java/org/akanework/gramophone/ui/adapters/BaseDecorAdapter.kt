@@ -25,8 +25,8 @@ import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.media3.common.C
 import androidx.media3.common.Player.REPEAT_MODE_OFF
-import androidx.recyclerview.widget.LinearSmoothScroller
-import androidx.recyclerview.widget.RecyclerView
+import androidx.fluidrecyclerview.widget.LinearSmoothScroller
+import androidx.fluidrecyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.gramophoneApplication

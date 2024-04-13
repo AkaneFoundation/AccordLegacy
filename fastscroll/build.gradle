@@ -1,0 +1,28 @@
+apply plugin: 'com.android.library'
+
+android {
+    namespace 'me.zhanghai.android.fastscroll'
+    compileSdk 34
+    buildToolsVersion = '34.0.0'
+    defaultConfig {
+        minSdk 21
+        targetSdk 34
+        versionCode Integer.parseInt(VERSION_CODE)
+        versionName VERSION_NAME
+        consumerProguardFiles 'proguard-rules.pro'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation project(":fluidrecyclerview")
+}

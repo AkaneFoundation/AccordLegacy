@@ -20,9 +20,9 @@ package org.akanework.gramophone.logic.ui
 import android.graphics.Canvas
 import android.graphics.Rect
 import android.view.MotionEvent
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.fluidrecyclerview.widget.GridLayoutManager
+import androidx.fluidrecyclerview.widget.LinearLayoutManager
+import androidx.fluidrecyclerview.widget.RecyclerView
 import me.zhanghai.android.fastscroll.FastScroller
 import me.zhanghai.android.fastscroll.PopupTextProvider
 import me.zhanghai.android.fastscroll.Predicate

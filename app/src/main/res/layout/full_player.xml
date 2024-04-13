@@ -185,7 +185,7 @@
 			app:layout_constraintStart_toStartOf="@id/bottom_frame"
 			app:layout_constraintBottom_toTopOf="@id/playlist_recyclerview"/>
 
-		<androidx.recyclerview.widget.RecyclerView
+		<androidx.fluidrecyclerview.widget.RecyclerView
 			android:id="@+id/playlist_recyclerview"
 			android:layout_width="match_parent"
 			android:layout_height="0dp"
@@ -244,7 +244,7 @@
 		app:fel_size_bottom="200dp"
 		app:fel_size_top="40dp">
 
-		<androidx.recyclerview.widget.RecyclerView
+		<androidx.fluidrecyclerview.widget.RecyclerView
 			android:id="@+id/lyric_frame"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"

@@ -16,3 +16,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Accord"
 include(":app")
+include(":fluidrecyclerview")
+include(":fastscroll")

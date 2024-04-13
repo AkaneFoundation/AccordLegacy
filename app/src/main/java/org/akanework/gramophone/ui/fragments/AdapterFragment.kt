@@ -22,8 +22,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.ConcatAdapter
-import androidx.recyclerview.widget.RecyclerView
+import androidx.fluidrecyclerview.widget.ConcatAdapter
+import androidx.fluidrecyclerview.widget.RecyclerView
 import me.zhanghai.android.fastscroll.PopupTextProvider
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.enableEdgeToEdgePaddingListener
