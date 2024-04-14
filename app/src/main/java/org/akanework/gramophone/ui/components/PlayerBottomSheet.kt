@@ -49,9 +49,11 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
-import coil.dispose
-import coil.imageLoader
-import coil.request.ImageRequest
+import coil3.annotation.ExperimentalCoilApi
+import coil3.dispose
+import coil3.imageLoader
+import coil3.request.ImageRequest
+import coil3.request.error
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.button.MaterialButton
@@ -65,6 +67,7 @@ import org.akanework.gramophone.logic.getBooleanStrict
 import org.akanework.gramophone.logic.gramophoneApplication
 import org.akanework.gramophone.logic.playOrPause
 import org.akanework.gramophone.logic.ui.MyBottomSheetBehavior
+import org.akanework.gramophone.logic.ui.coolCrossfade
 import org.akanework.gramophone.logic.utils.EnvUtils
 import org.akanework.gramophone.ui.MainActivity
 import org.akanework.gramophone.ui.components.blurview.BlurView
@@ -399,6 +402,7 @@ class PlayerBottomSheet private constructor(
 
     fun getPlayer(): MediaController? = instance
 
+    @OptIn(ExperimentalCoilApi::class)
     override fun onMediaItemTransition(
         mediaItem: MediaItem?,
         reason: Int,
@@ -406,12 +410,12 @@ class PlayerBottomSheet private constructor(
         if ((instance?.mediaItemCount ?: 0) > 0) {
             context.imageLoader.enqueue(ImageRequest.Builder(context).apply {
                 target(onSuccess = {
-                    bottomSheetPreviewCover.setImageDrawable(it)
+                    bottomSheetPreviewCover.setImageDrawable(it.asDrawable(context.resources))
                 }, onError = {
-                    bottomSheetPreviewCover.setImageDrawable(it)
+                    bottomSheetPreviewCover.setImageDrawable(it?.asDrawable(context.resources))
                 }) // do not react to onStart() which sets placeholder
                 data(mediaItem?.mediaMetadata?.artworkUri)
-                crossfade(true)
+                coolCrossfade(true)
                 error(R.drawable.ic_default_cover)
             }.build())
             mediaItem?.mediaMetadata?.artworkUri?.let {

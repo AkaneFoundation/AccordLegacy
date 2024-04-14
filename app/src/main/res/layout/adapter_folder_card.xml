@@ -33,6 +33,7 @@
                 android:layout_gravity="center_vertical"
                 android:importantForAccessibility="no"
                 android:src="@drawable/ic_folder"
+                android:scaleType="centerCrop"
                 app:tint="@color/contrast_colorOnSurface" />
 
         </com.google.android.material.card.MaterialCardView>

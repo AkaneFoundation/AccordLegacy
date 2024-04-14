@@ -26,7 +26,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.media.AudioManager
 import android.media.audiofx.AudioEffect
 import android.net.Uri
@@ -58,8 +57,11 @@ import androidx.media3.session.MediaSession.MediaItemsWithStartPosition
 import androidx.media3.session.MediaSessionService
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
-import coil.imageLoader
-import coil.request.ImageRequest
+import coil3.BitmapImage
+import coil3.annotation.ExperimentalCoilApi
+import coil3.imageLoader
+import coil3.request.ImageRequest
+import coil3.request.allowHardware
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
@@ -150,6 +152,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         }
     }
 
+    @OptIn(ExperimentalCoilApi::class)
     override fun onCreate() {
         super.onCreate()
         prefs = gramophoneApplication.prefs
@@ -250,7 +253,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
                                             // We don't need or want a placeholder.
                                         },
                                         onSuccess = { result ->
-                                            completer.set((result as BitmapDrawable).bitmap)
+                                            completer.set((result as BitmapImage).bitmap)
                                         },
                                         onError = { _ ->
                                             completer.setException(Exception("coil onError called"))

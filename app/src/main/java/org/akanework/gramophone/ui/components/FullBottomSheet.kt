@@ -7,8 +7,6 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
-import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.AttributeSet
@@ -30,18 +28,21 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fluidrecyclerview.widget.LinearLayoutManager
+import androidx.fluidrecyclerview.widget.RecyclerView
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
-import androidx.fluidrecyclerview.widget.LinearLayoutManager
-import androidx.fluidrecyclerview.widget.RecyclerView
 import androidx.transition.TransitionManager
-import coil.dispose
-import coil.imageLoader
-import coil.load
-import coil.request.ImageRequest
+import coil3.annotation.ExperimentalCoilApi
+import coil3.dispose
+import coil3.imageLoader
+import coil3.load
+import coil3.request.ImageRequest
+import coil3.request.placeholder
+import coil3.request.error
 import com.google.android.material.bottomsheet.BottomSheetDragHandleView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
@@ -63,6 +64,7 @@ import org.akanework.gramophone.logic.hasTimer
 import org.akanework.gramophone.logic.playOrPause
 import org.akanework.gramophone.logic.setTextAnimation
 import org.akanework.gramophone.logic.setTimer
+import org.akanework.gramophone.logic.ui.coolCrossfade
 import org.akanework.gramophone.logic.updateMargin
 import org.akanework.gramophone.logic.utils.CalculationUtils
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
@@ -573,6 +575,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			.toWindowInsets()!!
 	}
 
+	@OptIn(ExperimentalCoilApi::class)
 	@SuppressLint("NotifyDataSetChanged", "SetTextI18n")
 	override fun onMediaItemTransition(
 		mediaItem: MediaItem?,
@@ -581,15 +584,15 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		if (instance?.mediaItemCount != 0) {
 			context.imageLoader.enqueue(ImageRequest.Builder(context).apply {
 				target(onSuccess = {
-					bottomSheetFullCover.setImageDrawable(it)
-					bottomSheetFullPlaylistCover.setImageDrawable(it)
+					bottomSheetFullCover.setImageDrawable(it.asDrawable(context.resources))
+					bottomSheetFullPlaylistCover.setImageDrawable(it.asDrawable(context.resources))
 				}, onError = {
-					bottomSheetFullCover.setImageDrawable(it)
-					bottomSheetFullPlaylistCover.setImageDrawable(it)
+					bottomSheetFullCover.setImageDrawable(it?.asDrawable(context.resources))
+					bottomSheetFullPlaylistCover.setImageDrawable(it?.asDrawable(context.resources))
 				}) // do not react to onStart() which sets placeholder
 				data(mediaItem?.mediaMetadata?.artworkUri)
 				error(R.drawable.ic_default_cover)
-				crossfade(true)
+				coolCrossfade(true)
 			}.build())
 			bottomSheetFullTitle.setTextAnimation(mediaItem?.mediaMetadata?.title, skipAnimation = firstTime)
 			bottomSheetFullPlaylistTitle.setTextAnimation(mediaItem?.mediaMetadata?.title, skipAnimation = firstTime)
@@ -614,7 +617,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			if (playlistNowPlaying != null) {
 				playlistNowPlaying!!.text = mediaItem?.mediaMetadata?.title
 				playlistNowPlayingCover!!.load(mediaItem?.mediaMetadata?.artworkUri) {
-					crossfade(true)
+					coolCrossfade(true)
 					placeholder(R.drawable.ic_default_cover)
 					error(R.drawable.ic_default_cover)
 				}
@@ -926,7 +929,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			holder.songName.text = playlist[holder.bindingAdapterPosition].mediaMetadata.title
 			holder.songArtist.text = playlist[holder.bindingAdapterPosition].mediaMetadata.artist
 			holder.songCover.load(playlist[position].mediaMetadata.artworkUri) {
-				crossfade(true)
+				coolCrossfade(true)
 				placeholder(R.drawable.ic_default_cover)
 				error(R.drawable.ic_default_cover)
 			}

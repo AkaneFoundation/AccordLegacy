@@ -38,6 +38,7 @@
                 android:id="@+id/preview_album_cover"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:scaleType="centerCrop"
                 android:background="@color/contrast_colorBackgroundContainer"
                 android:contentDescription="@string/dialog_album"
                 android:src="@drawable/ic_default_cover" />

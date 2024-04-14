@@ -15,7 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.akanework.gramophone.ui
+package org.akanework.gramophone
 
 import android.app.Application
 import android.app.NotificationManager
@@ -31,11 +31,12 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.DefaultMediaNotificationProvider
 import androidx.preference.PreferenceManager
+import coil3.ImageLoader
+import coil3.PlatformContext
 import org.akanework.gramophone.logic.getStringStrict
-import coil.ImageLoader
-import coil.ImageLoaderFactory
-import coil.util.DebugLogger
-import org.akanework.gramophone.BuildConfig
+import coil3.SingletonImageLoader
+import coil3.util.DebugLogger
+import org.akanework.gramophone.ui.BugHandlerActivity
 import kotlin.system.exitProcess
 
 /**
@@ -43,7 +44,7 @@ import kotlin.system.exitProcess
  *
  * @author AkaneTan, nift4
  */
-class GramophoneApplication : Application(), ImageLoaderFactory {
+class GramophoneApplication : Application(), SingletonImageLoader.Factory {
 
     lateinit var prefs: SharedPreferences
         private set
@@ -98,8 +99,8 @@ class GramophoneApplication : Application(), ImageLoaderFactory {
         }
     }
 
-    override fun newImageLoader(): ImageLoader {
-        return ImageLoader.Builder(this)
+    override fun newImageLoader(context: PlatformContext): ImageLoader {
+        return ImageLoader.Builder(context)
             .diskCache(null)
             .run {
                 if (!BuildConfig.DEBUG) this else

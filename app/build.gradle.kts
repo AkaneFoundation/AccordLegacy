@@ -164,7 +164,7 @@ dependencies {
     implementation("androidx.media3:media3-session:$media3Version")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("com.google.android.material:material:1.11.0")
-    implementation("io.coil-kt:coil:2.6.0")
+    implementation("io.coil-kt.coil3:coil:3.0.0-alpha06")
     implementation(files("../libs/lib-decoder-ffmpeg-release.aar"))
     implementation(project(":fluidrecyclerview"))
     implementation(project(":fastscroll"))

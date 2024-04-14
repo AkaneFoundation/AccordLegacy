@@ -40,8 +40,10 @@ import androidx.fluidrecyclerview.widget.DiffUtil
 import androidx.fluidrecyclerview.widget.GridLayoutManager
 import androidx.fluidrecyclerview.widget.LinearLayoutManager
 import androidx.fluidrecyclerview.widget.RecyclerView
-import coil.dispose
-import coil.load
+import coil3.dispose
+import coil3.load
+import coil3.request.placeholder
+import coil3.request.error
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.divider.MaterialDivider
 import kotlinx.coroutines.sync.Semaphore
@@ -52,6 +54,7 @@ import org.akanework.gramophone.logic.gramophoneApplication
 import org.akanework.gramophone.logic.ui.DefaultItemHeightHelper
 import org.akanework.gramophone.logic.ui.ItemHeightHelper
 import org.akanework.gramophone.logic.ui.MyRecyclerView
+import org.akanework.gramophone.logic.ui.coolCrossfade
 import org.akanework.gramophone.logic.utils.FileOpUtils
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
 import org.akanework.gramophone.ui.MainActivity
@@ -123,7 +126,7 @@ abstract class BaseAdapter<T>(
     private val listHeightArtist = context.resources.getDimensionPixelSize(R.dimen.list_height_artist)
     private var gridHeight: Int? = null
     private val sorter = Sorter(sortHelper, naturalOrderHelper, rawOrderExposed)
-    val decorAdapter by lazy { createDecorAdapter() }
+    private val decorAdapter by lazy { createDecorAdapter() }
     override val concatAdapter by lazy { ConcatAdapter(decorAdapter, this) }
     override val itemHeightHelper by lazy {
         DefaultItemHeightHelper.concatItemHeightHelper(decorAdapter, {1}, this) }
@@ -397,7 +400,7 @@ abstract class BaseAdapter<T>(
         holder.title.text = titleOf(item) ?: virtualTitleOf(item)
         holder.subTitle?.text = subTitleOf(item)
         holder.songCover.load(coverOf(item)) {
-            crossfade(true)
+            coolCrossfade(true)
             placeholder(defaultCover)
             error(defaultCover)
         }
