@@ -28,6 +28,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fluidrecyclerview.widget.DiffUtil
 import androidx.fluidrecyclerview.widget.LinearLayoutManager
 import androidx.fluidrecyclerview.widget.RecyclerView
 import androidx.media3.common.MediaItem
@@ -668,6 +669,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 	override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
 		bottomSheetShuffleButton.isChecked = shuffleModeEnabled
+		bottomSheetFullPlaylistAdapter.updatePlaylist(
+			dumpPlaylist()
+		)
 	}
 
 	override fun onRepeatModeChanged(repeatMode: Int) {
@@ -908,9 +912,30 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 		@SuppressLint("NotifyDataSetChanged")
 		fun updatePlaylist(content: MutableList<MediaItem>) {
+			val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+				override fun getOldListSize(): Int = playlist.size
+
+				override fun getNewListSize(): Int = content.size
+
+				override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+					val oldItem = playlist[oldItemPosition]
+					val newItem = content[newItemPosition]
+					return oldItem == newItem
+				}
+
+				override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+					val oldItem = playlist[oldItemPosition]
+					val newItem = content[newItemPosition]
+					return oldItem.mediaId == newItem.mediaId
+							&& oldItem.mediaMetadata.title == newItem.mediaMetadata.title
+							&& oldItem.mediaMetadata.artist == newItem.mediaMetadata.artist
+							&& oldItem.mediaMetadata.albumTitle == newItem.mediaMetadata.albumTitle
+							&& oldItem.mediaMetadata.artworkUri == newItem.mediaMetadata.artworkUri
+				}
+			})
 			playlist.clear()
 			playlist.addAll(content)
-			notifyDataSetChanged()
+			diffResult.dispatchUpdatesTo(this)
 		}
 
 		fun getPlaylistSize() = playlist.size
