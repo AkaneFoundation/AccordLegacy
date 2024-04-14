@@ -47,6 +47,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util.isBitmapFactorySupportedMimeType
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.ShuffleOrder
 import androidx.media3.exoplayer.util.EventLogger
 import androidx.media3.session.CommandButton
 import androidx.media3.session.DefaultMediaNotificationProvider
@@ -78,6 +79,7 @@ import org.akanework.gramophone.logic.utils.LrcUtils.extractAndParseLyrics
 import org.akanework.gramophone.logic.utils.LrcUtils.loadAndParseLyricsFile
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
 import org.akanework.gramophone.ui.MainActivity
+import kotlin.random.Random
 
 
 /**
@@ -105,6 +107,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
     private var mediaSession: MediaLibrarySession? = null
     private var controller: MediaController? = null
     private var lyrics: MutableList<MediaStoreUtils.Lyric>? = null
+    private var shuffleSeed: Long? = null
     private lateinit var customCommands: List<CommandButton>
     private lateinit var handler: Handler
     private lateinit var lastPlayedManager: LastPlayedManager
@@ -226,6 +229,8 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
             putExtra(AudioEffect.EXTRA_AUDIO_SESSION, player.exoPlayer.audioSessionId)
             putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC)
         })
+        lastPlayedManager = LastPlayedManager(this, player) { shuffleSeed!! }
+        lastPlayedManager.allowSavingState = false
 
         setMediaNotificationProvider(DefaultMediaNotificationProvider(this).apply {
             setSmallIcon(R.drawable.ic_gramophone_notification)
@@ -289,20 +294,18 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
                 )
                 .build()
         controller = MediaController.Builder(this, mediaSession!!.token).buildAsync().get()
-        lastPlayedManager = LastPlayedManager(this, player)
+        lastPlayedManager = LastPlayedManager(this, player) { shuffleSeed!! }
         // this allowSavingState flag is to prevent A14 bug (explained below)
         // overriding last played with null because it is saved before it is restored
         lastPlayedManager.allowSavingState = false
         handler.post {
             if (mediaSession == null) return@post
-            lastPlayedManager.restore {
-                val mediaItemsWithStartPosition = it()
-                if (mediaItemsWithStartPosition != null) {
+            lastPlayedManager.restore { items, seed ->
+                applyShuffleSeed(seed)
+                if (items != null) {
                     try {
                         mediaSession?.player?.setMediaItems(
-                            mediaItemsWithStartPosition.mediaItems,
-                            mediaItemsWithStartPosition.startIndex,
-                            mediaItemsWithStartPosition.startPositionMs
+                            items.mediaItems, items.startIndex, items.startPositionMs
                         )
                     } catch (e: IllegalSeekPositionException) {
                         Log.e(TAG, "failed to restore: " + Log.getStackTraceString(e))
@@ -443,11 +446,19 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         controller: MediaSession.ControllerInfo
     ): ListenableFuture<MediaItemsWithStartPosition> {
         val settable = SettableFuture.create<MediaItemsWithStartPosition>()
-        lastPlayedManager.restore {
-            // TODO empty lists are not supported according to googlers? what to do if restore fails?
-            val mediaItemsWithStartPosition = it()
-                ?: MediaItemsWithStartPosition(listOf(), 0, 0)
-            settable.set(mediaItemsWithStartPosition)
+        lastPlayedManager.restore { items, seed ->
+            applyShuffleSeed(seed)
+            // TODO empty lists in set() are not supported according to googlers
+            //  is this fallback correct though?
+            if (items == null) {
+                settable.setException(NullPointerException(
+                    "null MediaItemsWithStartPosition, see former logs for root cause"))
+            } else if (items.mediaItems.isNotEmpty()) {
+                settable.set(items)
+            } else {
+                settable.setException(IndexOutOfBoundsException(
+                    "LastPlayedManager restored empty MediaItemsWithStartPosition"))
+            }
         }
         return settable
     }
@@ -494,6 +505,10 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
     override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
         super.onShuffleModeEnabledChanged(shuffleModeEnabled)
         mediaSession!!.setCustomLayout(ImmutableList.of(getRepeatCommand(), getShufflingCommand()))
+        // when disabling shuffle, re-shuffle lists so that when enabling again, the order changes
+        if (!shuffleModeEnabled) {
+            applyShuffleSeed(Random.nextLong())
+        }
     }
 
     override fun onRepeatModeChanged(repeatMode: Int) {
@@ -511,5 +526,12 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
     override fun onForegroundServiceStartNotAllowedException() {
         // TODO post notification to UI
         Log.w("Gramophone", "Failed to resume playback :/")
+    }
+
+    private fun applyShuffleSeed(seed: Long) {
+        shuffleSeed = seed
+        (mediaSession?.player as EndedRestoreWorkaroundPlayer?)?.exoPlayer?.let {
+            it.setShuffleOrder(ShuffleOrder.DefaultShuffleOrder(it.mediaItemCount, seed))
+        }
     }
 }
