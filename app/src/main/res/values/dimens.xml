@@ -23,5 +23,5 @@
     <dimen name="afs_md2_popup_elevation">3dp</dimen>
     <dimen name="afs_md2_popup_text_size">34dp</dimen>
     <dimen name="list_height_artist">60dp</dimen>
-    <dimen name="mtrl_slider_widget_height" tools:override="true">11dp</dimen>
+    <dimen name="mtrl_slider_widget_height" tools:override="true">21dp</dimen>
 </resources>

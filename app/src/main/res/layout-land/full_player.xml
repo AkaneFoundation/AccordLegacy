@@ -275,7 +275,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginHorizontal="28dp"
-			android:layout_marginBottom="18dp"
+			android:layout_marginBottom="13dp"
 			android:gravity="center"
 			android:orientation="vertical"
 			app:layout_constraintBottom_toTopOf="@id/slider_vert"
@@ -345,7 +345,7 @@
 				app:haloColor="@android:color/transparent"
 				app:thumbRadius="0dp"
 				app:thumbColor="@android:color/transparent"
-				app:trackHeight="7dp"
+				app:trackHeight="8dp"
 				app:thumbElevation="0dp"
 				tools:value="0.5"
 				tools:visibility="visible"
@@ -365,7 +365,7 @@
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toBottomOf="@id/slider_vert"
 			app:layout_constraintVertical_bias="0.0"
-			android:layout_marginTop="8dp">
+			android:layout_marginTop="3dp">
 
 			<TextView
 				android:id="@+id/position"
