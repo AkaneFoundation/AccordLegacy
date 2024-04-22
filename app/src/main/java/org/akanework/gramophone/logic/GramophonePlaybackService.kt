@@ -17,9 +17,8 @@
 
 package org.akanework.gramophone.logic
 
-import android.app.PendingIntent.FLAG_IMMUTABLE
-import android.app.PendingIntent.FLAG_UPDATE_CURRENT
-import android.app.PendingIntent.getActivity
+import android.annotation.SuppressLint
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -34,6 +33,9 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.concurrent.futures.CallbackToFutureAdapter
+import androidx.core.app.NotificationChannelCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
@@ -41,6 +43,7 @@ import androidx.media3.common.IllegalSeekPositionException
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
+import androidx.media3.common.Player.EVENT_SHUFFLE_MODE_ENABLED_CHANGED
 import androidx.media3.common.Timeline
 import androidx.media3.common.Tracks
 import androidx.media3.common.util.BitmapLoader
@@ -48,8 +51,10 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util.isBitmapFactorySupportedMimeType
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.source.ShuffleOrder
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.util.EventLogger
+import androidx.media3.extractor.DefaultExtractorsFactory
+import androidx.media3.extractor.mp3.Mp3Extractor
 import androidx.media3.session.CommandButton
 import androidx.media3.session.DefaultMediaNotificationProvider
 import androidx.media3.session.MediaController
@@ -59,6 +64,7 @@ import androidx.media3.session.MediaSession.MediaItemsWithStartPosition
 import androidx.media3.session.MediaSessionService
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
+import androidx.preference.PreferenceManager
 import coil3.BitmapImage
 import coil3.annotation.ExperimentalCoilApi
 import coil3.imageLoader
@@ -74,7 +80,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import org.akanework.gramophone.BuildConfig
 import org.akanework.gramophone.R
-import org.akanework.gramophone.logic.utils.EndedRestoreWorkaroundPlayer
+import org.akanework.gramophone.logic.utils.CircularShuffleOrder
+import org.akanework.gramophone.logic.utils.EndedWorkaroundPlayer
 import org.akanework.gramophone.logic.utils.LastPlayedManager
 import org.akanework.gramophone.logic.utils.LrcUtils.extractAndParseLyrics
 import org.akanework.gramophone.logic.utils.LrcUtils.loadAndParseLyricsFile
@@ -89,16 +96,19 @@ import kotlin.random.Random
  */
 @androidx.annotation.OptIn(UnstableApi::class)
 class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Listener,
-    MediaLibraryService.MediaLibrarySession.Callback, Player.Listener {
+    MediaLibraryService.MediaLibrarySession.Callback, Player.Listener, CircularShuffleOrder.Listener {
 
     companion object {
         private const val TAG = "GramoPlaybackService"
+        private const val NOTIFY_CHANNEL_ID = "serviceFgsError"
+        private const val NOTIFY_ID = 1
+        private const val PENDING_INTENT_SESSION_ID = 0
+        private const val PENDING_INTENT_NOTIFY_ID = 1
         private const val PLAYBACK_SHUFFLE_ACTION_ON = "shuffle_on"
         private const val PLAYBACK_SHUFFLE_ACTION_OFF = "shuffle_off"
         private const val PLAYBACK_REPEAT_OFF = "repeat_off"
         private const val PLAYBACK_REPEAT_ALL = "repeat_all"
         private const val PLAYBACK_REPEAT_ONE = "repeat_one"
-
         const val SERVICE_SET_TIMER = "set_timer"
         const val SERVICE_QUERY_TIMER = "query_timer"
         const val SERVICE_GET_LYRICS = "get_lyrics"
@@ -108,10 +118,11 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
     private var mediaSession: MediaLibrarySession? = null
     private var controller: MediaController? = null
     private var lyrics: MutableList<MediaStoreUtils.Lyric>? = null
-    private var shuffleSeed: Long? = null
-    private var lazyShuffleSeedApply = false
+    private var shuffleFactory: ((Int) -> CircularShuffleOrder)? = null
+    private var shufflePersistent: CircularShuffleOrder.Persistent? = null
     private lateinit var customCommands: List<CommandButton>
     private lateinit var handler: Handler
+    private lateinit var nm: NotificationManagerCompat
     private lateinit var lastPlayedManager: LastPlayedManager
     private val lyricsLock = Semaphore(1)
     private lateinit var prefs: SharedPreferences
@@ -159,8 +170,32 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
 
     @OptIn(ExperimentalCoilApi::class)
     override fun onCreate() {
+        handler = Handler(Looper.getMainLooper())
         super.onCreate()
-        prefs = gramophoneApplication.prefs
+        nm = NotificationManagerCompat.from(this)
+        prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        setListener(this)
+        setMediaNotificationProvider(
+            DefaultMediaNotificationProvider.Builder(this).build().apply {
+                setSmallIcon(R.drawable.ic_gramophone_monochrome)
+            }
+        )
+        if (mayThrowForegroundServiceStartNotAllowed()) {
+            // we don't need notification permission because this only is run on S/S_V2
+            nm.createNotificationChannel(NotificationChannelCompat.Builder(
+                NOTIFY_CHANNEL_ID, NotificationManagerCompat.IMPORTANCE_HIGH
+            ).apply {
+                setName(getString(R.string.fgs_failed_channel))
+                setVibrationEnabled(true)
+                setVibrationPattern(longArrayOf(0L, 200L))
+                setLightsEnabled(false)
+                setShowBadge(false)
+                setSound(null, null)
+            }.build())
+        } else if (nm.getNotificationChannel(NOTIFY_CHANNEL_ID) != null) {
+            // for people who upgraded from S/S_V2 to newer version
+            nm.deleteNotificationChannel(NOTIFY_CHANNEL_ID)
+        }
 
         customCommands =
             listOf(
@@ -200,9 +235,9 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
                     .setIconResId(R.drawable.ic_repeat_one)
                     .build(),
             )
-        handler = Handler(Looper.getMainLooper())
 
-        val player = EndedRestoreWorkaroundPlayer(ExoPlayer.Builder(
+        // TODO https://developer.android.com/media/media3/exoplayer/shrinking
+        val player = EndedWorkaroundPlayer(ExoPlayer.Builder(
             this,
             DefaultRenderersFactory(this)
                 .setEnableAudioFloatOutput(
@@ -214,6 +249,10 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         )
             .setWakeMode(C.WAKE_MODE_LOCAL)
             .setSkipSilenceEnabled(prefs.getBooleanStrict("skip_silence", false))
+            .setMediaSourceFactory(
+                DefaultMediaSourceFactory(this, DefaultExtractorsFactory()
+                    .setMp3ExtractorFlags(Mp3Extractor.FLAG_ENABLE_INDEX_SEEKING))
+            )
             .setAudioAttributes(
                 AudioAttributes
                     .Builder()
@@ -225,18 +264,15 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         if (BuildConfig.DEBUG) {
             player.exoPlayer.addAnalyticsListener(EventLogger())
         }
-        setListener(this)
         sendBroadcast(Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION).apply {
             putExtra(AudioEffect.EXTRA_PACKAGE_NAME, packageName)
             putExtra(AudioEffect.EXTRA_AUDIO_SESSION, player.exoPlayer.audioSessionId)
             putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC)
         })
-        lastPlayedManager = LastPlayedManager(this, player) { shuffleSeed!! }
+        lastPlayedManager = LastPlayedManager(this, player) {
+            if (mediaSession?.player?.shuffleModeEnabled == true) shufflePersistent else null }
         lastPlayedManager.allowSavingState = false
 
-        setMediaNotificationProvider(DefaultMediaNotificationProvider(this).apply {
-            setSmallIcon(R.drawable.ic_gramophone_notification)
-        })
         mediaSession =
             MediaLibrarySession
                 .Builder(this, player, this)
@@ -245,7 +281,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
                     // the same cover art as the rest of the app, ie MediaStore's cover
 
                     override fun decodeBitmap(data: ByteArray)
-                    = throw UnsupportedOperationException("decodeBitmap() not supported")
+                            = throw UnsupportedOperationException("decodeBitmap() not supported")
 
                     override fun loadBitmap(
                         uri: Uri
@@ -287,23 +323,20 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
                     }
                 })
                 .setSessionActivity(
-                    getActivity(
+                    PendingIntent.getActivity(
                         this,
-                        0,
+                        PENDING_INTENT_SESSION_ID,
                         Intent(this, MainActivity::class.java),
-                        FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT,
-                    ),
+                        PendingIntent.FLAG_IMMUTABLE or  PendingIntent.FLAG_UPDATE_CURRENT,
+                    )
                 )
                 .build()
         controller = MediaController.Builder(this, mediaSession!!.token).buildAsync().get()
-        lastPlayedManager = LastPlayedManager(this, player) { shuffleSeed!! }
-        // this allowSavingState flag is to prevent A14 bug (explained below)
-        // overriding last played with null because it is saved before it is restored
-        lastPlayedManager.allowSavingState = false
         handler.post {
             if (mediaSession == null) return@post
-            lastPlayedManager.restore { items, seed ->
-                applyShuffleSeed(seed, true)
+            lastPlayedManager.restore { items, factory ->
+                if (mediaSession == null) return@restore
+                applyShuffleSeed(true, factory.toFactory(this, controller!!))
                 if (items != null) {
                     try {
                         mediaSession?.player?.setMediaItems(
@@ -321,7 +354,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
                 lastPlayedManager.allowSavingState = true
             }
         }
-        onShuffleModeEnabledChanged(controller!!.shuffleModeEnabled)
+        onShuffleModeEnabledChanged(controller!!.shuffleModeEnabled) // refresh custom commands
         controller!!.addListener(this)
         registerReceiver(
             headSetReceiver,
@@ -339,7 +372,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
             putExtra(AudioEffect.EXTRA_PACKAGE_NAME, packageName)
             putExtra(
                 AudioEffect.EXTRA_AUDIO_SESSION,
-                (mediaSession!!.player as EndedRestoreWorkaroundPlayer).exoPlayer.audioSessionId
+                (mediaSession!!.player as EndedWorkaroundPlayer).exoPlayer.audioSessionId
             )
         })
         controller!!.release()
@@ -448,10 +481,8 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         controller: MediaSession.ControllerInfo
     ): ListenableFuture<MediaItemsWithStartPosition> {
         val settable = SettableFuture.create<MediaItemsWithStartPosition>()
-        lastPlayedManager.restore { items, seed ->
-            applyShuffleSeed(seed, true)
-            // TODO empty lists in set() are not supported according to googlers
-            //  is this fallback correct though?
+        lastPlayedManager.restore { items, factory ->
+            applyShuffleSeed(true, factory.toFactory(this, this.controller!!))
             if (items == null) {
                 settable.setException(NullPointerException(
                     "null MediaItemsWithStartPosition, see former logs for root cause"))
@@ -504,48 +535,94 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         lastPlayedManager.save()
     }
 
+    override fun onEvents(player: Player, events: Player.Events) {
+        super.onEvents(player, events)
+        // if timeline changed, handle shuffle update in onTimelineChanged() instead
+        // (onTimelineChanged() runs before both this callback and onShuffleModeEnabledChanged(),
+        // which means shuffleFactory != null is not a valid check)
+        if (events.contains(EVENT_SHUFFLE_MODE_ENABLED_CHANGED) &&
+            shuffleFactory == null && !events.contains(Player.EVENT_TIMELINE_CHANGED)) {
+            // when enabling shuffle, re-shuffle lists so that the first index is up to date
+            applyShuffleSeed(false) { CircularShuffleOrder(
+                this, it, controller!!.mediaItemCount, Random.nextLong()) }
+        }
+    }
+
     override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
         super.onShuffleModeEnabledChanged(shuffleModeEnabled)
         mediaSession!!.setCustomLayout(ImmutableList.of(getRepeatCommand(), getShufflingCommand()))
-        // when disabling shuffle, re-shuffle lists so that when enabling again, the order changes
-        if (!shuffleModeEnabled) {
-            applyShuffleSeed(Random.nextLong(), false)
+        if (needsMissingOnDestroyCallWorkarounds()) {
+            handler.post { lastPlayedManager.save() }
         }
     }
 
     override fun onTimelineChanged(timeline: Timeline, reason: Int) {
         super.onTimelineChanged(timeline, reason)
-        if (reason == Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED && lazyShuffleSeedApply) {
-            shuffleSeed?.let { applyShuffleSeed(it, false) }
+        if (reason == Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED) {
+            shuffleFactory?.let {
+                applyShuffleSeed(false, it)
+                shuffleFactory = null
+            }
         }
     }
 
     override fun onRepeatModeChanged(repeatMode: Int) {
         super.onRepeatModeChanged(repeatMode)
         mediaSession!!.setCustomLayout(ImmutableList.of(getRepeatCommand(), getShufflingCommand()))
-    }
-
-    // https://github.com/androidx/media/commit/6a5ac19140253e7e78ea65745914b0746e527058
-    override fun onTaskRemoved(rootIntent: Intent?) {
-        if (controller!!.playbackState == Player.STATE_ENDED || !controller!!.playWhenReady || controller!!.mediaItemCount == 0) {
-            stopSelf()
+        if (needsMissingOnDestroyCallWorkarounds()) {
+            handler.post { lastPlayedManager.save() }
         }
     }
 
+    @SuppressLint("MissingPermission") // only used on S/S_V2
     override fun onForegroundServiceStartNotAllowedException() {
-        // TODO post notification to UI
-        Log.w("Gramophone", "Failed to resume playback :/")
+        Log.w(TAG, "Failed to resume playback :/")
+        if (mayThrowForegroundServiceStartNotAllowed()) {
+            nm.notify(NOTIFY_ID, NotificationCompat.Builder(this, NOTIFY_CHANNEL_ID).apply {
+                setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                setAutoCancel(true)
+                setCategory(NotificationCompat.CATEGORY_ERROR)
+                setSmallIcon(R.drawable.ic_warning)
+                setContentTitle(this@GramophonePlaybackService.getString(R.string.fgs_failed_title))
+                setContentText(this@GramophonePlaybackService.getString(R.string.fgs_failed_text))
+                setContentIntent(
+                    PendingIntent.getActivity(
+                        this@GramophonePlaybackService,
+                        PENDING_INTENT_NOTIFY_ID,
+                        Intent(this@GramophonePlaybackService, MainActivity::class.java)
+                            .putExtra(MainActivity.PLAYBACK_AUTO_START_FOR_FGS, true),
+                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                    )
+                )
+                setVibrate(longArrayOf(0L, 200L))
+                setLights(0, 0, 0)
+                setBadgeIconType(NotificationCompat.BADGE_ICON_NONE)
+                setSound(null)
+            }.build())
+        } else {
+            handler.post {
+                throw IllegalStateException("onForegroundServiceStartNotAllowedException shouldn't be called on T+")
+            }
+        }
     }
 
-    private fun applyShuffleSeed(seed: Long, lazy: Boolean) {
-        shuffleSeed = seed
+    private fun applyShuffleSeed(lazy: Boolean, factory: (Int) -> CircularShuffleOrder) {
         if (lazy) {
-            lazyShuffleSeedApply = true
+            shuffleFactory = factory
         } else {
-            (mediaSession?.player as EndedRestoreWorkaroundPlayer?)?.exoPlayer?.let {
-                it.setShuffleOrder(ShuffleOrder.DefaultShuffleOrder(it.mediaItemCount, seed))
+            (mediaSession?.player as EndedWorkaroundPlayer?)?.exoPlayer?.let {
+                it.setShuffleOrder(factory(it.currentMediaItemIndex).also { s ->
+                    onPersistableDataUpdated(CircularShuffleOrder.Persistent(s))
+                })
             }
-            lazyShuffleSeedApply = false
         }
+    }
+
+    override fun onPersistableDataUpdated(order: CircularShuffleOrder.Persistent) {
+        shufflePersistent = order
+    }
+
+    override fun onLazilySetShuffleOrder(factory: (Int) -> CircularShuffleOrder) {
+        applyShuffleSeed(true, factory)
     }
 }

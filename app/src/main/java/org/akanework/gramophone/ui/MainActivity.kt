@@ -63,6 +63,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val PERMISSION_READ_MEDIA_AUDIO = 100
+        const val PLAYBACK_AUTO_START_FOR_FGS = "AutoStartFgs"
     }
 
     // Import our viewModels.
@@ -73,6 +74,7 @@ class MainActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private val reportFullyDrawnRunnable = Runnable { if (!ready) reportFullyDrawn() }
     private var ready = false
+    private var autoPlay = false
     lateinit var playerBottomSheet: PlayerBottomSheet
         private set
     private lateinit var intentSender: ActivityResultLauncher<IntentSenderRequest>
@@ -103,6 +105,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         installSplashScreen().setKeepOnScreenCondition { !ready }
         enableEdgeToEdgeProperly()
+        autoPlay = intent?.extras?.getBoolean(PLAYBACK_AUTO_START_FOR_FGS, false) == true
         intentSender = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
             if (it.resultCode == RESULT_OK) {
                 if (intentSenderAction != null) {
@@ -248,4 +251,8 @@ class MainActivity : AppCompatActivity() {
      *   Returns a media controller.
      */
     fun getPlayer() = playerBottomSheet.getPlayer()
+
+    fun consumeAutoPlay(): Boolean {
+        return autoPlay.also { autoPlay = false }
+    }
 }

@@ -182,4 +182,7 @@
     <string name="add_notes_desc">Add notes to your favorite tracks, record your feelings, thoughts, or special memories. Revisit them here at anytime.</string>
     <string name="rearrange">Rearrange</string>
     <string name="rearrange_desc">You can revisit the list at any time to rearrange the order of songs, personalizing your music experience.</string>
+    <string name="fgs_failed_channel">Playback failed to resume</string>
+    <string name="fgs_failed_text">Click here to open the app and continue playback</string>
+    <string name="fgs_failed_title">Failed to resume music playback</string>
 </resources>

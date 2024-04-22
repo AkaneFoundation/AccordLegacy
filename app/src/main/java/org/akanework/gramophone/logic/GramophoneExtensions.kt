@@ -57,11 +57,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import org.akanework.gramophone.BuildConfig
+import org.akanework.gramophone.GramophoneApplication
 import org.akanework.gramophone.logic.GramophonePlaybackService.Companion.SERVICE_GET_LYRICS
 import org.akanework.gramophone.logic.GramophonePlaybackService.Companion.SERVICE_QUERY_TIMER
 import org.akanework.gramophone.logic.GramophonePlaybackService.Companion.SERVICE_SET_TIMER
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
-import org.akanework.gramophone.GramophoneApplication
 import java.io.File
 
 fun MediaController.playOrPause() {
@@ -413,3 +413,11 @@ fun Context.resourceUri(resourceId: Int): Uri = with(resources) {
         .appendPath(getResourceEntryName(resourceId))
         .build()
 }
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun mayThrowForegroundServiceStartNotAllowed(): Boolean =
+    Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun needsMissingOnDestroyCallWorkarounds(): Boolean =
+    Build.VERSION.SDK_INT == Build.VERSION_CODES.UPSIDE_DOWN_CAKE

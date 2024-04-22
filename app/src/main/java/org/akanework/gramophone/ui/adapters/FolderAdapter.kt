@@ -23,13 +23,14 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.TextView
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.fluidrecyclerview.widget.ConcatAdapter
 import androidx.fluidrecyclerview.widget.DiffUtil
 import androidx.fluidrecyclerview.widget.LinearLayoutManager
 import androidx.fluidrecyclerview.widget.RecyclerView
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import com.google.android.material.divider.MaterialDivider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -181,6 +182,9 @@ class FolderAdapter(
             holder.itemView.setOnClickListener {
                 folderFragment.enter(item.folderName)
             }
+            if (position == itemCount - 1) {
+                holder.divider.visibility = View.GONE
+            }
         }
 
         override fun getPopupText(view: View, position: Int): CharSequence {
@@ -267,6 +271,7 @@ class FolderAdapter(
         ) : RecyclerView.ViewHolder(view) {
             val folderName: TextView = view.findViewById(R.id.title)
             val folderSubtitle: TextView = view.findViewById(R.id.subtitle)
+            val divider: MaterialDivider = view.findViewById(R.id.divider_list)
         }
     }
 }

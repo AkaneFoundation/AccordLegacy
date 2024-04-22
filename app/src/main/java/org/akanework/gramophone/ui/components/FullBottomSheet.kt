@@ -7,7 +7,6 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
-import android.os.Build
 import android.os.Bundle
 import android.util.AttributeSet
 import android.util.DisplayMetrics
@@ -28,9 +27,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.fluidrecyclerview.widget.DiffUtil
 import androidx.fluidrecyclerview.widget.LinearLayoutManager
 import androidx.fluidrecyclerview.widget.RecyclerView
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
@@ -42,8 +41,8 @@ import coil3.dispose
 import coil3.imageLoader
 import coil3.load
 import coil3.request.ImageRequest
-import coil3.request.placeholder
 import coil3.request.error
+import coil3.request.placeholder
 import com.google.android.material.bottomsheet.BottomSheetDragHandleView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
@@ -232,9 +231,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		}
 
 		bottomSheetTimerButton.setOnClickListener {
-			if (Build.VERSION.SDK_INT >= 23) {
-				it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-			}
+			it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
 			val picker =
 				MaterialTimePicker
 					.Builder()
@@ -254,9 +251,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		}
 
 		bottomSheetLoopButton.setOnClickListener {
-			if (Build.VERSION.SDK_INT >= 23) {
-				it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-			}
+			it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
 			when (instance?.repeatMode) {
 				Player.REPEAT_MODE_OFF -> {
 					bottomSheetInfinityButton.isChecked = false
@@ -275,9 +270,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		}
 
 		bottomSheetInfinityButton.addOnCheckedChangeListener { it, isChecked ->
-			if (Build.VERSION.SDK_INT >= 23) {
-				it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-			}
+			it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
 			if (isChecked) {
 				bottomSheetLoopButton.isChecked = false
 				bottomSheetLoopButton.isEnabled = false
@@ -304,7 +297,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			}
 			if (isChecked && !bottomSheetFullLyricButton.isChecked) {
 				changeMovableFrame(false)
-				bottomSheetFullPlaylistRecyclerView.scrollToPosition(instance?.currentMediaItemIndex ?: 0)
+				bottomSheetFullPlaylistRecyclerView.scrollToPosition(dumpPlaylist().indexOfFirst { item ->
+					item.first == (instance?.currentMediaItemIndex ?: 0)
+				})
 				bottomSheetFullPlaylistSubtitle.setTextColor(Color.parseColor("#33FFFFFF"))
 				bottomSheetFullHeaderFrame.fadInAnimation(VIEW_TRANSIT_DURATION) {
 					bottomSheetFullPlaylistSubtitle.setTextColor(Color.parseColor("#CCFFFFFF"))
@@ -372,21 +367,15 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		}
 
 		bottomSheetFullControllerButton.setOnClickListener {
-			if (Build.VERSION.SDK_INT >= 23) {
-				it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-			}
+			it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
 			instance?.playOrPause()
 		}
 		bottomSheetFullPreviousButton.setOnClickListener {
-			if (Build.VERSION.SDK_INT >= 23) {
-				it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-			}
+			it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
 			instance?.seekToPreviousMediaItem()
 		}
 		bottomSheetFullNextButton.setOnClickListener {
-			if (Build.VERSION.SDK_INT >= 23) {
-				it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-			}
+			it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
 			instance?.seekToNextMediaItem()
 		}
 		bottomSheetShuffleButton.addOnCheckedChangeListener { _, isChecked ->
@@ -412,9 +401,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetFullSlider.addOnSliderTouchListener(touchListener)
 
 		bottomSheetShuffleButton.setOnClickListener {
-			if (Build.VERSION.SDK_INT >= 23) {
-				it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-			}
+			it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
 		}
 
 		bottomSheetFullLyricRecyclerView.layoutManager =
@@ -669,7 +656,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 	override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
 		bottomSheetShuffleButton.isChecked = shuffleModeEnabled
-		bottomSheetFullPlaylistAdapter.updatePlaylist(
+		bottomSheetFullPlaylistAdapter.updatePlaylistWhenShuffle(
 			dumpPlaylist()
 		)
 	}
@@ -733,7 +720,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	}
 
 	override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-		//android.util.Log.e("hi","$keyCode") TODO this method is no-op, but why?
 		return when (keyCode) {
 			KeyEvent.KEYCODE_SPACE -> {
 				instance?.playOrPause(); true
@@ -751,10 +737,18 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		}
 	}
 
-	private fun dumpPlaylist(): MutableList<MediaItem> {
-		val items = mutableListOf<MediaItem>()
-		for (i in 0 until instance!!.mediaItemCount) {
-			items.add(instance!!.getMediaItemAt(i))
+	private fun dumpPlaylist(): MutableList<Pair<Int, MediaItem>> {
+		val items = mutableListOf<Pair<Int, MediaItem>>()
+		if (instance!!.shuffleModeEnabled) {
+			var i = instance!!.currentTimeline.getFirstWindowIndex(true)
+			while (i != C.INDEX_UNSET) {
+				items.add(Pair(i, instance!!.getMediaItemAt(i)))
+				i = instance!!.currentTimeline.getNextWindowIndex(i, Player.REPEAT_MODE_OFF, true)
+			}
+		} else {
+			for (i in 0 until instance!!.mediaItemCount) {
+				items.add(Pair(i, instance!!.getMediaItemAt(i)))
+			}
 		}
 		return items
 	}
@@ -798,9 +792,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 			with(holder.lyricCard) {
 				setOnClickListener {
-					if (Build.VERSION.SDK_INT >= 23) {
-						performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-					}
+					performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
 					activity.getPlayer()?.apply {
 						if (!isPlaying) play()
 						seekTo(lyric.timeStamp)
@@ -908,34 +900,29 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		private val activity: MainActivity
 	) : RecyclerView.Adapter<PlaylistCardAdapter.ViewHolder>() {
 
-		private val playlist: MutableList<MediaItem> = mutableListOf()
+		private val playlist: MutableList<Pair<Int, MediaItem>> = mutableListOf()
+		private lateinit var mRecyclerView: RecyclerView
+
+		override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+			super.onAttachedToRecyclerView(recyclerView)
+			mRecyclerView = recyclerView
+		}
 
 		@SuppressLint("NotifyDataSetChanged")
-		fun updatePlaylist(content: MutableList<MediaItem>) {
-			val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-				override fun getOldListSize(): Int = playlist.size
-
-				override fun getNewListSize(): Int = content.size
-
-				override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-					val oldItem = playlist[oldItemPosition]
-					val newItem = content[newItemPosition]
-					return oldItem == newItem
-				}
-
-				override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-					val oldItem = playlist[oldItemPosition]
-					val newItem = content[newItemPosition]
-					return oldItem.mediaId == newItem.mediaId
-							&& oldItem.mediaMetadata.title == newItem.mediaMetadata.title
-							&& oldItem.mediaMetadata.artist == newItem.mediaMetadata.artist
-							&& oldItem.mediaMetadata.albumTitle == newItem.mediaMetadata.albumTitle
-							&& oldItem.mediaMetadata.artworkUri == newItem.mediaMetadata.artworkUri
-				}
-			})
+		fun updatePlaylist(content: MutableList<Pair<Int, MediaItem>>) {
 			playlist.clear()
 			playlist.addAll(content)
-			diffResult.dispatchUpdatesTo(this)
+			notifyDataSetChanged()
+		}
+
+		fun updatePlaylistWhenShuffle(content: MutableList<Pair<Int, MediaItem>>) {
+			playlist.clear()
+			playlist.addAll(content)
+			notifyItemRangeRemoved(0, itemCount)
+			notifyItemRangeInserted(0, itemCount)
+			mRecyclerView.scrollToPosition(playlist.indexOfFirst { item ->
+				item.first == (activity.getPlayer()?.currentMediaItemIndex ?: 0)
+			})
 		}
 
 		fun getPlaylistSize() = playlist.size
@@ -951,29 +938,25 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			)
 
 		override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-			holder.songName.text = playlist[holder.bindingAdapterPosition].mediaMetadata.title
-			holder.songArtist.text = playlist[holder.bindingAdapterPosition].mediaMetadata.artist
-			holder.songCover.load(playlist[position].mediaMetadata.artworkUri) {
+			holder.songName.text = playlist[holder.bindingAdapterPosition].second.mediaMetadata.title
+			holder.songArtist.text = playlist[holder.bindingAdapterPosition].second.mediaMetadata.artist
+			holder.songCover.load(playlist[position].second.mediaMetadata.artworkUri) {
 				coolCrossfade(true)
 				placeholder(R.drawable.ic_default_cover)
 				error(R.drawable.ic_default_cover)
 			}
 			holder.closeButton.setOnClickListener {
-				if (Build.VERSION.SDK_INT >= 23) {
-					it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-				}
+				it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
 				val instance = activity.getPlayer()
-				val pos = holder.bindingAdapterPosition
+				val pos = playlist[holder.absoluteAdapterPosition].first
 				playlist.removeAt(pos)
 				notifyItemRemoved(pos)
 				instance?.removeMediaItem(pos)
 			}
 			holder.itemView.setOnClickListener {
-				if (Build.VERSION.SDK_INT >= 23) {
-					it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-				}
+				it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
 				val instance = activity.getPlayer()
-				instance?.seekToDefaultPosition(holder.absoluteAdapterPosition)
+				instance?.seekToDefaultPosition(playlist[holder.absoluteAdapterPosition].first)
 			}
 		}
 
