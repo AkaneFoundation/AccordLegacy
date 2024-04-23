@@ -10,6 +10,7 @@ import android.graphics.PorterDuffXfermode
 import android.os.Bundle
 import android.util.AttributeSet
 import android.util.DisplayMetrics
+import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.HapticFeedbackConstants
@@ -94,6 +95,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private var isUserTracking = false
 	private var runnableRunning = false
 	private var firstTime = false
+	private var overrideDeletionUpdate = 0
 
 	val interpolator = DecelerateInterpolator()
 
@@ -203,7 +205,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetInfinityButton = findViewById(R.id.sheet_infinity)
 		bottomSheetActionBar = findViewById(R.id.actionBar)
 
-		bottomSheetFullPlaylistAdapter = PlaylistCardAdapter(activity)
+		bottomSheetFullPlaylistAdapter = PlaylistCardAdapter(activity, this)
 		bottomSheetFullPlaylistRecyclerView.layoutManager = LinearLayoutManager(context)
 		bottomSheetFullPlaylistRecyclerView.adapter = bottomSheetFullPlaylistAdapter
 
@@ -517,9 +519,15 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				}
 
 				GramophonePlaybackService.SERVICE_SHUFFLE_CHANGED -> {
-					bottomSheetFullPlaylistAdapter.updatePlaylistWhenShuffle(
-						dumpPlaylist()
-					)
+					if (instance!!.shuffleModeEnabled && overrideDeletionUpdate == 0) {
+						handler.post {
+							bottomSheetFullPlaylistAdapter.updatePlaylist(
+								dumpPlaylist()
+							)
+						}
+					} else if (instance!!.shuffleModeEnabled) {
+						overrideDeletionUpdate = 0
+					}
 				}
 
 				GramophonePlaybackService.SERVICE_GET_LYRICS -> {
@@ -629,9 +637,11 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 					error(R.drawable.ic_default_cover)
 				}
 			}
-			if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED) {
+			if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED && !instance!!.shuffleModeEnabled) {
+				Log.d("TAG", "PLAYLIST_CHANGED, TIME: ${System.currentTimeMillis()}")
 				bottomSheetFullPlaylistAdapter.updatePlaylist(
-					dumpPlaylist()
+					dumpPlaylist(),
+					animation = false
 				)
 			}
 		} else {
@@ -660,18 +670,19 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	}
 
 	override fun onTimelineChanged(timeline: Timeline, reason: Int) {
-		if (reason == Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED) {
+		// WORKAROUND
+		if (reason == Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED && instance?.shuffleModeEnabled == false && overrideDeletionUpdate == 0) {
+			Log.d("TAG", "TIMELINE_CHANGED, TIME: ${System.currentTimeMillis()}")
 			bottomSheetFullPlaylistAdapter.updatePlaylist(
 				dumpPlaylist()
 			)
+		} else if (reason == Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED && instance?.shuffleModeEnabled == false && overrideDeletionUpdate - 1 >= 0) {
+			overrideDeletionUpdate --
 		}
 	}
 
 	override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
 		bottomSheetShuffleButton.isChecked = shuffleModeEnabled
-		bottomSheetFullPlaylistAdapter.updatePlaylistWhenShuffle(
-			dumpPlaylist()
-		)
 	}
 
 	override fun onRepeatModeChanged(repeatMode: Int) {
@@ -910,7 +921,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 
 	private class PlaylistCardAdapter(
-		private val activity: MainActivity
+		private val activity: MainActivity,
+		private val bottomSheet: FullBottomSheet
 	) : RecyclerView.Adapter<PlaylistCardAdapter.ViewHolder>() {
 
 		private val playlist: MutableList<Pair<Int, MediaItem>> = mutableListOf()
@@ -921,24 +933,21 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			mRecyclerView = recyclerView
 		}
 
-		@SuppressLint("NotifyDataSetChanged")
-		fun updatePlaylist(content: MutableList<Pair<Int, MediaItem>>) {
+		fun updatePlaylist(content: MutableList<Pair<Int, MediaItem>>, animation: Boolean = true) {
+			Log.d(
+				"TAG",
+				"updatePlaylistWhenShuffle, ${System.currentTimeMillis()}"
+			)
 			playlist.clear()
 			playlist.addAll(content)
-			notifyDataSetChanged()
+			if (animation) {
+				notifyItemRangeRemoved(0, itemCount)
+				notifyItemRangeInserted(0, itemCount)
+				mRecyclerView.scrollToPosition(playlist.indexOfFirst { item ->
+					item.first == (activity.getPlayer()?.currentMediaItemIndex ?: 0)
+				})
+			}
 		}
-
-		fun updatePlaylistWhenShuffle(content: MutableList<Pair<Int, MediaItem>>) {
-			playlist.clear()
-			playlist.addAll(content)
-			notifyItemRangeRemoved(0, itemCount)
-			notifyItemRangeInserted(0, itemCount)
-			mRecyclerView.scrollToPosition(playlist.indexOfFirst { item ->
-				item.first == (activity.getPlayer()?.currentMediaItemIndex ?: 0)
-			})
-		}
-
-		fun getPlaylistSize() = playlist.size
 
 		override fun onCreateViewHolder(
 			parent: ViewGroup,
@@ -963,8 +972,10 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				val instance = activity.getPlayer()
 				val pos = playlist[holder.absoluteAdapterPosition].first
 				playlist.removeAt(pos)
-				notifyItemRemoved(pos)
+				notifyItemRemoved(holder.absoluteAdapterPosition)
+				bottomSheet.overrideDeletionUpdate = 2
 				instance?.removeMediaItem(pos)
+				updatePlaylist(bottomSheet.dumpPlaylist(), false)
 			}
 			holder.itemView.setOnClickListener {
 				it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
