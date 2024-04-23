@@ -103,6 +103,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:blurOverlayColor="#66000000" />
+        app:blurOverlayColor="#40000000" />
 
 </merge>

@@ -20,15 +20,12 @@ package org.akanework.gramophone.ui.components
 import android.content.ComponentName
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.drawable.Drawable
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
 import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowInsets
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -50,10 +47,11 @@ import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import coil3.annotation.ExperimentalCoilApi
-import coil3.dispose
 import coil3.imageLoader
+import coil3.request.Disposable
 import coil3.request.ImageRequest
 import coil3.request.error
+import coil3.size.Scale
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.button.MaterialButton
@@ -67,12 +65,8 @@ import org.akanework.gramophone.logic.getBooleanStrict
 import org.akanework.gramophone.logic.gramophoneApplication
 import org.akanework.gramophone.logic.playOrPause
 import org.akanework.gramophone.logic.ui.MyBottomSheetBehavior
-import org.akanework.gramophone.logic.ui.coolCrossfade
 import org.akanework.gramophone.logic.utils.EnvUtils
 import org.akanework.gramophone.ui.MainActivity
-import org.akanework.gramophone.ui.components.blurview.BlurView
-import org.akanework.gramophone.ui.components.blurview.RenderEffectBlur
-import org.akanework.gramophone.ui.components.blurview.RenderScriptBlur
 
 
 class PlayerBottomSheet private constructor(
@@ -87,6 +81,7 @@ class PlayerBottomSheet private constructor(
     }
 
     private var sessionToken: SessionToken? = null
+    private var lastDisposable: Disposable? = null
     private var controllerFuture: ListenableFuture<MediaController>? = null
     private var standardBottomSheetBehavior: MyBottomSheetBehavior<FrameLayout>? = null
     private var bottomSheetBackCallback: OnBackPressedCallback? = null
@@ -150,34 +145,14 @@ class PlayerBottomSheet private constructor(
         }
 
         bottomSheetPreviewControllerButton.setOnClickListener {
-            if (Build.VERSION.SDK_INT >= 23) {
-                it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-            }
+            it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
             instance?.playOrPause()
         }
 
         bottomSheetPreviewNextButton.setOnClickListener {
-            if (Build.VERSION.SDK_INT >= 23) {
-                it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-            }
+            it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
             instance?.seekToNextMediaItem()
         }
-    }
-
-    private fun setUpBlurView(
-        blurView: BlurView,
-        rootView: ViewGroup,
-        blurRadius: Float,
-        frameClearDrawable: Drawable) {
-        blurView.setupWith(
-            rootView,
-            if (Build.VERSION.SDK_INT >= 31)
-                RenderEffectBlur()
-            else
-                RenderScriptBlur(context)
-        )
-            .setBlurRadius(blurRadius)
-            .setFrameClearDrawable(frameClearDrawable)
     }
 
     private val bottomSheetCallback = object : BottomSheetCallback() {
@@ -397,14 +372,15 @@ class PlayerBottomSheet private constructor(
         reason: Int,
     ) {
         if ((instance?.mediaItemCount ?: 0) > 0) {
-            context.imageLoader.enqueue(ImageRequest.Builder(context).apply {
+            lastDisposable?.dispose()
+            lastDisposable = context.imageLoader.enqueue(ImageRequest.Builder(context).apply {
                 target(onSuccess = {
                     bottomSheetPreviewCover.setImageDrawable(it.asDrawable(context.resources))
                 }, onError = {
                     bottomSheetPreviewCover.setImageDrawable(it?.asDrawable(context.resources))
                 }) // do not react to onStart() which sets placeholder
                 data(mediaItem?.mediaMetadata?.artworkUri)
-                coolCrossfade(true)
+                scale(Scale.FILL)
                 error(R.drawable.ic_default_cover)
             }.build())
             mediaItem?.mediaMetadata?.artworkUri?.let {
@@ -414,7 +390,8 @@ class PlayerBottomSheet private constructor(
             }
             bottomSheetPreviewTitle.text = mediaItem?.mediaMetadata?.title
         } else {
-            bottomSheetPreviewCover.dispose()
+            lastDisposable?.dispose()
+            lastDisposable = null
         }
         var newState = standardBottomSheetBehavior!!.state
         if ((instance?.mediaItemCount ?: 0) > 0 && visible) {
@@ -436,20 +413,16 @@ class PlayerBottomSheet private constructor(
     }
 
     override fun onPlaybackStateChanged(playbackState: Int) {
-        if (instance?.isPlaying == true) {
-            if (bottomSheetPreviewControllerButton.getTag(R.id.play_next) as Int? != 1) {
-                bottomSheetPreviewControllerButton.icon =
-                    AppCompatResources.getDrawable(context, R.drawable.ic_apple_pause)
-                bottomSheetPreviewControllerButton.setTag(R.id.play_next, 1)
-                bottomSheetBlendBackgroundView.startRotationAnimation()
-            }
-        } else if (playbackState != Player.STATE_BUFFERING) {
-            if (bottomSheetPreviewControllerButton.getTag(R.id.play_next) as Int? != 2) {
-                bottomSheetPreviewControllerButton.icon =
-                    AppCompatResources.getDrawable(context, R.drawable.ic_apple_play)
-                bottomSheetPreviewControllerButton.setTag(R.id.play_next, 2)
-                bottomSheetBlendBackgroundView.stopRotationAnimation()
-            }
+        if (playbackState == Player.STATE_BUFFERING) return
+        val myTag = bottomSheetPreviewControllerButton.getTag(R.id.play_next) as Int?
+        if (instance?.isPlaying == true && myTag != 1) {
+            bottomSheetPreviewControllerButton.icon =
+                AppCompatResources.getDrawable(context, R.drawable.ic_apple_pause)
+            bottomSheetPreviewControllerButton.setTag(R.id.play_next, 1)
+        } else if (instance?.isPlaying == false && myTag != 2) {
+            bottomSheetPreviewControllerButton.icon =
+                AppCompatResources.getDrawable(context, R.drawable.ic_apple_play)
+            bottomSheetPreviewControllerButton.setTag(R.id.play_next, 2)
         }
     }
 

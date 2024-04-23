@@ -314,6 +314,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				bottomSheetFullControllerFrame.fadInAnimation(VIEW_TRANSIT_DURATION) {
 					showSliderOverlay()
 				}
+				bottomSheetFullControllerButton.fadInAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullNextButton.fadInAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullPreviousButton.fadInAnimation(VIEW_TRANSIT_DURATION)
 				bottomSheetFullPlaylistFrame.fadInAnimation(VIEW_TRANSIT_DURATION)
 				bottomSheetActionBar.fadInAnimation(VIEW_TRANSIT_DURATION)
 			} else {
@@ -341,6 +344,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				bottomSheetFullLyricRecyclerView.fadInAnimation(VIEW_TRANSIT_DURATION)
 				hideSliderOverlay()
 				bottomSheetFullControllerFrame.fadOutAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullControllerButton.fadOutAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullNextButton.fadOutAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullPreviousButton.fadOutAnimation(VIEW_TRANSIT_DURATION)
 				bottomSheetActionBar.fadOutAnimation(VIEW_TRANSIT_DURATION)
 				bottomSheetFullBlendBackgroundView?.animateBlurRadius(false, VIEW_TRANSIT_DURATION)
 			} else if (bottomSheetPlaylistButton.isChecked) {
@@ -350,6 +356,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				bottomSheetFullControllerFrame.fadOutAnimation(VIEW_TRANSIT_DURATION) {
 					hideSliderOverlay()
 				}
+				bottomSheetFullControllerButton.fadOutAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullNextButton.fadOutAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullPreviousButton.fadOutAnimation(VIEW_TRANSIT_DURATION)
 				bottomSheetFullLyricRecyclerView.fadInAnimation(VIEW_TRANSIT_DURATION)
 				bottomSheetActionBar.fadOutAnimation(VIEW_TRANSIT_DURATION)
 			} else {
@@ -362,6 +371,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				bottomSheetFullControllerFrame.fadInAnimation(VIEW_TRANSIT_DURATION) {
 					showSliderOverlay()
 				}
+				bottomSheetFullControllerButton.fadInAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullNextButton.fadInAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFullPreviousButton.fadInAnimation(VIEW_TRANSIT_DURATION)
 				bottomSheetActionBar.fadInAnimation(VIEW_TRANSIT_DURATION)
 				bottomSheetFullBlendBackgroundView?.animateBlurRadius(true, VIEW_TRANSIT_DURATION)
 			}
@@ -740,13 +752,13 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 	private fun dumpPlaylist(): MutableList<Pair<Int, MediaItem>> {
 		val items = mutableListOf<Pair<Int, MediaItem>>()
-		if (instance!!.shuffleModeEnabled) {
+		if (instance != null && instance!!.shuffleModeEnabled) {
 			var i = instance!!.currentTimeline.getFirstWindowIndex(true)
 			while (i != C.INDEX_UNSET) {
 				items.add(Pair(i, instance!!.getMediaItemAt(i)))
 				i = instance!!.currentTimeline.getNextWindowIndex(i, Player.REPEAT_MODE_OFF, true)
 			}
-		} else {
+		} else if (instance != null) {
 			for (i in 0 until instance!!.mediaItemCount) {
 				items.add(Pair(i, instance!!.getMediaItemAt(i)))
 			}
