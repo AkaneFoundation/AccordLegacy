@@ -113,6 +113,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         const val SERVICE_QUERY_TIMER = "query_timer"
         const val SERVICE_GET_LYRICS = "get_lyrics"
         const val SERVICE_TIMER_CHANGED = "changed_timer"
+        const val SERVICE_SHUFFLE_CHANGED = "shuffle_changed"
     }
 
     private var mediaSession: MediaLibrarySession? = null
@@ -620,6 +621,10 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
 
     override fun onPersistableDataUpdated(order: CircularShuffleOrder.Persistent) {
         shufflePersistent = order
+        handler.post {
+            mediaSession?.broadcastCustomCommand(SessionCommand(
+                SERVICE_SHUFFLE_CHANGED, Bundle.EMPTY), Bundle.EMPTY)
+        }
     }
 
     override fun onLazilySetShuffleOrder(factory: (Int) -> CircularShuffleOrder) {

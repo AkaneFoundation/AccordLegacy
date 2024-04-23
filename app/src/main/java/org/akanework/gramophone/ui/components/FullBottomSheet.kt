@@ -32,6 +32,7 @@ import androidx.fluidrecyclerview.widget.RecyclerView
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.Timeline
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
@@ -503,6 +504,12 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 					bottomSheetTimerButton.isChecked = controller.hasTimer()
 				}
 
+				GramophonePlaybackService.SERVICE_SHUFFLE_CHANGED -> {
+					bottomSheetFullPlaylistAdapter.updatePlaylistWhenShuffle(
+						dumpPlaylist()
+					)
+				}
+
 				GramophonePlaybackService.SERVICE_GET_LYRICS -> {
 					val parsedLyrics = instance?.getLyrics()
 					if (bottomSheetFullLyricList != parsedLyrics) {
@@ -640,14 +647,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		updateLyric(duration)
 	}
 
-	override fun onEvents(player: Player, events: Player.Events) {
-		super.onEvents(player, events)
-		if (events.size() == 2 &&
-			events[0] == Player.EVENT_TIMELINE_CHANGED &&
-			events[1] == Player.EVENT_POSITION_DISCONTINUITY &&
-			instance != null &&
-			instance!!.mediaItemCount > bottomSheetFullPlaylistAdapter.getPlaylistSize()
-			) {
+	override fun onTimelineChanged(timeline: Timeline, reason: Int) {
+		if (reason == Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED) {
 			bottomSheetFullPlaylistAdapter.updatePlaylist(
 				dumpPlaylist()
 			)
