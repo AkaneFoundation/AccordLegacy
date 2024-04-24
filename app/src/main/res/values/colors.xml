@@ -6,6 +6,7 @@
     <color name="contrast_colorOnSurfaceFainted">#80000000</color>
     <color name="contrast_colorOnSurfaceSecondary">#B3000000</color>
     <color name="contrast_colorOutline">#0D000000</color>
+    <color name="contrast_blendOverlayColor">#40000000</color>
 
     <!-- Fallback -->
     <color name="md_theme_primary">#000000</color>
