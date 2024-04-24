@@ -1,5 +1,7 @@
 package org.akanework.gramophone.ui.components
 
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
@@ -107,24 +109,44 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		const val LYRIC_SMOOTH_SCROLL_MINIMUM_SCROLL_TIME: Int = 600     // Lyric scroll accelerate limit
 		const val LYRIC_SMOOTH_SCROLL_SPEED_KEY: Float = 300f            // Lyric scroll general speed
 		const val LYRIC_SMOOTH_SCROLL_SQUARE_FACTOR: Double = 1.06
+		const val SHRINK_VALUE = 0.93f
+		const val ALBUM_SHRINK_DURATION_ANIMATION = 300L
+
+	}
+
+	private fun buildShrinkAnimator(isShrink: Boolean = true) {
+		val scaleX = PropertyValuesHolder.ofFloat(
+			View.SCALE_X,
+			if (isShrink) 1f else SHRINK_VALUE,
+			if (isShrink) SHRINK_VALUE else 1f
+		)
+		val scaleY = PropertyValuesHolder.ofFloat(
+			View.SCALE_Y,
+			if (isShrink) 1f else SHRINK_VALUE,
+			if (isShrink) SHRINK_VALUE else 1f
+		)
+		bottomSheetFullCoverFrame.apply {
+			val animator = ObjectAnimator.ofPropertyValuesHolder(this, scaleX, scaleY)
+			animator.duration = ALBUM_SHRINK_DURATION_ANIMATION
+			animator.interpolator = DecelerateInterpolator()
+			animator.start()
+		}
 	}
 
 	private val touchListener = object : OverlaySlider.OnSliderTouchListener {
 		override fun onStartTrackingTouch(slider: OverlaySlider) {
 			isUserTracking = true
+			buildShrinkAnimator()
 		}
 
 		override fun onStopTrackingTouch(slider: OverlaySlider) {
-			// This value is multiplied by 1000 is because
-			// when the number is too big (like when toValue
-			// used the duration directly) we might encounter
-			// some performance problem.
 			val mediaId = instance?.currentMediaItem?.mediaId
 			if (mediaId != null) {
 				instance?.seekTo((slider.value.toLong()))
 				updateLyric(slider.value.toLong())
 			}
 			isUserTracking = false
+			buildShrinkAnimator(false)
 		}
 	}
 	private val bottomSheetFullCover: ImageView
