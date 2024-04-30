@@ -208,7 +208,8 @@ class BlendBackgroundView(context: Context, attrs: AttributeSet?, defStyleAttr: 
             if (Build.VERSION.SDK_INT >= 31)
                 RenderEffectBlur()
             else
-                RenderScriptBlur(context)
+                RenderScriptBlur(context),
+            null
         )
             .setBlurRadius(blurRadius)
     }

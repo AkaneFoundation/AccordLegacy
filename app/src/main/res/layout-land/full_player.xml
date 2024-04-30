@@ -339,12 +339,12 @@
 				android:value="0"
 				app:labelBehavior="gone"
 				app:trackColorActive="#B3FFFFFF"
-				app:trackColorInactive="#0AFFFFFF"
+				app:trackColorInactive="#00FFFFFF"
 				app:haloRadius="0dp"
 				app:haloColor="@android:color/transparent"
 				app:thumbRadius="0dp"
 				app:thumbColor="@android:color/transparent"
-				app:trackHeight="8dp"
+				app:trackHeight="7.25dp"
 				app:thumbElevation="0dp"
 				tools:value="0.5"
 				tools:visibility="visible"
@@ -370,12 +370,12 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_gravity="start"
+				android:fontFamily="sans-serif"
 				android:text="@string/default_time"
-				android:textColor="#0AFFFFFF"
+				android:textColor="@color/contrast_colorSecondaryTopOverlayActivated"
 				android:textFontWeight="500"
 				android:textSize="12sp"
 				android:letterSpacing="0.05"
-				android:fontFamily="sans-serif"
 				tools:targetApi="p" />
 
 			<TextView
@@ -383,12 +383,12 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_gravity="start"
+				android:fontFamily="sans-serif"
 				android:text="@string/default_time"
-				android:textColor="#80FFFFFF"
+				android:textColor="@color/contrast_colorSecondaryBackOverlayActivated"
 				android:textFontWeight="500"
 				android:textSize="12sp"
 				android:letterSpacing="0.05"
-				android:fontFamily="sans-serif"
 				tools:targetApi="p" />
 
 			<TextView
@@ -396,12 +396,12 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_gravity="end"
+				android:fontFamily="sans-serif"
 				android:text="@string/default_time"
-				android:textColor="#0AFFFFFF"
+				android:textColor="@color/contrast_colorSecondaryTopOverlayActivated"
 				android:textFontWeight="500"
 				android:textSize="12sp"
 				android:letterSpacing="0.05"
-				android:fontFamily="sans-serif"
 				tools:targetApi="p" />
 
 			<TextView
@@ -409,12 +409,12 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_gravity="end"
+				android:fontFamily="sans-serif"
 				android:text="@string/default_time"
-				android:textColor="#80FFFFFF"
+				android:textColor="@color/contrast_colorSecondaryBackOverlayActivated"
 				android:textFontWeight="500"
 				android:textSize="12sp"
 				android:letterSpacing="0.05"
-				android:fontFamily="sans-serif"
 				tools:targetApi="p" />
 
 		</FrameLayout>

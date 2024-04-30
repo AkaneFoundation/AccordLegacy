@@ -5,13 +5,14 @@ import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.ColorStateList
+import android.graphics.BlendMode
 import android.graphics.Color
+import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.os.Bundle
 import android.util.AttributeSet
-import android.util.DisplayMetrics
+import android.util.Size
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.HapticFeedbackConstants
@@ -26,11 +27,14 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.animation.doOnEnd
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fluidrecyclerview.widget.LinearLayoutManager
 import androidx.fluidrecyclerview.widget.RecyclerView
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -43,12 +47,16 @@ import coil3.annotation.ExperimentalCoilApi
 import coil3.dispose
 import coil3.imageLoader
 import coil3.load
+import coil3.request.Disposable
 import coil3.request.ImageRequest
+import coil3.request.allowHardware
 import coil3.request.error
 import coil3.request.placeholder
+import coil3.size.Scale
 import com.google.android.material.bottomsheet.BottomSheetDragHandleView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.motion.MotionUtils
 import com.google.android.material.slider.OverlaySlider
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
@@ -58,23 +66,27 @@ import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.GramophonePlaybackService
+import org.akanework.gramophone.logic.checkIfNegativeOrNullOrMaxedOut
 import org.akanework.gramophone.logic.dpToPx
 import org.akanework.gramophone.logic.fadInAnimation
 import org.akanework.gramophone.logic.fadOutAnimation
+import org.akanework.gramophone.logic.getFile
 import org.akanework.gramophone.logic.getLyrics
 import org.akanework.gramophone.logic.getTimer
+import org.akanework.gramophone.logic.hasImagePermission
+import org.akanework.gramophone.logic.hasScopedStorageV1
+import org.akanework.gramophone.logic.hasScopedStorageWithMediaTypes
 import org.akanework.gramophone.logic.hasTimer
 import org.akanework.gramophone.logic.playOrPause
 import org.akanework.gramophone.logic.setTextAnimation
 import org.akanework.gramophone.logic.setTimer
+import org.akanework.gramophone.logic.ui.CustomLinearLayoutManager
+import org.akanework.gramophone.logic.ui.CustomSmoothScroller
 import org.akanework.gramophone.logic.ui.coolCrossfade
 import org.akanework.gramophone.logic.updateMargin
 import org.akanework.gramophone.logic.utils.CalculationUtils
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
 import org.akanework.gramophone.ui.MainActivity
-import kotlin.math.ceil
-import kotlin.math.min
-import kotlin.math.pow
 
 @SuppressLint("SetTextI18n")
 class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
@@ -97,22 +109,24 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private var runnableRunning = false
 	private var firstTime = false
 
-	val interpolator = DecelerateInterpolator()
+	val interpolator = MotionUtils.resolveThemeInterpolator(
+		context,
+		com.google.android.material.R.attr.motionEasingStandardInterpolator,
+		FastOutSlowInInterpolator()
+	)
 
 	companion object {
-		const val SLIDER_UPDATE_INTERVAL: Long = 100
-		const val VIEW_TRANSIT_DURATION: Long = 350
-		const val LYRIC_REMOVE_HIGHLIGHT: Int = 0
-		const val LYRIC_SET_HIGHLIGHT: Int = 1
-		const val LYRIC_TRANSIT_DURATION: Long = 500                     // Lyric size animate duration
-		const val LYRIC_SMOOTH_SCROLL_MAX_DIST: Int = 250                // Lyric scroll 1st phase distance
-		const val LYRIC_SMOOTH_SCROLL_MINIMUM_SCROLL_TIME: Int = 600     // Lyric scroll accelerate limit
-		const val LYRIC_SMOOTH_SCROLL_SPEED_KEY: Float = 300f            // Lyric scroll general speed
-		const val LYRIC_SMOOTH_SCROLL_SQUARE_FACTOR: Double = 1.06
-		const val SHRINK_VALUE = 0.93f
+		const val SLIDER_UPDATE_INTERVAL = 100L
+		const val VIEW_TRANSIT_DURATION = 350L
+		const val LYRIC_REMOVE_HIGHLIGHT = 0
+		const val LYRIC_SET_HIGHLIGHT = 1
+		const val LYRIC_SCROLL_DURATION = 700L
+		const val SHRINK_VALUE = 0.93F
 		const val ALBUM_SHRINK_DURATION_ANIMATION = 300L
-
+		const val SHRINK_TRIGGER_DURATION = 150L
 	}
+
+	private var isCoverShrink = false
 
 	private fun buildShrinkAnimator(isShrink: Boolean = true) {
 		val scaleX = PropertyValuesHolder.ofFloat(
@@ -130,13 +144,18 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			animator.duration = ALBUM_SHRINK_DURATION_ANIMATION
 			animator.interpolator = DecelerateInterpolator()
 			animator.start()
+			isCoverShrink = isShrink
 		}
 	}
 
 	private val touchListener = object : OverlaySlider.OnSliderTouchListener {
 		override fun onStartTrackingTouch(slider: OverlaySlider) {
 			isUserTracking = true
-			buildShrinkAnimator()
+			handler.postDelayed({
+				if (isUserTracking) {
+					buildShrinkAnimator()
+				}
+			}, SHRINK_TRIGGER_DURATION)
 		}
 
 		override fun onStopTrackingTouch(slider: OverlaySlider) {
@@ -146,9 +165,12 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				updateLyric(slider.value.toLong())
 			}
 			isUserTracking = false
-			buildShrinkAnimator(false)
+			if (isCoverShrink) {
+				buildShrinkAnimator(false)
+			}
 		}
 	}
+
 	private val bottomSheetFullCover: ImageView
 	private val bottomSheetFullTitle: TextView
 	private val bottomSheetFullSubtitle: TextView
@@ -172,7 +194,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private val bottomSheetFullLyricRecyclerView: RecyclerView
 	private val bottomSheetFullLyricList: MutableList<MediaStoreUtils.Lyric> = mutableListOf()
 	private val bottomSheetFullLyricAdapter: LyricAdapter = LyricAdapter(bottomSheetFullLyricList)
-	private val bottomSheetFullLyricLinearLayoutManager = LinearLayoutManager(context)
+	private val bottomSheetFullLyricLinearLayoutManager = CustomLinearLayoutManager(context)
 	private val bottomSheetFullDragHandle: BottomSheetDragHandleView
 	private val bottomSheetFullTextLayout: LinearLayout
 	private val bottomSheetFullHeaderFrame: ConstraintLayout
@@ -189,6 +211,10 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private var playlistNowPlayingCover: ImageView? = null
 	private var triggerLock: Boolean = false
 	var bottomSheetFullBlendBackgroundView: BlendBackgroundView? = null
+	private var lastDisposable: Disposable? = null
+
+	private val secondaryTopOverlayActivatedColor = ContextCompat.getColor(context, R.color.contrast_colorSecondaryTopOverlayActivated)
+	private val secondaryTopOverlayInActivatedColor = ContextCompat.getColor(context, R.color.contrast_colorSecondaryTopOverlayInActivated)
 
 	init {
 		inflate(context, R.layout.full_player, this)
@@ -229,10 +255,15 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetFullPlaylistRecyclerView.layoutManager = LinearLayoutManager(context)
 		bottomSheetFullPlaylistRecyclerView.adapter = bottomSheetFullPlaylistAdapter
 
-		bottomSheetFullSubtitle.paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
-		bottomSheetFullPlaylistSubtitle.paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
-		bottomSheetFullDurationBack.paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
-		bottomSheetFullPositionBack.paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
+		val paint = Paint().apply {
+			blendMode = BlendMode.OVERLAY
+			xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
+		}
+		bottomSheetFullPlaylistSubtitle.setLayerType(LAYER_TYPE_HARDWARE, paint)
+		bottomSheetFullSubtitle.setLayerType(LAYER_TYPE_HARDWARE, paint)
+
+		bottomSheetFullDuration.setLayerType(LAYER_TYPE_HARDWARE, paint)
+		bottomSheetFullPosition.setLayerType(LAYER_TYPE_HARDWARE, paint)
 
 		ViewCompat.setOnApplyWindowInsetsListener(bottomSheetFullLyricRecyclerView) { v, insets ->
 			val myInsets = insets.getInsets(
@@ -443,25 +474,19 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			bottomSheetFullLyricLinearLayoutManager
 		bottomSheetFullLyricRecyclerView.adapter =
 			bottomSheetFullLyricAdapter
-
+		bottomSheetFullLyricRecyclerView.addItemDecoration(LyricPaddingDecoration(context))
 	}
 
 	fun hideSliderOverlay() {
-		bottomSheetFullSlider.updateBottomTrackColor(Color.parseColor("#00FFFFFF"))
-		bottomSheetFullSlider.trackInactiveTintList = ColorStateList.valueOf(Color.parseColor("#33FFFFFF"))
-		bottomSheetFullDurationBack.setTextColor(Color.parseColor("#00FFFFFF"))
-		bottomSheetFullDuration.setTextColor(Color.parseColor("#33FFFFFF"))
-		bottomSheetFullPositionBack.setTextColor(Color.parseColor("#00FFFFFF"))
-		bottomSheetFullPosition.setTextColor(Color.parseColor("#33FFFFFF"))
+		bottomSheetFullSlider.updateBottomTrackOverlayColor(secondaryTopOverlayInActivatedColor)
+		bottomSheetFullDuration.setTextColor(secondaryTopOverlayInActivatedColor)
+		bottomSheetFullPosition.setTextColor(secondaryTopOverlayInActivatedColor)
 	}
 
 	fun showSliderOverlay() {
-		bottomSheetFullSlider.updateBottomTrackColor(Color.parseColor("#80FFFFFF"))
-		bottomSheetFullSlider.trackInactiveTintList = ColorStateList.valueOf(Color.parseColor("#0AFFFFFF"))
-		bottomSheetFullDurationBack.setTextColor(Color.parseColor("#80FFFFFF"))
-		bottomSheetFullDuration.setTextColor(Color.parseColor("#0AFFFFFF"))
-		bottomSheetFullPositionBack.setTextColor(Color.parseColor("#80FFFFFF"))
-		bottomSheetFullPosition.setTextColor(Color.parseColor("#0AFFFFFF"))
+		bottomSheetFullSlider.updateBottomTrackOverlayColor(secondaryTopOverlayActivatedColor)
+		bottomSheetFullDuration.setTextColor(secondaryTopOverlayActivatedColor)
+		bottomSheetFullPosition.setTextColor(secondaryTopOverlayActivatedColor)
 	}
 
 	fun hideSubtitleOverlay() {
@@ -610,19 +635,41 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		mediaItem: MediaItem?,
 		reason: Int
 	) {
-		if (instance?.mediaItemCount != 0) {
-			context.imageLoader.enqueue(ImageRequest.Builder(context).apply {
-				target(onSuccess = {
-					bottomSheetFullCover.setImageDrawable(it.asDrawable(context.resources))
-					bottomSheetFullPlaylistCover.setImageDrawable(it.asDrawable(context.resources))
-				}, onError = {
-					bottomSheetFullCover.setImageDrawable(it?.asDrawable(context.resources))
-					bottomSheetFullPlaylistCover.setImageDrawable(it?.asDrawable(context.resources))
-				}) // do not react to onStart() which sets placeholder
-				data(mediaItem?.mediaMetadata?.artworkUri)
+		if (instance?.mediaItemCount != 0) {val req = { data: Any?, block: ImageRequest.Builder.() -> Unit ->
+			lastDisposable?.dispose()
+			lastDisposable = context.imageLoader.enqueue(ImageRequest.Builder(context).apply {
+				data(data)
+				scale(Scale.FILL)
+				block()
 				error(R.drawable.ic_default_cover)
-				coolCrossfade(true)
+				allowHardware(false)
 			}.build())
+		}
+			val load = { data: Any? ->
+				req(data) {
+					target(onSuccess = {
+						bottomSheetFullCover.setImageDrawable(it.asDrawable(context.resources))
+						bottomSheetFullPlaylistCover.setImageDrawable(it.asDrawable(context.resources))
+					}, onError = {
+						bottomSheetFullCover.setImageDrawable(it?.asDrawable(context.resources))
+						bottomSheetFullPlaylistCover.setImageDrawable(it?.asDrawable(context.resources))
+					}) // do not react to onStart() which sets placeholder
+				}
+			}
+			val file = mediaItem?.getFile()
+			if (hasScopedStorageV1() && (!hasScopedStorageWithMediaTypes()
+						|| context.hasImagePermission()) && file != null) {
+				req(Pair(file, Size(bottomSheetFullCover.width, bottomSheetFullCover.height))) {
+					target(onSuccess = {
+						bottomSheetFullCover.setImageDrawable(it.asDrawable(context.resources))
+						bottomSheetFullPlaylistCover.setImageDrawable(it.asDrawable(context.resources))
+					}, onError = {
+						load(mediaItem.mediaMetadata.artworkUri)
+					})
+				}
+			} else {
+				load(mediaItem?.mediaMetadata?.artworkUri)
+			}
 			bottomSheetFullTitle.setTextAnimation(mediaItem?.mediaMetadata?.title, skipAnimation = firstTime)
 			bottomSheetFullPlaylistTitle.setTextAnimation(mediaItem?.mediaMetadata?.title, skipAnimation = firstTime)
 			bottomSheetFullSubtitle.setTextAnimation(
@@ -657,6 +704,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				)
 			}
 		} else {
+			lastDisposable?.dispose()
+			lastDisposable = null
 			bottomSheetFullCover.dispose()
 			playlistNowPlayingCover?.dispose()
 		}
@@ -666,7 +715,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		if (duration != null && !isUserTracking) {
 			bottomSheetFullSlider.valueTo = duration.toFloat()
 			bottomSheetFullSlider.value =
-				min(instance?.currentPosition?.toFloat() ?: 0f, bottomSheetFullSlider.valueTo)
+				instance?.currentPosition?.toFloat().checkIfNegativeOrNullOrMaxedOut(bottomSheetFullSlider.valueTo)
 			bottomSheetFullPosition.text = position
 			bottomSheetFullPositionBack.text = bottomSheetFullPosition.text
 			bottomSheetFullDuration.text =
@@ -793,7 +842,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	) : RecyclerView.Adapter<LyricAdapter.ViewHolder>() {
 
 		private var defaultTextColor =
-			Color.parseColor("#33FFFFFF")
+			Color.parseColor("#26FFFFFF")
 
 		private var highlightTextColor =
 			Color.parseColor("#FFFFFF")
@@ -839,6 +888,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				visibility = if (lyric.content.isNotEmpty()) View.VISIBLE else View.GONE
 				text = lyric.content
 				gravity = if (isLyricCentered) Gravity.CENTER else Gravity.START
+				translationY = 0f
 
 				val textSize = if (lyric.isTranslation) 20f else 32f
 				val paddingTop = if (lyric.isTranslation) 2 else 18
@@ -874,7 +924,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				scaleX = animatedValue
 				scaleY = animatedValue
 			}
-			animator.duration = LYRIC_TRANSIT_DURATION
+			animator.duration = LYRIC_SCROLL_DURATION
 			animator.interpolator = interpolator
 			animator.start()
 
@@ -883,7 +933,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				val animatedValue = animation.animatedValue as Int
 				setTextColor(animatedValue)
 			}
-			colorAnimator.duration = LYRIC_TRANSIT_DURATION
+			colorAnimator.duration = LYRIC_SCROLL_DURATION
 			colorAnimator.interpolator = interpolator
 			colorAnimator.start()
 		}
@@ -960,8 +1010,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			})
 		}
 
-		fun getPlaylistSize() = playlist.size
-
 		override fun onCreateViewHolder(
 			parent: ViewGroup,
 			viewType: Int
@@ -1013,31 +1061,35 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 	}
 
+	private fun updateNewIndex(): Int {
+		val filteredList = bottomSheetFullLyricList.filterIndexed { _, lyric ->
+			lyric.timeStamp <= (instance?.currentPosition ?: 0)
+		}
+
+		return if (filteredList.isNotEmpty()) {
+			filteredList.indices.maxBy {
+				filteredList[it].timeStamp
+			}
+		} else {
+			-1
+		}
+	}
+
 	fun updateLyric(duration: Long?) {
 		if (bottomSheetFullLyricList.isNotEmpty()) {
-			val newIndex: Int
-
-			val filteredList = bottomSheetFullLyricList.filterIndexed { _, lyric ->
-				lyric.timeStamp <= (instance?.currentPosition ?: 0)
-			}
-
-			newIndex = if (filteredList.isNotEmpty()) {
-				filteredList.indices.maxBy {
-					filteredList[it].timeStamp
-				}
-			} else {
-				-1
-			}
+			val newIndex = updateNewIndex()
 
 			if (newIndex != -1 &&
 				duration != null &&
 				newIndex != bottomSheetFullLyricAdapter.currentFocusPos
 			) {
-				val smoothScroller = createSmoothScroller()
-				smoothScroller.targetPosition = newIndex
-				bottomSheetFullLyricLinearLayoutManager.startSmoothScroll(
-					smoothScroller
-				)
+				if (bottomSheetFullLyricList[newIndex].content.isNotEmpty()) {
+					val smoothScroller = createSmoothScroller()
+					smoothScroller.targetPosition = newIndex
+					bottomSheetFullLyricLinearLayoutManager.startSmoothScroll(
+						smoothScroller
+					)
+				}
 
 				bottomSheetFullLyricAdapter.updateHighlight(newIndex)
 			}
@@ -1045,10 +1097,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	}
 
 	private fun createSmoothScroller(): RecyclerView.SmoothScroller {
-		val smoothScrollLimit = LYRIC_SMOOTH_SCROLL_MAX_DIST.dpToPx(context)
-		val speedPerPixel = LYRIC_SMOOTH_SCROLL_SPEED_KEY / context.resources.displayMetrics.densityDpi
-
-		return object : CustomLinearSmoothScroller(context) {
+		return object : CustomSmoothScroller(context) {
 
 			override fun calculateDtToFit(
 				viewStart: Int,
@@ -1057,7 +1106,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				boxEnd: Int,
 				snapPreference: Int
 			): Int {
-				return super.calculateDtToFit(viewStart, viewEnd, boxStart, boxEnd, snapPreference) + 36.dpToPx(context)
+				return super.calculateDtToFit(viewStart, viewEnd, boxStart, boxEnd, snapPreference) + 72.dpToPx(context)
 			}
 
 			override fun getVerticalSnapPreference(): Int {
@@ -1065,19 +1114,52 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			}
 
 			override fun calculateTimeForDeceleration(dx: Int): Int {
-				val timeForScrolling = calculateTimeForScrolling(dx)
-				val calculatedTime = ceil(timeForScrolling / .3356).toInt()
-				return if (dx <= smoothScrollLimit) calculatedTime else {
-					val maximumTime = ceil(calculateTimeForScrolling(smoothScrollLimit) / .3356).toInt()
-					val finalFactor = maximumTime * (smoothScrollLimit / dx).toDouble().pow(LYRIC_SMOOTH_SCROLL_SQUARE_FACTOR).toInt()
-					if (finalFactor > LYRIC_SMOOTH_SCROLL_MINIMUM_SCROLL_TIME) finalFactor else LYRIC_SMOOTH_SCROLL_MINIMUM_SCROLL_TIME
-				}
+				return LYRIC_SCROLL_DURATION.toInt()
 			}
 
-			override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float {
-				return speedPerPixel
+			override fun afterTargetFound() {
+				val newIndex = updateNewIndex()
+				if (newIndex > 1) {
+					val firstVisibleItemPosition: Int = newIndex + 1
+					val lastVisibleItemPosition: Int =
+						bottomSheetFullLyricLinearLayoutManager.findLastVisibleItemPosition() + 2
+					for (i in firstVisibleItemPosition..lastVisibleItemPosition) {
+						val view: View? =
+							bottomSheetFullLyricLinearLayoutManager.findViewByPosition(i)
+						if (view != null) {
+							val ii = i - firstVisibleItemPosition
+							applyAnimation(view, ii)
+						}
+					}
+				}
 			}
 		}
+	}
+
+	private fun applyAnimation(view: View, ii: Int) {
+		val depth = 8.dpToPx(context).toFloat() + 3.dpToPx(context) * ii
+		val duration = 275L
+		val durationStep = 275L
+		val animator = ObjectAnimator.ofFloat(
+			view,
+			"translationY",
+			0f,
+			depth,
+		)
+		animator.setDuration(duration)
+		animator.interpolator = interpolator
+		animator.doOnEnd {
+			val animator1 = ObjectAnimator.ofFloat(
+				view,
+				"translationY",
+				depth,
+				0f
+			)
+			animator1.setDuration(duration + ii * durationStep)
+			animator1.interpolator = interpolator
+			animator1.start()
+		}
+		animator.start()
 	}
 
 
@@ -1092,7 +1174,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			if (duration != null && !isUserTracking) {
 				bottomSheetFullSlider.valueTo = duration.toFloat()
 				bottomSheetFullSlider.value =
-					min(instance?.currentPosition?.toFloat() ?: 0f, bottomSheetFullSlider.valueTo)
+					instance?.currentPosition?.toFloat().checkIfNegativeOrNullOrMaxedOut(bottomSheetFullSlider.valueTo)
 				bottomSheetFullPosition.text = position
 				bottomSheetFullPositionBack.text = bottomSheetFullPosition.text
 				bottomSheetFullDuration.text =
@@ -1103,8 +1185,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 					)
 				bottomSheetFullDurationBack.text = bottomSheetFullDuration.text
 			}
-			if (duration != null && duration >= LYRIC_TRANSIT_DURATION) {
-				updateLyric(duration - LYRIC_TRANSIT_DURATION)
+			if (duration != null && duration >= LYRIC_SCROLL_DURATION) {
+				updateLyric(duration - LYRIC_SCROLL_DURATION)
 			}
 			if (instance?.isPlaying == true) {
 				handler.postDelayed(this, SLIDER_UPDATE_INTERVAL)

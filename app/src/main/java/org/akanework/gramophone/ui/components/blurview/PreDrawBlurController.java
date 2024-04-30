@@ -1,6 +1,7 @@
 package org.akanework.gramophone.ui.components.blurview;
 
 import android.graphics.Bitmap;
+import android.graphics.BlendMode;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -37,6 +38,10 @@ public final class PreDrawBlurController implements BlurController {
     @SuppressWarnings("WeakerAccess")
     final View blurView;
     private int overlayColor;
+
+    @Nullable
+    private final BlendMode blendMode;
+
     private final ViewGroup rootView;
     private final int[] rootLocation = new int[2];
     private final int[] blurViewLocation = new int[2];
@@ -65,10 +70,11 @@ public final class PreDrawBlurController implements BlurController {
      *                  Can be Activity's root content layout (android.R.id.content)
      * @param algorithm sets the blur algorithm
      */
-    public PreDrawBlurController(@NonNull View blurView, @NonNull ViewGroup rootView, @ColorInt int overlayColor, BlurAlgorithm algorithm) {
+    public PreDrawBlurController(@NonNull View blurView, @NonNull ViewGroup rootView, @ColorInt int overlayColor, @Nullable BlendMode blendMode, BlurAlgorithm algorithm) {
         this.rootView = rootView;
         this.blurView = blurView;
         this.overlayColor = overlayColor;
+        this.blendMode = blendMode;
         this.blurAlgorithm = algorithm;
         if (algorithm instanceof RenderEffectBlur) {
             // noinspection NewApi
@@ -163,7 +169,9 @@ public final class PreDrawBlurController implements BlurController {
         canvas.scale(scaleFactorW, scaleFactorH);
         blurAlgorithm.render(canvas, internalBitmap);
         canvas.restore();
-        if (overlayColor != TRANSPARENT) {
+        if (overlayColor != TRANSPARENT && blendMode != null) {
+            canvas.drawColor(overlayColor, blendMode);
+        } else if (overlayColor != TRANSPARENT) {
             canvas.drawColor(overlayColor);
         }
         return true;

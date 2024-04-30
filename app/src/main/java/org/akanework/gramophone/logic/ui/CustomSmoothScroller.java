@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package org.akanework.gramophone.ui.components;
+package org.akanework.gramophone.logic.ui;
 
+import android.animation.TimeInterpolator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.PointF;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
+import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 
 import androidx.fluidrecyclerview.widget.RecyclerView;
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
+
+import com.google.android.material.motion.MotionUtils;
 
 /**
  * {@link RecyclerView.SmoothScroller} implementation which uses a {@link LinearInterpolator} until
@@ -37,7 +41,7 @@ import androidx.fluidrecyclerview.widget.RecyclerView;
  * {@link #computeScrollVectorForPosition(int)} method. All the LayoutManagers bundled with
  * the support library implement this interface.
  */
-public class CustomLinearSmoothScroller extends RecyclerView.SmoothScroller {
+public class CustomSmoothScroller extends RecyclerView.SmoothScroller {
 
     private static final boolean DEBUG = false;
 
@@ -80,9 +84,9 @@ public class CustomLinearSmoothScroller extends RecyclerView.SmoothScroller {
     // scrolling slows down and reschedule another interim target scroll
     private static final float TARGET_SEEK_EXTRA_SCROLL_RATIO = 1.2f;
 
-    protected final LinearInterpolator mLinearInterpolator = new LinearInterpolator();
+    protected LinearInterpolator mLinearInterpolator = new LinearInterpolator();
 
-    protected final DecelerateInterpolator mDecelerateInterpolator = new DecelerateInterpolator();
+    protected TimeInterpolator mDecelerateInterpolator;
 
     @SuppressLint("UnknownNullness") // b/240775049: Cannot annotate properly
     protected PointF mTargetVector;
@@ -96,8 +100,13 @@ public class CustomLinearSmoothScroller extends RecyclerView.SmoothScroller {
     protected int mInterimTargetDx = 0, mInterimTargetDy = 0;
 
     @SuppressLint("UnknownNullness") // b/240775049: Cannot annotate properly
-    public CustomLinearSmoothScroller(Context context) {
+    public CustomSmoothScroller(Context context) {
         mDisplayMetrics = context.getResources().getDisplayMetrics();
+        mDecelerateInterpolator = MotionUtils.resolveThemeInterpolator(
+                context,
+                com.google.android.material.R.attr.motionEasingStandardInterpolator,
+                new FastOutSlowInInterpolator()
+        );
     }
 
     /**
@@ -119,8 +128,13 @@ public class CustomLinearSmoothScroller extends RecyclerView.SmoothScroller {
         final int distance = (int) Math.sqrt(dx * dx + dy * dy);
         final int time = calculateTimeForDeceleration(distance);
         if (time > 0) {
-            action.update(-dx, -dy, time, mDecelerateInterpolator);
+            action.update(-dx, -dy, time, (Interpolator) mDecelerateInterpolator);
+            afterTargetFound();
         }
+    }
+
+    protected void afterTargetFound() {
+
     }
 
     /**
@@ -263,12 +277,13 @@ public class CustomLinearSmoothScroller extends RecyclerView.SmoothScroller {
 
         mInterimTargetDx = (int) (TARGET_SEEK_SCROLL_DISTANCE_PX * scrollVector.x);
         mInterimTargetDy = (int) (TARGET_SEEK_SCROLL_DISTANCE_PX * scrollVector.y);
+        final int time = calculateTimeForScrolling(TARGET_SEEK_SCROLL_DISTANCE_PX);
         // To avoid UI hiccups, trigger a smooth scroll to a distance little further than the
         // interim target. Since we track the distance travelled in onSeekTargetStep callback, it
         // won't actually scroll more than what we need.
         action.update((int) (mInterimTargetDx * TARGET_SEEK_EXTRA_SCROLL_RATIO),
                 (int) (mInterimTargetDy * TARGET_SEEK_EXTRA_SCROLL_RATIO),
-                FullBottomSheet.LYRIC_SMOOTH_SCROLL_MINIMUM_SCROLL_TIME, mLinearInterpolator);
+                (int) (time * TARGET_SEEK_EXTRA_SCROLL_RATIO), mLinearInterpolator);
     }
 
     private int clampApplyScroll(int tmpDt, int dt) {

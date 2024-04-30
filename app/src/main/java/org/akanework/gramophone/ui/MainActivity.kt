@@ -42,6 +42,7 @@ import androidx.fragment.app.FragmentManager.FragmentLifecycleCallbacks
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.DefaultMediaNotificationProvider
 import coil3.imageLoader
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -49,6 +50,7 @@ import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.enableEdgeToEdgeProperly
 import org.akanework.gramophone.logic.postAtFrontOfQueueAsync
 import org.akanework.gramophone.logic.utils.MediaStoreUtils.updateLibraryWithInCoroutine
+import org.akanework.gramophone.ui.components.HalcyonDialogFragment
 import org.akanework.gramophone.ui.components.PlayerBottomSheet
 import org.akanework.gramophone.ui.fragments.BaseFragment
 
@@ -139,6 +141,12 @@ class MainActivity : AppCompatActivity() {
         // Modifies FragmentContainerView's insets to account for bottom sheet size.
         ViewCompat.setOnApplyWindowInsetsListener(container) { _, insets ->
             playerBottomSheet.generateBottomSheetInsets(insets)
+        }
+
+        val fab = findViewById<FloatingActionButton>(R.id.halcyon)
+        fab.setOnClickListener {
+            val fragment = HalcyonDialogFragment()
+            fragment.show(supportFragmentManager, null)
         }
 
         // Check all permissions.

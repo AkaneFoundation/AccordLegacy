@@ -4,6 +4,7 @@ import static org.akanework.gramophone.ui.components.blurview.PreDrawBlurControl
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.BlendMode;
 import android.graphics.Canvas;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -13,6 +14,7 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
 import org.akanework.gramophone.R;
@@ -88,9 +90,9 @@ public class BlurView extends FrameLayout {
      * @param algorithm sets the blur algorithm
      * @return {@link BlurView} to setup needed params.
      */
-    public BlurViewFacade setupWith(@NonNull ViewGroup rootView, BlurAlgorithm algorithm) {
+    public BlurViewFacade setupWith(@NonNull ViewGroup rootView, BlurAlgorithm algorithm, @Nullable BlendMode blendMode) {
         this.blurController.destroy();
-        BlurController blurController = new PreDrawBlurController(this, rootView, overlayColor, algorithm);
+        BlurController blurController = new PreDrawBlurController(this, rootView, overlayColor, blendMode, algorithm);
         this.blurController = blurController;
 
         return blurController;
@@ -106,8 +108,8 @@ public class BlurView extends FrameLayout {
      * @return {@link BlurView} to setup needed params.
      */
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
-    public BlurViewFacade setupWith(@NonNull ViewGroup rootView) {
-        return setupWith(rootView, getBlurAlgorithm());
+    public BlurViewFacade setupWith(@NonNull ViewGroup rootView, @Nullable BlendMode blendMode) {
+        return setupWith(rootView, getBlurAlgorithm(), blendMode);
     }
 
     // Setters duplicated to be able to conveniently change these settings outside of setupWith chain

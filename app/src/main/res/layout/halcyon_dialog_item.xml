@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="240dp"
+    android:layout_gravity="center"
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="@color/contrast_colorBackgroundContainerHalcyon"
+    app:strokeColor="@android:color/transparent"
+    app:cardPreventCornerOverlap="false"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="6dp"
+    android:background="@android:color/transparent">
+
+    <org.akanework.gramophone.ui.components.blurview.BlurView
+        android:id="@+id/blur_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:blurOverlayColor="@color/contrast_colorOverlayBlurHalcyon"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/contrast_colorBackgroundContainerHalcyon"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:background="@color/contrast_colorBackgroundContainerHalcyon">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="14dp"
+                android:src="@drawable/ic_dot"
+                app:tint="@color/contrast_colorOnSurfaceHalcyon" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sort_by_name"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:textFontWeight="500"
+                android:textColor="@color/contrast_colorOnSurfaceHalcyon"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="38dp"
+                android:includeFontPadding="false"
+                />
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center_vertical|end"
+                android:layout_marginEnd="24dp"
+                android:scaleType="center"
+                android:src="@drawable/ic_character"
+                app:tint="@color/contrast_colorOnSurfaceHalcyon" />
+
+        </FrameLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/contrast_colorBackgroundElevatedHalcyon"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:background="@color/contrast_colorBackgroundContainerHalcyon">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sort_by_album"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:textFontWeight="500"
+                android:textColor="@color/contrast_colorOnSurfaceHalcyon"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="38dp"
+                android:includeFontPadding="false"
+                />
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center_vertical|end"
+                android:layout_marginEnd="24dp"
+                android:src="@drawable/ic_album_sort"
+                app:tint="@color/contrast_colorOnSurfaceHalcyon" />
+
+        </FrameLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/contrast_colorBackgroundElevatedHalcyon"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:background="@color/contrast_colorBackgroundContainerHalcyon">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sort_by_add_date"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:textFontWeight="500"
+                android:textColor="@color/contrast_colorOnSurfaceHalcyon"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="38dp"
+                android:includeFontPadding="false"
+                />
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center_vertical|end"
+                android:layout_marginEnd="24dp"
+                android:src="@drawable/ic_calendar_add"
+                app:tint="@color/contrast_colorOnSurfaceHalcyon" />
+
+        </FrameLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/contrast_colorBackgroundElevatedHalcyon"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:background="@color/contrast_colorBackgroundContainerHalcyon">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sort_by_modified_date"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:textFontWeight="500"
+                android:textColor="@color/contrast_colorOnSurfaceHalcyon"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="38dp"
+                android:includeFontPadding="false"
+                />
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center_vertical|end"
+                android:layout_marginEnd="24dp"
+                android:src="@drawable/ic_edit"
+                app:tint="@color/contrast_colorOnSurfaceHalcyon" />
+
+        </FrameLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:alpha="0.85"
+            android:background="@color/contrast_colorBackgroundSeparatorHalcyon"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:background="@color/contrast_colorBackgroundContainerHalcyon">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/layout"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:textFontWeight="500"
+                android:textColor="@color/contrast_colorOnSurfaceHalcyon"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="38dp"
+                android:includeFontPadding="false"
+                />
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center_vertical|end"
+                android:layout_marginEnd="24dp"
+                android:src="@drawable/ic_layout_type"
+                app:tint="@color/contrast_colorOnSurfaceHalcyon" />
+
+        </FrameLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/contrast_colorBackgroundContainerHalcyon"/>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

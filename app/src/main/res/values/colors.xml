@@ -3,10 +3,19 @@
     <color name="contrast_colorBackground">#FFFFFF</color>
     <color name="contrast_colorBackgroundElevated">#F5F5F5</color>
     <color name="contrast_colorBackgroundContainer">#E6E6E6</color>
+    <color name="contrast_colorOnSurfaceHalcyon">#DE000000</color>
+    <color name="contrast_colorBackgroundContainerHalcyon">#B3FAFAFA</color>
+    <color name="contrast_colorBackgroundElevatedHalcyon">#B3E6E6EB</color>
     <color name="contrast_colorOnSurfaceFainted">#80000000</color>
     <color name="contrast_colorOnSurfaceSecondary">#B3000000</color>
     <color name="contrast_colorOutline">#0D000000</color>
     <color name="contrast_blendOverlayColor">#40000000</color>
+    <color name="contrast_colorOverlayBlurHalcyon">#66FFFFFF</color>
+    <color name="contrast_colorBackgroundSeparatorHalcyon">#B3E6E6EB</color>
+
+    <color name="contrast_colorSecondaryTopOverlayActivated">#80FFFFFF</color>
+    <color name="contrast_colorSecondaryTopOverlayInActivated">#33FFFFFF</color>
+    <color name="contrast_colorSecondaryBackOverlayActivated">#26FFFFFF</color>
 
     <!-- Fallback -->
     <color name="md_theme_primary">#000000</color>

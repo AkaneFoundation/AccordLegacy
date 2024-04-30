@@ -20,4 +20,12 @@
         android:layout_height="match_parent"
         tools:behavior_peekHeight="1000dp" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/halcyon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:src="@drawable/ic_play_arrow"
+        />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

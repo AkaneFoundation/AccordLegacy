@@ -38,7 +38,6 @@
             app:expandedTitleTextColor="@color/contrast_colorOnSurface"
             app:expandedTitleTextAppearance="?textAppearanceHeadlineLarge"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
-            app:title="@string/home_menu_settings"
             app:contentScrim="@color/contrast_colorBackground"
             android:background="@color/contrast_colorBackground"
             app:expandedTitleMarginStart="24dp">

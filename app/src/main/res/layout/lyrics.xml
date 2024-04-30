@@ -11,7 +11,8 @@
     android:focusable="true"
     app:cardBackgroundColor="@android:color/transparent"
     app:cardElevation="0dp"
-    app:strokeColor="@android:color/transparent">
+    app:strokeColor="@android:color/transparent"
+    tools:cardBackgroundColor="@color/contrast_colorOnSurface">
 
     <TextView
         android:id="@+id/lyric"
@@ -21,6 +22,7 @@
         android:paddingBottom="18dp"
         android:textColor="#FFFFFF"
         android:textStyle="bold"
+        android:shadowColor="#FFFFFF"
         tools:targetApi="p"
         tools:text="轢き潰してきた その全てに 对着那被碾碎的 曾经的所有" />
 

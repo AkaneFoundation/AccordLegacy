@@ -27,9 +27,9 @@ import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceFragmentCompat
 import androidx.recyclerview.widget.RecyclerView
 import org.akanework.gramophone.R
+import org.akanework.gramophone.logic.allowDiskAccessInStrictMode
 import org.akanework.gramophone.logic.dpToPx
 import org.akanework.gramophone.logic.enableEdgeToEdgePaddingListener
-import org.akanework.gramophone.logic.useSharedPrefs
 
 /**
  * BasePreferenceFragment:
@@ -51,7 +51,7 @@ abstract class BasePreferenceFragment : PreferenceFragmentCompat(),
     }
 
     override fun setPreferencesFromResource(preferencesResId: Int, key: String?) {
-        useSharedPrefs { super.setPreferencesFromResource(preferencesResId, key) }
+        allowDiskAccessInStrictMode { super.setPreferencesFromResource(preferencesResId, key) }
     }
 
     override fun setDivider(divider: Drawable?) {

@@ -19,10 +19,11 @@ package org.akanework.gramophone.logic
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.ContentResolver
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.database.Cursor
 import android.graphics.Color
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.graphics.drawable.Drawable
@@ -40,13 +41,18 @@ import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.core.graphics.Insets
+import androidx.core.net.toFile
+import androidx.core.os.BundleCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.children
 import androidx.core.view.updateLayoutParams
+import androidx.core.view.updateMargins
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
@@ -57,14 +63,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import org.akanework.gramophone.BuildConfig
-import org.akanework.gramophone.GramophoneApplication
 import org.akanework.gramophone.logic.GramophonePlaybackService.Companion.SERVICE_GET_LYRICS
 import org.akanework.gramophone.logic.GramophonePlaybackService.Companion.SERVICE_QUERY_TIMER
 import org.akanework.gramophone.logic.GramophonePlaybackService.Companion.SERVICE_SET_TIMER
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
 import java.io.File
 
-fun MediaController.playOrPause() {
+fun Player.playOrPause() {
     if (isPlaying) {
         pause()
     } else {
@@ -77,18 +82,7 @@ fun MediaItem.getUri(): Uri? {
 }
 
 fun MediaItem.getFile(): File? {
-    return getUri()?.path?.let { File(it) }
-}
-
-// uses reified for performant inlining only
-inline fun <reified K, reified V> HashMap<K, V>.putIfAbsentSupport(key: K, value: V) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        putIfAbsent(key, value)
-    } else {
-        // meh...
-        if (!containsKey(key))
-            this[key] = value
-    }
+    return getUri()?.toFile()
 }
 
 fun Activity.closeKeyboard(view: View) {
@@ -178,10 +172,6 @@ fun View.fadInAnimation(duration: Long = 300, completion: (() -> Unit)? = null) 
 inline fun Int.dpToPx(context: Context): Int =
     (this.toFloat() * context.resources.displayMetrics.density).toInt()
 
-@Suppress("NOTHING_TO_INLINE")
-inline fun Int.pxToDp(context: Context): Int =
-    (this.toFloat() / context.resources.displayMetrics.density).toInt()
-
 fun MediaController.getTimer(): Int =
     sendCustomCommand(
         SessionCommand(SERVICE_QUERY_TIMER, Bundle.EMPTY),
@@ -197,18 +187,24 @@ fun MediaController.setTimer(value: Int) {
     )
 }
 
+inline fun <reified T, reified U> HashMap<T, U>.putIfAbsentSupport(key: T, value: U) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        putIfAbsent(key, value)
+    } else {
+        // Duh...
+        if (!containsKey(key))
+            put(key, value)
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
 fun MediaController.getLyrics(): MutableList<MediaStoreUtils.Lyric>? =
     sendCustomCommand(
         SessionCommand(SERVICE_GET_LYRICS, Bundle.EMPTY),
         Bundle.EMPTY
     ).get().extras.let {
-        @Suppress("UNCHECKED_CAST")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            it.getParcelableArray("lyrics", MediaStoreUtils.Lyric::class.java)
-        } else {
-            @Suppress("deprecation")
-            it.getParcelableArray("lyrics") as Array<MediaStoreUtils.Lyric>?
-        }?.toMutableList()
+        (BundleCompat.getParcelableArray(it, "lyrics", MediaStoreUtils.Lyric::class.java)
+                as Array<MediaStoreUtils.Lyric>?)?.toMutableList()
     }
 
 // https://twitter.com/Piwai/status/1529510076196630528
@@ -220,14 +216,14 @@ fun Handler.postAtFrontOfQueueAsync(callback: Runnable) {
     })
 }
 
-fun View.enableEdgeToEdgePaddingListener(ime: Boolean = false, top: Boolean = false) {
+fun View.enableEdgeToEdgePaddingListener(ime: Boolean = false, top: Boolean = false,
+                                         extra: ((Insets) -> Unit)? = null) {
     if (fitsSystemWindows) throw IllegalArgumentException("must have fitsSystemWindows disabled")
     if (this is AppBarLayout) {
         if (ime) throw IllegalArgumentException("AppBarLayout must have ime flag disabled")
         // AppBarLayout fitsSystemWindows does not handle left/right for a good reason, it has
         // to be applied to children to look good; we rewrite fitsSystemWindows in a way mostly specific
         // to Gramophone to support shortEdges displayCutout
-        if (fitsSystemWindows) throw IllegalArgumentException("must have fitsSystemWindows disabled")
         val collapsingToolbarLayout = children.find { it is CollapsingToolbarLayout } as CollapsingToolbarLayout?
         collapsingToolbarLayout?.let {
             // The CollapsingToolbarLayout mustn't consume insets, we handle padding here anyway
@@ -254,6 +250,7 @@ fun View.enableEdgeToEdgePaddingListener(ime: Boolean = false, top: Boolean = fa
             v.setPadding(0, cutoutAndBars.top, 0, 0)
             val i = insets.getInsetsIgnoringVisibility(WindowInsetsCompat.Type.systemBars()
                     or WindowInsetsCompat.Type.displayCutout())
+            extra?.invoke(cutoutAndBars)
             return@setOnApplyWindowInsetsListener WindowInsetsCompat.Builder(insets)
                 .setInsets(WindowInsetsCompat.Type.systemBars()
                         or WindowInsetsCompat.Type.displayCutout(), Insets.of(cutoutAndBars.left, 0, cutoutAndBars.right, cutoutAndBars.bottom))
@@ -273,6 +270,7 @@ fun View.enableEdgeToEdgePaddingListener(ime: Boolean = false, top: Boolean = fa
             val i = insets.getInsets(mask)
             v.setPadding(pl + i.left, pt + (if (top) i.top else 0), pr + i.right,
                 pb + i.bottom)
+            extra?.invoke(i)
             return@setOnApplyWindowInsetsListener WindowInsetsCompat.Builder(insets)
                 .setInsets(mask, Insets.NONE)
                 .setInsetsIgnoringVisibility(mask, Insets.NONE)
@@ -294,12 +292,13 @@ data class Margin(var left: Int, var top: Int, var right: Int, var bottom: Int) 
 
     @Suppress("NOTHING_TO_INLINE")
     internal inline fun apply(marginLayoutParams: MarginLayoutParams) {
-        marginLayoutParams.leftMargin = left
-        marginLayoutParams.topMargin = top
-        marginLayoutParams.rightMargin = right
-        marginLayoutParams.bottomMargin = bottom
+        marginLayoutParams.updateMargins(left, top, right, bottom)
     }
 }
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun Cursor.getColumnIndexOrNull(columnName: String): Int? =
+    getColumnIndex(columnName).let { if (it == -1) null else it }
 
 fun View.updateMargin(
     block: Margin.() -> Unit
@@ -323,9 +322,6 @@ fun ComponentActivity.enableEdgeToEdgeProperly() {
         enableEdgeToEdge(navigationBarStyle = SystemBarStyle.light(Color.TRANSPARENT, darkScrim))
     }
 }
-
-val Context.gramophoneApplication
-    get() = applicationContext as GramophoneApplication
 
 @SuppressLint("DiscouragedPrivateApi")
 private fun WindowInsets.unconsumeIfNeeded() {
@@ -367,7 +363,7 @@ inline fun Semaphore.runInBg(crossinline runnable: suspend () -> Unit) {
 
 // the whole point of this function is to do literally nothing at all (but without impacting
 // performance) in release builds and ignore StrictMode violations in debug builds
-inline fun <reified T> useSharedPrefs(doIt: () -> T): T {
+inline fun <reified T> allowDiskAccessInStrictMode(doIt: () -> T): T {
     return if (BuildConfig.DEBUG) {
         if (Looper.getMainLooper() != Looper.myLooper()) throw IllegalStateException()
         val policy = StrictMode.allowThreadDiskReads()
@@ -380,8 +376,18 @@ inline fun <reified T> useSharedPrefs(doIt: () -> T): T {
     } else doIt()
 }
 
+fun Float?.checkIfNegativeOrNullOrMaxedOut(maxedOut: Float): Float {
+    return if (this != null && this >= 0 && this <= maxedOut ) {
+        this
+    } else if (this != null && this > maxedOut) {
+        maxedOut
+    } else {
+        0f
+    }
+}
+
 inline fun <reified T> SharedPreferences.use(doIt: SharedPreferences.() -> T): T {
-    return useSharedPrefs { doIt() }
+    return allowDiskAccessInStrictMode { doIt() }
 }
 
 // use below functions if accessing from UI thread only
@@ -405,19 +411,40 @@ inline fun SharedPreferences.getStringSetStrict(key: String, defValue: Set<Strin
     return use { getStringSet(key, defValue) }
 }
 
-fun Context.resourceUri(resourceId: Int): Uri = with(resources) {
-    Uri.Builder()
-        .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
-        .authority(getResourcePackageName(resourceId))
-        .appendPath(getResourceTypeName(resourceId))
-        .appendPath(getResourceEntryName(resourceId))
-        .build()
-}
-
-@Suppress("NOTHING_TO_INLINE")
-inline fun mayThrowForegroundServiceStartNotAllowed(): Boolean =
-    Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+fun Context.hasImagePermission() =
+    checkSelfPermission(android.Manifest.permission.READ_MEDIA_IMAGES) ==
+            PackageManager.PERMISSION_GRANTED
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun needsMissingOnDestroyCallWorkarounds(): Boolean =
     Build.VERSION.SDK_INT == Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun hasImprovedMediaStore(): Boolean =
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun hasAlbumArtistIdInMediaStore(): Boolean =
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun hasOsClipboardDialog(): Boolean =
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun hasScopedStorageV2(): Boolean =
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun hasScopedStorageV1(): Boolean =
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun hasScopedStorageWithMediaTypes(): Boolean =
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun mayThrowForegroundServiceStartNotAllowed(): Boolean =
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+            Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2

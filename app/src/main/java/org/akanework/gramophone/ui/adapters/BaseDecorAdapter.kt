@@ -23,13 +23,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
+import org.akanework.gramophone.logic.ui.CustomSmoothScroller
+import androidx.fluidrecyclerview.widget.RecyclerView
 import androidx.media3.common.C
 import androidx.media3.common.Player.REPEAT_MODE_OFF
-import androidx.fluidrecyclerview.widget.LinearSmoothScroller
-import androidx.fluidrecyclerview.widget.RecyclerView
+import androidx.preference.PreferenceManager
 import com.google.android.material.button.MaterialButton
 import org.akanework.gramophone.R
-import org.akanework.gramophone.logic.gramophoneApplication
 import org.akanework.gramophone.logic.ui.ItemHeightHelper
 import org.akanework.gramophone.logic.ui.MyRecyclerView
 import org.akanework.gramophone.logic.utils.FileOpUtils
@@ -45,7 +45,7 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
     protected val context: Context = adapter.context
     private val dpHeight = context.resources.getDimensionPixelSize(R.dimen.decor_height)
     private var recyclerView: MyRecyclerView? = null
-    private var prefs = context.gramophoneApplication.prefs
+    private val prefs = PreferenceManager.getDefaultSharedPreferences(context)
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -194,7 +194,7 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
     }
 
     private fun scrollToViewPosition(pos: Int) {
-        val smoothScroller = object : LinearSmoothScroller(context) {
+        val smoothScroller = object : CustomSmoothScroller(context) {
             override fun calculateDtToFit(
                 viewStart: Int,
                 viewEnd: Int,

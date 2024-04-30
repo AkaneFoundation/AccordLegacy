@@ -32,25 +32,25 @@ import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.doOnLayout
 import androidx.core.view.updateLayoutParams
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.fluidrecyclerview.widget.ConcatAdapter
 import androidx.fluidrecyclerview.widget.DiffUtil
 import androidx.fluidrecyclerview.widget.GridLayoutManager
 import androidx.fluidrecyclerview.widget.LinearLayoutManager
 import androidx.fluidrecyclerview.widget.RecyclerView
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.preference.PreferenceManager
 import coil3.dispose
 import coil3.load
-import coil3.request.placeholder
 import coil3.request.error
+import coil3.request.placeholder
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.divider.MaterialDivider
 import kotlinx.coroutines.sync.Semaphore
 import me.zhanghai.android.fastscroll.PopupTextProvider
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.getStringStrict
-import org.akanework.gramophone.logic.gramophoneApplication
 import org.akanework.gramophone.logic.ui.DefaultItemHeightHelper
 import org.akanework.gramophone.logic.ui.ItemHeightHelper
 import org.akanework.gramophone.logic.ui.MyRecyclerView
@@ -141,7 +141,7 @@ abstract class BaseAdapter<T>(
     protected var recyclerView: MyRecyclerView? = null
         private set
 
-    private var prefs = context.gramophoneApplication.prefs
+    private val prefs = PreferenceManager.getDefaultSharedPreferences(context)
 
     @Suppress("LeakingThis")
     private var prefSortType: Sorter.Type = Sorter.Type.valueOf(

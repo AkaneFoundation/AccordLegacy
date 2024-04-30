@@ -46,6 +46,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
+import androidx.preference.PreferenceManager
 import coil3.annotation.ExperimentalCoilApi
 import coil3.imageLoader
 import coil3.request.Disposable
@@ -62,7 +63,6 @@ import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.GramophonePlaybackService
 import org.akanework.gramophone.logic.clone
 import org.akanework.gramophone.logic.getBooleanStrict
-import org.akanework.gramophone.logic.gramophoneApplication
 import org.akanework.gramophone.logic.playOrPause
 import org.akanework.gramophone.logic.ui.MyBottomSheetBehavior
 import org.akanework.gramophone.logic.utils.EnvUtils
@@ -95,7 +95,7 @@ class PlayerBottomSheet private constructor(
 
     private val activity
         get() = context as MainActivity
-    private val prefs = context.gramophoneApplication.prefs
+    private val prefs = PreferenceManager.getDefaultSharedPreferences(context)
     private val lifecycleOwner: LifecycleOwner
         get() = activity
     private val handler = Handler(Looper.getMainLooper())
@@ -419,10 +419,12 @@ class PlayerBottomSheet private constructor(
             bottomSheetPreviewControllerButton.icon =
                 AppCompatResources.getDrawable(context, R.drawable.ic_apple_pause)
             bottomSheetPreviewControllerButton.setTag(R.id.play_next, 1)
+            bottomSheetBlendBackgroundView.startRotationAnimation()
         } else if (instance?.isPlaying == false && myTag != 2) {
             bottomSheetPreviewControllerButton.icon =
                 AppCompatResources.getDrawable(context, R.drawable.ic_apple_play)
             bottomSheetPreviewControllerButton.setTag(R.id.play_next, 2)
+            bottomSheetBlendBackgroundView.stopRotationAnimation()
         }
     }
 

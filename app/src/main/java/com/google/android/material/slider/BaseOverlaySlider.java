@@ -80,6 +80,7 @@ import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
@@ -250,6 +251,7 @@ abstract class BaseOverlaySlider<
 
   @NonNull private final Paint inactiveTrackPaint;
   @NonNull private final Paint inactiveTrackPaintUnder;
+  @NonNull private final Paint inactiveTrackPaintUnderOverlay;
   @NonNull private final Paint activeTrackPaint;
   @NonNull private final Paint thumbPaint;
   @NonNull private final Paint haloPaint;
@@ -363,8 +365,13 @@ abstract class BaseOverlaySlider<
     inactiveTrackPaintUnder = new Paint();
     inactiveTrackPaintUnder.setStyle(Style.STROKE);
     inactiveTrackPaintUnder.setStrokeCap(Cap.ROUND);
-    inactiveTrackPaintUnder.setColor(Color.parseColor("#80FFFFFF"));
-    inactiveTrackPaintUnder.setXfermode(new PorterDuffXfermode(Mode.OVERLAY));
+    inactiveTrackPaintUnder.setColor(ContextCompat.getColor(context, org.akanework.gramophone.R.color.contrast_colorSecondaryBackOverlayActivated));
+
+    inactiveTrackPaintUnderOverlay = new Paint();
+    inactiveTrackPaintUnderOverlay.setStyle(Style.STROKE);
+    inactiveTrackPaintUnderOverlay.setStrokeCap(Cap.ROUND);
+    inactiveTrackPaintUnderOverlay.setXfermode(new PorterDuffXfermode(Mode.OVERLAY));
+    inactiveTrackPaintUnderOverlay.setColor(ContextCompat.getColor(context, org.akanework.gramophone.R.color.contrast_colorSecondaryTopOverlayActivated));
 
     inactiveTrackPaint = new Paint();
     inactiveTrackPaint.setStyle(Style.STROKE);
@@ -1788,9 +1795,11 @@ abstract class BaseOverlaySlider<
 
     int yCenter = calculateTrackCenter();
 
+    drawBottomTrackOverlay(canvas, trackWidth, yCenter);
+
     drawBottomTrack(canvas, trackWidth, yCenter);
 
-    drawInactiveTrack(canvas, trackWidth, yCenter);
+    // drawInactiveTrack(canvas, trackWidth, yCenter);
     if (max(getValues()) > valueFrom) {
       drawActiveTrack(canvas, trackWidth, yCenter);
     }
@@ -1846,6 +1855,16 @@ abstract class BaseOverlaySlider<
             trackSidePadding + width,
             yCenter,
             inactiveTrackPaintUnder
+    );
+  }
+
+  private void drawBottomTrackOverlay(@NonNull Canvas canvas, int width, int yCenter) {
+    canvas.drawLine(
+            trackSidePadding,
+            yCenter,
+            trackSidePadding + width,
+            yCenter,
+            inactiveTrackPaintUnderOverlay
     );
   }
 
@@ -2037,6 +2056,11 @@ abstract class BaseOverlaySlider<
 
   public void updateBottomTrackColor(int color) {
     inactiveTrackPaintUnder.setColor(color);
+    postInvalidate();
+  }
+
+  public void updateBottomTrackOverlayColor(int color) {
+    inactiveTrackPaintUnderOverlay.setColor(color);
     postInvalidate();
   }
 
@@ -2351,9 +2375,10 @@ abstract class BaseOverlaySlider<
   }
 
   private void invalidateTrack() {
-    inactiveTrackPaint.setStrokeWidth(trackHeight);
+    // inactiveTrackPaint.setStrokeWidth(trackHeight);
     activeTrackPaint.setStrokeWidth(trackHeight);
     inactiveTrackPaintUnder.setStrokeWidth(trackHeight);
+    inactiveTrackPaintUnderOverlay.setStrokeWidth(trackHeight);
   }
 
   /**
