@@ -38,7 +38,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "org.akanework.accord"
+        applicationId = "uk.akane.accord"
         // Reasons to not support KK include me.zhanghai.android.fastscroll, WindowInsets for
         // bottom sheet padding, ExoPlayer requiring multidex for KK and poor SD card support
         // That said, supporting Android 5.0 barely costs any tech debt and we plan to keep support

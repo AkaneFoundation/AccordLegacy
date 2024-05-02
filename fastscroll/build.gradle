@@ -7,8 +7,6 @@ android {
     defaultConfig {
         minSdk 21
         targetSdk 34
-        versionCode Integer.parseInt(VERSION_CODE)
-        versionName VERSION_NAME
         consumerProguardFiles 'proguard-rules.pro'
     }
     compileOptions {

@@ -1115,6 +1115,26 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				return LYRIC_SCROLL_DURATION.toInt()
 			}
 
+			/*
+			WIP
+			override fun afterTargetFound() {
+				val newIndex = updateNewIndex()
+				if (newIndex > 1) {
+					val firstVisibleItemPosition: Int = newIndex + 1
+					val lastVisibleItemPosition: Int =
+						bottomSheetFullLyricLinearLayoutManager.findLastVisibleItemPosition() + 2
+					for (i in firstVisibleItemPosition..lastVisibleItemPosition) {
+						val view: View? =
+							bottomSheetFullLyricLinearLayoutManager.findViewByPosition(i)
+						if (view != null) {
+							val ii = i - firstVisibleItemPosition
+							applyAnimation(view, ii)
+						}
+					}
+				}
+			}
+
+			 */
 		}
 	}
 
