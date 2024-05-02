@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
+import android.view.animation.PathInterpolator;
 
 import androidx.fluidrecyclerview.widget.RecyclerView;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
@@ -86,7 +87,8 @@ public class CustomSmoothScroller extends RecyclerView.SmoothScroller {
 
     protected LinearInterpolator mLinearInterpolator = new LinearInterpolator();
 
-    protected TimeInterpolator mDecelerateInterpolator;
+    protected TimeInterpolator mDecelerateInterpolator =
+            new PathInterpolator(0.4f, 0.2f, 0f, 1f);
 
     @SuppressLint("UnknownNullness") // b/240775049: Cannot annotate properly
     protected PointF mTargetVector;
@@ -102,11 +104,6 @@ public class CustomSmoothScroller extends RecyclerView.SmoothScroller {
     @SuppressLint("UnknownNullness") // b/240775049: Cannot annotate properly
     public CustomSmoothScroller(Context context) {
         mDisplayMetrics = context.getResources().getDisplayMetrics();
-        mDecelerateInterpolator = MotionUtils.resolveThemeInterpolator(
-                context,
-                com.google.android.material.R.attr.motionEasingStandardInterpolator,
-                new FastOutSlowInInterpolator()
-        );
     }
 
     /**

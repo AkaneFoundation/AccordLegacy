@@ -34,7 +34,8 @@
                 android:scaleType="centerCrop"
                 android:padding="12dp"
                 android:importantForAccessibility="no"
-                android:src="@drawable/ic_folder" />
+                android:src="@drawable/ic_folder"
+                app:tint="@color/contrast_colorOnSurface"/>
 
         </com.google.android.material.card.MaterialCardView>
 

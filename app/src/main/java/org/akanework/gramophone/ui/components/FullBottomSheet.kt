@@ -22,6 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
 import android.view.animation.DecelerateInterpolator
+import android.view.animation.PathInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -109,11 +110,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private var runnableRunning = false
 	private var firstTime = false
 
-	val interpolator = MotionUtils.resolveThemeInterpolator(
-		context,
-		com.google.android.material.R.attr.motionEasingStandardInterpolator,
-		FastOutSlowInInterpolator()
-	)
+	val interpolator = PathInterpolator(0.4f, 0.2f, 0f, 1f)
 
 	companion object {
 		const val SLIDER_UPDATE_INTERVAL = 100L
@@ -216,6 +213,11 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private val secondaryTopOverlayActivatedColor = ContextCompat.getColor(context, R.color.contrast_colorSecondaryTopOverlayActivated)
 	private val secondaryTopOverlayInActivatedColor = ContextCompat.getColor(context, R.color.contrast_colorSecondaryTopOverlayInActivated)
 
+	private val overlayPaint = Paint().apply {
+		blendMode = BlendMode.OVERLAY
+		xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
+	}
+
 	init {
 		inflate(context, R.layout.full_player, this)
 		bottomSheetFullCoverFrame = findViewById(R.id.album_cover_frame)
@@ -255,15 +257,11 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetFullPlaylistRecyclerView.layoutManager = LinearLayoutManager(context)
 		bottomSheetFullPlaylistRecyclerView.adapter = bottomSheetFullPlaylistAdapter
 
-		val paint = Paint().apply {
-			blendMode = BlendMode.OVERLAY
-			xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
-		}
-		bottomSheetFullPlaylistSubtitle.setLayerType(LAYER_TYPE_HARDWARE, paint)
-		bottomSheetFullSubtitle.setLayerType(LAYER_TYPE_HARDWARE, paint)
+		bottomSheetFullPlaylistSubtitle.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
+		bottomSheetFullSubtitle.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
 
-		bottomSheetFullDuration.setLayerType(LAYER_TYPE_HARDWARE, paint)
-		bottomSheetFullPosition.setLayerType(LAYER_TYPE_HARDWARE, paint)
+		bottomSheetFullDuration.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
+		bottomSheetFullPosition.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
 
 		ViewCompat.setOnApplyWindowInsetsListener(bottomSheetFullLyricRecyclerView) { v, insets ->
 			val myInsets = insets.getInsets(
@@ -1117,29 +1115,14 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				return LYRIC_SCROLL_DURATION.toInt()
 			}
 
-			override fun afterTargetFound() {
-				val newIndex = updateNewIndex()
-				if (newIndex > 1) {
-					val firstVisibleItemPosition: Int = newIndex + 1
-					val lastVisibleItemPosition: Int =
-						bottomSheetFullLyricLinearLayoutManager.findLastVisibleItemPosition() + 2
-					for (i in firstVisibleItemPosition..lastVisibleItemPosition) {
-						val view: View? =
-							bottomSheetFullLyricLinearLayoutManager.findViewByPosition(i)
-						if (view != null) {
-							val ii = i - firstVisibleItemPosition
-							applyAnimation(view, ii)
-						}
-					}
-				}
-			}
 		}
 	}
 
 	private fun applyAnimation(view: View, ii: Int) {
-		val depth = 8.dpToPx(context).toFloat() + 3.dpToPx(context) * ii
-		val duration = 275L
-		val durationStep = 275L
+		val depth = 15.dpToPx(context).toFloat()
+		val duration = 210L
+		val durationReturn = 490L
+		val durationStep = 140L
 		val animator = ObjectAnimator.ofFloat(
 			view,
 			"translationY",
@@ -1147,7 +1130,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			depth,
 		)
 		animator.setDuration(duration)
-		animator.interpolator = interpolator
+		animator.interpolator = PathInterpolator(0.73f, 0.18f, 0.64f, 1f)
 		animator.doOnEnd {
 			val animator1 = ObjectAnimator.ofFloat(
 				view,
@@ -1155,8 +1138,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				depth,
 				0f
 			)
-			animator1.setDuration(duration + ii * durationStep)
-			animator1.interpolator = interpolator
+			animator1.setDuration(durationReturn + ii * durationStep)
+			animator1.interpolator = PathInterpolator(0.15f, 0f, 1f, 0f)
 			animator1.start()
 		}
 		animator.start()
