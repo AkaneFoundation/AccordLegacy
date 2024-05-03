@@ -2,6 +2,7 @@ package org.akanework.gramophone.ui.components
 
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
+import android.animation.TimeInterpolator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
@@ -1115,8 +1116,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				return LYRIC_SCROLL_DURATION.toInt()
 			}
 
-			/*
-			WIP
 			override fun afterTargetFound() {
 				val newIndex = updateNewIndex()
 				if (newIndex > 1) {
@@ -1133,16 +1132,14 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 					}
 				}
 			}
-
-			 */
 		}
 	}
 
 	private fun applyAnimation(view: View, ii: Int) {
 		val depth = 15.dpToPx(context).toFloat()
-		val duration = 210L
-		val durationReturn = 490L
-		val durationStep = 140L
+		val duration = 195L
+		val durationReturn = 505L
+		val durationStep = 70L
 		val animator = ObjectAnimator.ofFloat(
 			view,
 			"translationY",
@@ -1150,7 +1147,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			depth,
 		)
 		animator.setDuration(duration)
-		animator.interpolator = PathInterpolator(0.73f, 0.18f, 0.64f, 1f)
+		animator.interpolator = PathInterpolator(0.96f, 0.43f, 0.72f, 1f)
 		animator.doOnEnd {
 			val animator1 = ObjectAnimator.ofFloat(
 				view,
@@ -1159,7 +1156,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				0f
 			)
 			animator1.setDuration(durationReturn + ii * durationStep)
-			animator1.interpolator = PathInterpolator(0.15f, 0f, 1f, 0f)
+			animator1.interpolator = PathInterpolator(0.17f, 0f, -0.15f, 1f)
 			animator1.start()
 		}
 		animator.start()
