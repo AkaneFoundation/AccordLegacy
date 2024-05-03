@@ -2,7 +2,6 @@ package org.akanework.gramophone.ui.components
 
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
-import android.animation.TimeInterpolator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
@@ -36,7 +35,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fluidrecyclerview.widget.LinearLayoutManager
 import androidx.fluidrecyclerview.widget.RecyclerView
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -58,7 +56,6 @@ import coil3.size.Scale
 import com.google.android.material.bottomsheet.BottomSheetDragHandleView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
-import com.google.android.material.motion.MotionUtils
 import com.google.android.material.slider.OverlaySlider
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
@@ -210,6 +207,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private var triggerLock: Boolean = false
 	var bottomSheetFullBlendBackgroundView: BlendBackgroundView? = null
 	private var lastDisposable: Disposable? = null
+	private var animationLock: Boolean = false
 
 	private val secondaryTopOverlayActivatedColor = ContextCompat.getColor(context, R.color.contrast_colorSecondaryTopOverlayActivated)
 	private val secondaryTopOverlayInActivatedColor = ContextCompat.getColor(context, R.color.contrast_colorSecondaryTopOverlayInActivated)
@@ -843,8 +841,11 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		private var defaultTextColor =
 			Color.parseColor("#26FFFFFF")
 
+		private var highlightTranslationTextColor =
+			Color.parseColor("#C7FFFFFF")
+
 		private var highlightTextColor =
-			Color.parseColor("#FFFFFF")
+			Color.parseColor("#EBFFFFFF")
 
 		private val sizeFactor = 1.03f
 
@@ -877,8 +878,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				setOnClickListener {
 					performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
 					activity.getPlayer()?.apply {
-						if (!isPlaying) play()
+						animationLock = true
 						seekTo(lyric.timeStamp)
+						if (!isPlaying) play()
 					}
 				}
 			}
@@ -901,12 +903,22 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				when {
 					isHighlightPayload -> {
 						val targetScale = if (payloads[0] == LYRIC_SET_HIGHLIGHT) sizeFactor else 1f
-						val targetColor = if (payloads[0] == LYRIC_SET_HIGHLIGHT) highlightTextColor else defaultTextColor
+						val targetColor =
+							if (payloads[0] == LYRIC_SET_HIGHLIGHT && lyric.isTranslation)
+								highlightTranslationTextColor
+							else if (payloads[0] == LYRIC_SET_HIGHLIGHT)
+								highlightTextColor
+							else
+								defaultTextColor
 						animateText(targetScale, targetColor)
 					}
-					position == currentFocusPos || position == currentTranslationPos -> {
+					position == currentFocusPos -> {
 						scaleText(sizeFactor)
 						setTextColor(highlightTextColor)
+					}
+					position == currentTranslationPos -> {
+						scaleText(sizeFactor)
+						setTextColor(highlightTranslationTextColor)
 					}
 					else -> {
 						scaleText(1f)
@@ -1083,11 +1095,12 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				newIndex != bottomSheetFullLyricAdapter.currentFocusPos
 			) {
 				if (bottomSheetFullLyricList[newIndex].content.isNotEmpty()) {
-					val smoothScroller = createSmoothScroller()
+					val smoothScroller = createSmoothScroller(animationLock)
 					smoothScroller.targetPosition = newIndex
 					bottomSheetFullLyricLinearLayoutManager.startSmoothScroll(
 						smoothScroller
 					)
+					if (animationLock) animationLock = false
 				}
 
 				bottomSheetFullLyricAdapter.updateHighlight(newIndex)
@@ -1095,7 +1108,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		}
 	}
 
-	private fun createSmoothScroller(): RecyclerView.SmoothScroller {
+	private fun createSmoothScroller(noAnimation: Boolean = false): RecyclerView.SmoothScroller {
 		return object : CustomSmoothScroller(context) {
 
 			override fun calculateDtToFit(
@@ -1117,17 +1130,23 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			}
 
 			override fun afterTargetFound() {
-				val newIndex = updateNewIndex()
-				if (newIndex > 1) {
-					val firstVisibleItemPosition: Int = newIndex + 1
-					val lastVisibleItemPosition: Int =
-						bottomSheetFullLyricLinearLayoutManager.findLastVisibleItemPosition() + 2
-					for (i in firstVisibleItemPosition..lastVisibleItemPosition) {
-						val view: View? =
-							bottomSheetFullLyricLinearLayoutManager.findViewByPosition(i)
-						if (view != null) {
-							val ii = i - firstVisibleItemPosition
-							applyAnimation(view, ii)
+				if (!noAnimation) {
+					val newIndex = updateNewIndex()
+					if (newIndex > 1) {
+						val firstVisibleItemPosition: Int = newIndex + 1
+						val lastVisibleItemPosition: Int =
+							bottomSheetFullLyricLinearLayoutManager.findLastVisibleItemPosition() + 2
+						for (i in firstVisibleItemPosition..lastVisibleItemPosition) {
+							val view: View? =
+								bottomSheetFullLyricLinearLayoutManager.findViewByPosition(i)
+							if (view != null) {
+								val ii = i - firstVisibleItemPosition -
+										if (bottomSheetFullLyricList[i].isTranslation) 1 else 0
+								if (i == newIndex + 1 && bottomSheetFullLyricList[i].isTranslation) {
+									continue
+								}
+								applyAnimation(view, ii)
+							}
 						}
 					}
 				}
