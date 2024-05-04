@@ -5,6 +5,7 @@ import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.BlendMode
 import android.graphics.Color
 import android.graphics.Paint
@@ -12,12 +13,14 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.os.Bundle
 import android.util.AttributeSet
+import android.util.DisplayMetrics
 import android.util.Size
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
@@ -63,6 +66,12 @@ import com.google.android.material.transition.MaterialContainerTransform
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.GramophonePlaybackService
 import org.akanework.gramophone.logic.checkIfNegativeOrNullOrMaxedOut
@@ -202,12 +211,18 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private val bottomSheetFullPlaylistAdapter: PlaylistCardAdapter
 	private val bottomSheetFullPlaylistCoverFrame: MaterialCardView
 	private val bottomSheetActionBar: LinearLayout
+	private val bottomSheetFadingEdgeLayout: FadingEdgeLayout
 	private var playlistNowPlaying: TextView? = null
 	private var playlistNowPlayingCover: ImageView? = null
 	private var triggerLock: Boolean = false
 	var bottomSheetFullBlendBackgroundView: BlendBackgroundView? = null
 	private var lastDisposable: Disposable? = null
 	private var animationLock: Boolean = false
+	private var bottomMargin: Int = 0
+	private var hideJob: CoroutineScope? = null
+	private var startY = 0f
+	private var isScrollingDown = false
+	private var animationBroadcastLock = false
 
 	private val secondaryTopOverlayActivatedColor = ContextCompat.getColor(context, R.color.contrast_colorSecondaryTopOverlayActivated)
 	private val secondaryTopOverlayInActivatedColor = ContextCompat.getColor(context, R.color.contrast_colorSecondaryTopOverlayInActivated)
@@ -251,6 +266,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetFullPlaylistRecyclerView = findViewById(R.id.playlist_recyclerview)
 		bottomSheetInfinityButton = findViewById(R.id.sheet_infinity)
 		bottomSheetActionBar = findViewById(R.id.actionBar)
+		bottomSheetFadingEdgeLayout = findViewById(R.id.fadingEdgeLayout)
 
 		bottomSheetFullPlaylistAdapter = PlaylistCardAdapter(activity)
 		bottomSheetFullPlaylistRecyclerView.layoutManager = LinearLayoutManager(context)
@@ -272,6 +288,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				right = -myInsets.right
 				bottom = -myInsets.bottom
 			}
+			bottomMargin = myInsets.bottom
 			v.setPadding(myInsets.left, myInsets.top, myInsets.right, myInsets.bottom)
 			return@setOnApplyWindowInsetsListener WindowInsetsCompat.Builder(insets)
 				.setInsets(WindowInsetsCompat.Type.systemBars()
@@ -361,14 +378,19 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				triggerLock = true
 				bottomSheetFullLyricButton.isChecked = false
 				bottomSheetFullLyricRecyclerView.fadOutAnimation(VIEW_TRANSIT_DURATION)
-				bottomSheetFullControllerFrame.fadInAnimation(VIEW_TRANSIT_DURATION) {
-					showSliderOverlay()
-				}
-				bottomSheetFullControllerButton.fadInAnimation(VIEW_TRANSIT_DURATION)
-				bottomSheetFullNextButton.fadInAnimation(VIEW_TRANSIT_DURATION)
-				bottomSheetFullPreviousButton.fadInAnimation(VIEW_TRANSIT_DURATION)
 				bottomSheetFullPlaylistFrame.fadInAnimation(VIEW_TRANSIT_DURATION)
-				bottomSheetActionBar.fadInAnimation(VIEW_TRANSIT_DURATION)
+				if (bottomSheetFullControllerButton.visibility == View.GONE || bottomSheetFullControllerButton.visibility == View.INVISIBLE) {
+					hideJob?.cancel()
+					bottomSheetFullControllerFrame.fadInAnimation(VIEW_TRANSIT_DURATION) {
+						showSliderOverlay()
+					}
+					bottomSheetFullControllerButton.fadInAnimation(VIEW_TRANSIT_DURATION)
+					bottomSheetFullNextButton.fadInAnimation(VIEW_TRANSIT_DURATION)
+					bottomSheetFullPreviousButton.fadInAnimation(VIEW_TRANSIT_DURATION)
+					bottomSheetActionBar.fadInAnimation(VIEW_TRANSIT_DURATION)
+				} else {
+					hideJob?.cancel()
+				}
 			} else {
 				changeMovableFrame(true)
 				bottomSheetFullPlaylistSubtitle.setTextColor(Color.parseColor("#33FFFFFF"))
@@ -391,26 +413,33 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				bottomSheetFullHeaderFrame.fadInAnimation(VIEW_TRANSIT_DURATION) {
 					bottomSheetFullPlaylistSubtitle.setTextColor(Color.parseColor("#CCFFFFFF"))
 				}
+				bottomSheetFadingEdgeLayout.setPadding(
+					bottomSheetFadingEdgeLayout.paddingLeft,
+					bottomSheetFadingEdgeLayout.paddingTop,
+					bottomSheetFadingEdgeLayout.paddingRight,
+					if (context.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
+						getDistanceToBottom(bottomSheetFullSlider) + bottomMargin + 54.dpToPx(context)
+					else
+						0
+				)
 				bottomSheetFullLyricRecyclerView.fadInAnimation(VIEW_TRANSIT_DURATION)
-				hideSliderOverlay()
-				bottomSheetFullControllerFrame.fadOutAnimation(VIEW_TRANSIT_DURATION)
-				bottomSheetFullControllerButton.fadOutAnimation(VIEW_TRANSIT_DURATION)
-				bottomSheetFullNextButton.fadOutAnimation(VIEW_TRANSIT_DURATION)
-				bottomSheetFullPreviousButton.fadOutAnimation(VIEW_TRANSIT_DURATION)
-				bottomSheetActionBar.fadOutAnimation(VIEW_TRANSIT_DURATION)
+				hideControllerJob()
 				bottomSheetFullBlendBackgroundView?.animateBlurRadius(false, VIEW_TRANSIT_DURATION)
 			} else if (bottomSheetPlaylistButton.isChecked) {
 				triggerLock = true
 				bottomSheetPlaylistButton.isChecked = false
 				bottomSheetFullPlaylistFrame.fadOutAnimation(VIEW_TRANSIT_DURATION)
-				bottomSheetFullControllerFrame.fadOutAnimation(VIEW_TRANSIT_DURATION) {
-					hideSliderOverlay()
-				}
-				bottomSheetFullControllerButton.fadOutAnimation(VIEW_TRANSIT_DURATION)
-				bottomSheetFullNextButton.fadOutAnimation(VIEW_TRANSIT_DURATION)
-				bottomSheetFullPreviousButton.fadOutAnimation(VIEW_TRANSIT_DURATION)
+				bottomSheetFadingEdgeLayout.setPadding(
+					bottomSheetFadingEdgeLayout.paddingLeft,
+					bottomSheetFadingEdgeLayout.paddingTop,
+					bottomSheetFadingEdgeLayout.paddingRight,
+					if (context.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
+						getDistanceToBottom(bottomSheetFullSlider) + bottomMargin + 54.dpToPx(context)
+					else
+						0
+				)
 				bottomSheetFullLyricRecyclerView.fadInAnimation(VIEW_TRANSIT_DURATION)
-				bottomSheetActionBar.fadOutAnimation(VIEW_TRANSIT_DURATION)
+				hideControllerJob()
 			} else {
 				changeMovableFrame(true)
 				bottomSheetFullPlaylistSubtitle.setTextColor(Color.parseColor("#33FFFFFF"))
@@ -418,13 +447,19 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 					bottomSheetFullPlaylistSubtitle.setTextColor(Color.parseColor("#CCFFFFFF"))
 				}
 				bottomSheetFullLyricRecyclerView.fadOutAnimation(VIEW_TRANSIT_DURATION, View.GONE)
-				bottomSheetFullControllerFrame.fadInAnimation(VIEW_TRANSIT_DURATION) {
-					showSliderOverlay()
+
+				if (bottomSheetFullControllerButton.visibility == View.GONE || bottomSheetFullControllerButton.visibility == View.INVISIBLE) {
+					hideJob?.cancel()
+					bottomSheetFullControllerFrame.fadInAnimation(VIEW_TRANSIT_DURATION) {
+						showSliderOverlay()
+					}
+					bottomSheetFullControllerButton.fadInAnimation(VIEW_TRANSIT_DURATION)
+					bottomSheetFullNextButton.fadInAnimation(VIEW_TRANSIT_DURATION)
+					bottomSheetFullPreviousButton.fadInAnimation(VIEW_TRANSIT_DURATION)
+					bottomSheetActionBar.fadInAnimation(VIEW_TRANSIT_DURATION)
+				} else {
+					hideJob?.cancel()
 				}
-				bottomSheetFullControllerButton.fadInAnimation(VIEW_TRANSIT_DURATION)
-				bottomSheetFullNextButton.fadInAnimation(VIEW_TRANSIT_DURATION)
-				bottomSheetFullPreviousButton.fadInAnimation(VIEW_TRANSIT_DURATION)
-				bottomSheetActionBar.fadInAnimation(VIEW_TRANSIT_DURATION)
 				bottomSheetFullBlendBackgroundView?.animateBlurRadius(true, VIEW_TRANSIT_DURATION)
 			}
 		}
@@ -472,6 +507,126 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetFullLyricRecyclerView.adapter =
 			bottomSheetFullLyricAdapter
 		bottomSheetFullLyricRecyclerView.addItemDecoration(LyricPaddingDecoration(context))
+		bottomSheetFullLyricRecyclerView.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
+			override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+				when (e.action) {
+					MotionEvent.ACTION_DOWN -> {
+						startY = e.y
+					}
+					MotionEvent.ACTION_MOVE -> {
+						val currentY = e.y
+						isScrollingDown = currentY < startY
+						if (!animationBroadcastLock && !isScrollingDown && bottomSheetFullControllerButton.visibility != View.VISIBLE) {
+							// Down
+							animationBroadcastLock = true
+							showEveryController()
+							val animator = ValueAnimator.ofInt(0,
+								if (context.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
+									getDistanceToBottom(bottomSheetFullSlider) + bottomMargin + 54.dpToPx(context)
+								else
+									0
+							)
+							animator.addUpdateListener {
+								val value = it.animatedValue as Int
+								bottomSheetFadingEdgeLayout.setPadding(
+									bottomSheetFadingEdgeLayout.paddingLeft,
+									bottomSheetFadingEdgeLayout.paddingTop,
+									bottomSheetFadingEdgeLayout.paddingRight,
+									value
+								)
+							}
+							animator.doOnEnd {
+								animationBroadcastLock = false
+							}
+							animator.duration = VIEW_TRANSIT_DURATION
+							animator.start()
+							hideControllerJob()
+						} else if (!animationBroadcastLock && isScrollingDown) {
+							animationBroadcastLock = true
+							hideJob?.cancel()
+							// Up
+							hideEveryController()
+							val animator = ValueAnimator.ofInt(bottomSheetFadingEdgeLayout.paddingBottom, 0)
+							animator.addUpdateListener {
+								val value = it.animatedValue as Int
+								bottomSheetFadingEdgeLayout.setPadding(
+									bottomSheetFadingEdgeLayout.paddingLeft,
+									bottomSheetFadingEdgeLayout.paddingTop,
+									bottomSheetFadingEdgeLayout.paddingRight,
+									value
+								)
+							}
+							animator.doOnEnd {
+								animationBroadcastLock = false
+							}
+							animator.duration = VIEW_TRANSIT_DURATION
+							animator.start()
+						}
+					}
+				}
+				return false
+			}
+
+			override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
+			}
+
+			override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
+			}
+		})
+	}
+
+	@Suppress("DEPRECATION")
+	private fun getDistanceToBottom(view: View): Int {
+		val displayMetrics = DisplayMetrics()
+		activity.windowManager.defaultDisplay.getMetrics(displayMetrics)
+		val screenHeight = displayMetrics.heightPixels
+
+		val location = IntArray(2)
+		view.getLocationOnScreen(location)
+
+		return screenHeight - (location[1] + view.height)
+	}
+
+	private fun hideControllerJob() {
+		hideJob?.cancel()
+		hideJob = CoroutineScope(Dispatchers.Default)
+		hideJob!!.launch {
+			delay(5000)
+			hideEveryController()
+			withContext(Dispatchers.Main) {
+				val animator = ValueAnimator.ofInt(bottomSheetFadingEdgeLayout.paddingBottom, 0)
+				animator.addUpdateListener {
+					val value = it.animatedValue as Int
+					bottomSheetFadingEdgeLayout.setPadding(
+						bottomSheetFadingEdgeLayout.paddingLeft,
+						bottomSheetFadingEdgeLayout.paddingTop,
+						bottomSheetFadingEdgeLayout.paddingRight,
+						value
+					)
+				}
+				animator.duration = VIEW_TRANSIT_DURATION
+				animator.start()
+			}
+		}
+	}
+
+	private fun hideEveryController() {
+		hideSliderOverlay()
+		bottomSheetFullControllerFrame.fadOutAnimation(VIEW_TRANSIT_DURATION)
+		bottomSheetFullControllerButton.fadOutAnimation(VIEW_TRANSIT_DURATION)
+		bottomSheetFullNextButton.fadOutAnimation(VIEW_TRANSIT_DURATION)
+		bottomSheetFullPreviousButton.fadOutAnimation(VIEW_TRANSIT_DURATION)
+		bottomSheetActionBar.fadOutAnimation(VIEW_TRANSIT_DURATION)
+	}
+
+	private fun showEveryController() {
+		bottomSheetFullControllerFrame.fadInAnimation(VIEW_TRANSIT_DURATION) {
+			showSliderOverlay()
+		}
+		bottomSheetFullControllerButton.fadInAnimation(VIEW_TRANSIT_DURATION)
+		bottomSheetFullNextButton.fadInAnimation(VIEW_TRANSIT_DURATION)
+		bottomSheetFullPreviousButton.fadInAnimation(VIEW_TRANSIT_DURATION)
+		bottomSheetActionBar.fadInAnimation(VIEW_TRANSIT_DURATION)
 	}
 
 	fun hideSliderOverlay() {
@@ -709,7 +864,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		val currentPosition = instance?.currentPosition
 		val position = CalculationUtils.convertDurationToTimeStamp(currentPosition ?: 0)
 		val duration = instance?.currentMediaItem?.mediaMetadata?.extras?.getLong("Duration")
-		if (duration != null && !isUserTracking) {
+		if (duration != null && duration != 0L && !isUserTracking) {
 			bottomSheetFullSlider.valueTo = duration.toFloat()
 			bottomSheetFullSlider.value =
 				instance?.currentPosition?.toFloat().checkIfNegativeOrNullOrMaxedOut(bottomSheetFullSlider.valueTo)
@@ -842,7 +997,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			Color.parseColor("#26FFFFFF")
 
 		private var highlightTranslationTextColor =
-			Color.parseColor("#C7FFFFFF")
+			Color.parseColor("#66FFFFFF")
 
 		private var highlightTextColor =
 			Color.parseColor("#EBFFFFFF")
@@ -1191,7 +1346,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			val position =
 				CalculationUtils.convertDurationToTimeStamp(currentPosition ?: 0)
 			val duration = instance?.currentMediaItem?.mediaMetadata?.extras?.getLong("Duration")
-			if (duration != null && !isUserTracking) {
+			if (duration != null && duration != 0L && !isUserTracking) {
 				bottomSheetFullSlider.valueTo = duration.toFloat()
 				bottomSheetFullSlider.value =
 					instance?.currentPosition?.toFloat().checkIfNegativeOrNullOrMaxedOut(bottomSheetFullSlider.valueTo)

@@ -278,33 +278,26 @@ class BlendBackgroundView(context: Context, attrs: AttributeSet?, defStyleAttr: 
     }
 
     private fun areBitmapsSame(bitmap1: Bitmap, bitmap2: Bitmap): Boolean {
-        val width = bitmap1.width
-        val height = bitmap1.height
-
-        if (width != bitmap2.width || height != bitmap2.height) {
-            return false
-        }
-
         if (bitmap1.config != bitmap2.config) {
             return false
         }
 
         val cornerPixels1 = intArrayOf(
             bitmap1.getPixel(0, 0),
-            bitmap1.getPixel(width - 1, 0),
-            bitmap1.getPixel(0, height - 1),
-            bitmap1.getPixel(width - 1, height - 1)
+            bitmap1.getPixel(bitmap1.width - 1, 0),
+            bitmap1.getPixel(0, bitmap1.height - 1),
+            bitmap1.getPixel(bitmap1.width - 1, bitmap1.height - 1)
         )
 
         val cornerPixels2 = intArrayOf(
             bitmap2.getPixel(0, 0),
-            bitmap2.getPixel(width - 1, 0),
-            bitmap2.getPixel(0, height - 1),
-            bitmap2.getPixel(width - 1, height - 1)
+            bitmap2.getPixel(bitmap2.width - 1, 0),
+            bitmap2.getPixel(0, bitmap2.height - 1),
+            bitmap2.getPixel(bitmap2.width - 1, bitmap2.height - 1)
         )
 
-        val centerPixel1 = bitmap1.getPixel(width / 2, height / 2)
-        val centerPixel2 = bitmap2.getPixel(width / 2, height / 2)
+        val centerPixel1 = bitmap1.getPixel(bitmap1.width / 2, bitmap1.height / 2)
+        val centerPixel2 = bitmap2.getPixel(bitmap2.width / 2, bitmap2.height / 2)
 
         return cornerPixels1 contentEquals cornerPixels2 && centerPixel1 == centerPixel2
     }

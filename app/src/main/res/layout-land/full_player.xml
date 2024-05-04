@@ -205,6 +205,7 @@
 	</androidx.constraintlayout.widget.ConstraintLayout>
 
 	<org.akanework.gramophone.ui.components.FadingEdgeLayout
+		android:id="@+id/fadingEdgeLayout"
 		android:layout_width="0dp"
 		android:layout_height="0dp"
 		app:layout_constraintTop_toBottomOf="@id/playlist_frame"
@@ -289,7 +290,7 @@
 				android:gravity="start|center_vertical"
 				android:scrollbars="none"
 				android:textColor="#EBFFFFFF"
-				android:textFontWeight="500"
+				android:textFontWeight="600"
 				android:fontFamily="sans-serif"
 				android:textSize="20sp"
 				tools:targetApi="p"

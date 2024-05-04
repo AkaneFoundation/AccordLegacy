@@ -7,10 +7,4 @@
             <corners android:radius="0dp" />
         </shape>
     </item>
-    <item
-        android:bottom="12dp"
-        android:drawable="@drawable/ic_playlist_play"
-        android:left="12dp"
-        android:right="12dp"
-        android:top="12dp" />
 </layer-list>
