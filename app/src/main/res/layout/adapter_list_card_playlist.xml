@@ -7,8 +7,8 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    android:paddingStart="30dp"
-    android:paddingEnd="30dp"
+    android:paddingStart="32.5dp"
+    android:paddingEnd="32.5dp"
     android:paddingTop="4dp"
     android:paddingBottom="4dp"
     tools:background="@color/contrast_colorOnSurface">

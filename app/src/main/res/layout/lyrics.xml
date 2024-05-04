@@ -23,6 +23,9 @@
         android:textColor="#FFFFFF"
         android:textStyle="bold"
         android:shadowColor="#FFFFFF"
+        android:letterSpacing="0.02"
+        tools:textSize="33sp"
+        tools:layout_marginHorizontal="12.5dp"
         tools:targetApi="p"
         tools:text="轢き潰してきた その全てに 对着那被碾碎的 曾经的所有" />
 

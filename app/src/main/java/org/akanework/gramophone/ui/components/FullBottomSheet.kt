@@ -847,7 +847,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		private var highlightTextColor =
 			Color.parseColor("#EBFFFFFF")
 
-		private val sizeFactor = 1.03f
+		private val sizeFactor = 1f
+		private val defaultSizeFactor = 0.98f
 
 		var currentFocusPos = -1
 		private var currentTranslationPos = -1
@@ -891,18 +892,18 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				gravity = if (isLyricCentered) Gravity.CENTER else Gravity.START
 				translationY = 0f
 
-				val textSize = if (lyric.isTranslation) 20f else 32f
+				val textSize = if (lyric.isTranslation) 20f else 33f
 				val paddingTop = if (lyric.isTranslation) 2 else 18
 				val paddingBottom = if (position + 1 < lyricList.size && lyricList[position + 1].isTranslation) 2 else 18
 
 				setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
-				setPadding(10.dpToPx(context), paddingTop.dpToPx(context), 10.dpToPx(context), paddingBottom.dpToPx(context))
+				setPadding((12.5f).dpToPx(context).toInt(), paddingTop.dpToPx(context), (12.5f).dpToPx(context).toInt(), paddingBottom.dpToPx(context))
 				pivotX = 0f
 				pivotY = height.toFloat() / 2
 
 				when {
 					isHighlightPayload -> {
-						val targetScale = if (payloads[0] == LYRIC_SET_HIGHLIGHT) sizeFactor else 1f
+						val targetScale = if (payloads[0] == LYRIC_SET_HIGHLIGHT) sizeFactor else defaultSizeFactor
 						val targetColor =
 							if (payloads[0] == LYRIC_SET_HIGHLIGHT && lyric.isTranslation)
 								highlightTranslationTextColor
@@ -921,7 +922,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 						setTextColor(highlightTranslationTextColor)
 					}
 					else -> {
-						scaleText(1f)
+						scaleText(defaultSizeFactor)
 						setTextColor(defaultTextColor)
 					}
 				}
@@ -1156,9 +1157,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 	private fun applyAnimation(view: View, ii: Int) {
 		val depth = 15.dpToPx(context).toFloat()
-		val duration = 195L
-		val durationReturn = 505L
-		val durationStep = 70L
+		val duration = (LYRIC_SCROLL_DURATION * 0.278).toLong()
+		val durationReturn = (LYRIC_SCROLL_DURATION * 0.722).toLong()
+		val durationStep = (LYRIC_SCROLL_DURATION * 0.1).toLong()
 		val animator = ObjectAnimator.ofFloat(
 			view,
 			"translationY",
