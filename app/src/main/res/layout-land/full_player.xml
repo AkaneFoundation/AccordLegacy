@@ -50,11 +50,12 @@
 
 		</com.google.android.material.card.MaterialCardView>
 
-		<LinearLayout
+		<androidx.constraintlayout.widget.ConstraintLayout
 			android:id="@+id/playlist_title_frame"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:orientation="vertical"
+			android:minHeight="44dp"
 			android:layout_marginStart="16dp"
 			android:layout_marginEnd="30dp"
 			app:layout_constraintTop_toTopOf="@id/playlist_cover_frame"
@@ -64,7 +65,7 @@
 
 			<org.akanework.gramophone.ui.components.MarqueeTextView
 				android:id="@+id/playlist_song_name"
-				android:layout_width="match_parent"
+				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:fontFamily="sans-serif"
 				android:gravity="start"
@@ -74,11 +75,20 @@
 				android:textFontWeight="600"
 				android:textSize="18sp"
 				tools:targetApi="p"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintEnd_toStartOf="@id/star_btn_playlist"
+				app:layout_constraintBottom_toTopOf="@id/playlist_desc_frame"
+				android:layout_marginEnd="16dp"
 				tools:text="Artifiction" />
 
 			<FrameLayout
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content">
+				android:id="@+id/playlist_desc_frame"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintEnd_toStartOf="@id/star_btn_playlist"
+				app:layout_constraintTop_toBottomOf="@id/playlist_song_name"
+				android:layout_marginEnd="16dp">
 
 				<org.akanework.gramophone.ui.components.MarqueeTextView
 					android:id="@+id/playlist_song_artist"
@@ -110,7 +120,44 @@
 
 			</FrameLayout>
 
-		</LinearLayout>
+			<org.akanework.gramophone.ui.components.OverlayButton
+				android:id="@+id/star_btn_playlist"
+				android:layout_width="27dp"
+				android:layout_height="27dp"
+				android:background="@drawable/rp_buttons"
+				android:layout_marginEnd="16dp"
+				app:backgroundTint="#00FFFFFF"
+				app:iconSize="18.5dp"
+				app:iconGravity="textStart"
+				app:iconPadding="0dp"
+				app:icon="@drawable/ic_star"
+				app:iconTint="#EBFFFFFF"
+				app:cornerRadius="128dp"
+				android:gravity="center"
+				app:rippleColor="@android:color/transparent"
+				app:layout_constraintTop_toTopOf="parent"
+				app:layout_constraintBottom_toBottomOf="parent"
+				app:layout_constraintEnd_toStartOf="@id/more_btn_playlist"  />
+
+			<org.akanework.gramophone.ui.components.OverlayButton
+				android:id="@+id/more_btn_playlist"
+				android:layout_width="27dp"
+				android:layout_height="27dp"
+				android:background="@drawable/rp_buttons"
+				app:backgroundTint="#00FFFFFF"
+				app:iconSize="24.5dp"
+				app:iconGravity="textStart"
+				app:iconPadding="0dp"
+				app:icon="@drawable/ic_more_vert_bold"
+				app:iconTint="#EBFFFFFF"
+				app:cornerRadius="128dp"
+				android:gravity="center"
+				app:rippleColor="@android:color/transparent"
+				app:layout_constraintTop_toTopOf="parent"
+				app:layout_constraintBottom_toBottomOf="parent"
+				app:layout_constraintEnd_toEndOf="parent"  />
+
+		</androidx.constraintlayout.widget.ConstraintLayout>
 
 	</androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -270,12 +317,13 @@
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toEndOf="@id/album_cover_frame">
 
-		<LinearLayout
+		<androidx.constraintlayout.widget.ConstraintLayout
 			android:id="@+id/textLayout"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginHorizontal="28dp"
-			android:layout_marginBottom="13dp"
+			android:layout_marginBottom="8dp"
+			android:minHeight="58dp"
 			android:gravity="center"
 			android:orientation="vertical"
 			app:layout_constraintBottom_toTopOf="@id/slider_vert"
@@ -285,7 +333,7 @@
 
 			<org.akanework.gramophone.ui.components.MarqueeTextView
 				android:id="@+id/full_song_name"
-				android:layout_width="match_parent"
+				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:gravity="start|center_vertical"
 				android:scrollbars="none"
@@ -293,12 +341,21 @@
 				android:textFontWeight="600"
 				android:fontFamily="sans-serif"
 				android:textSize="20sp"
+				android:layout_marginEnd="16dp"
+				app:layout_constraintEnd_toStartOf="@id/star_btn"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintBottom_toTopOf="@id/desc_frame"
 				tools:targetApi="p"
 				tools:text="Artifiction" />
 
 			<FrameLayout
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content">
+				android:id="@+id/desc_frame"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_marginEnd="16dp"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintEnd_toStartOf="@id/star_btn"
+				app:layout_constraintTop_toBottomOf="@id/full_song_name">
 
 				<org.akanework.gramophone.ui.components.MarqueeTextView
 					android:id="@+id/full_song_artist"
@@ -330,7 +387,44 @@
 
 			</FrameLayout>
 
-		</LinearLayout>
+			<org.akanework.gramophone.ui.components.OverlayButton
+				android:id="@+id/star_btn"
+				android:layout_width="27dp"
+				android:layout_height="27dp"
+				android:background="@drawable/rp_buttons"
+				android:layout_marginEnd="16dp"
+				app:backgroundTint="#00FFFFFF"
+				app:iconSize="18.5dp"
+				app:iconGravity="textStart"
+				app:iconPadding="0dp"
+				app:icon="@drawable/ic_star"
+				app:iconTint="#EBFFFFFF"
+				app:cornerRadius="128dp"
+				android:gravity="center"
+				app:rippleColor="@android:color/transparent"
+				app:layout_constraintTop_toTopOf="@id/textLayout"
+				app:layout_constraintBottom_toBottomOf="@id/textLayout"
+				app:layout_constraintEnd_toStartOf="@id/more_btn"  />
+
+			<org.akanework.gramophone.ui.components.OverlayButton
+				android:id="@+id/more_btn"
+				android:layout_width="27dp"
+				android:layout_height="27dp"
+				android:background="@drawable/rp_buttons"
+				app:backgroundTint="#00FFFFFF"
+				app:iconSize="24.5dp"
+				app:iconGravity="textStart"
+				app:iconPadding="0dp"
+				app:icon="@drawable/ic_more_vert_bold"
+				app:iconTint="#EBFFFFFF"
+				app:cornerRadius="128dp"
+				android:gravity="center"
+				app:rippleColor="@android:color/transparent"
+				app:layout_constraintTop_toTopOf="@id/textLayout"
+				app:layout_constraintBottom_toBottomOf="@id/textLayout"
+				app:layout_constraintEnd_toEndOf="parent"  />
+
+		</androidx.constraintlayout.widget.ConstraintLayout>
 
 			<com.google.android.material.slider.OverlaySlider
 				android:id="@+id/slider_vert"
@@ -339,7 +433,7 @@
 				android:layout_gravity="center"
 				android:value="0"
 				app:labelBehavior="gone"
-				app:trackColorActive="#B3FFFFFF"
+				app:trackColorActive="#80FFFFFF"
 				app:trackColorInactive="#00FFFFFF"
 				app:haloRadius="0dp"
 				app:haloColor="@android:color/transparent"
@@ -417,6 +511,88 @@
 				android:textSize="12sp"
 				android:letterSpacing="0.05"
 				tools:targetApi="p" />
+
+			<com.google.android.material.card.MaterialCardView
+				android:id="@+id/quality_card"
+				android:layout_width="wrap_content"
+				android:layout_height="match_parent"
+				android:layout_gravity="center"
+				app:cardCornerRadius="5dp"
+				app:cardBackgroundColor="#0DFFFFFF"
+				app:strokeWidth="0dp"
+				android:clickable="true"
+				android:focusable="true">
+
+				<FrameLayout
+					android:id="@+id/quality_overlay"
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					android:background="#26FFFFFF"
+					/>
+
+				<LinearLayout
+					android:id="@+id/quality_frame"
+					android:layout_width="match_parent"
+					android:layout_height="match_parent">
+
+					<ImageView
+						android:layout_width="15dp"
+						android:layout_height="wrap_content"
+						android:adjustViewBounds="true"
+						android:layout_gravity="center_vertical"
+						android:layout_marginStart="7.5dp"
+						android:layout_marginTop="0.5dp"
+						app:tint="#80FFFFFF"
+						android:src="@drawable/apple_lossless_seeklogo"/>
+
+					<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_gravity="center"
+						android:layout_marginStart="5dp"
+						android:layout_marginEnd="7.5dp"
+						android:layout_marginTop="3dp"
+						android:layout_marginBottom="3dp"
+						android:fontFamily="sans-serif"
+						android:textFontWeight="500"
+						android:textColor="#80FFFFFF"
+						android:textSize="11sp"
+						android:text="@string/lossless"/>
+
+				</LinearLayout>
+
+				<LinearLayout
+					android:id="@+id/quality_frame_1"
+					android:layout_width="match_parent"
+					android:layout_height="match_parent">
+
+					<ImageView
+						android:layout_width="15dp"
+						android:layout_height="wrap_content"
+						android:adjustViewBounds="true"
+						android:layout_gravity="center_vertical"
+						android:layout_marginStart="7.5dp"
+						android:layout_marginTop="0.5dp"
+						app:tint="#80FFFFFF"
+						android:src="@drawable/apple_lossless_seeklogo"/>
+
+					<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_gravity="center"
+						android:layout_marginStart="5dp"
+						android:layout_marginEnd="7.5dp"
+						android:layout_marginTop="3dp"
+						android:layout_marginBottom="3dp"
+						android:fontFamily="sans-serif"
+						android:textFontWeight="500"
+						android:textColor="#80FFFFFF"
+						android:textSize="11sp"
+						android:text="@string/lossless"/>
+
+				</LinearLayout>
+
+			</com.google.android.material.card.MaterialCardView>
 
 		</FrameLayout>
 	</androidx.constraintlayout.widget.ConstraintLayout>

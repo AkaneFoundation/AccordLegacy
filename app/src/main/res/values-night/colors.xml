@@ -1,4 +1,5 @@
 <resources>
+    <color name="contrast_themeColor">#F50E38</color>
     <color name="contrast_colorOnSurface">#FFFFFF</color>
     <color name="contrast_colorBackground">#000000</color>
     <color name="contrast_colorBackgroundElevated">#0A0A0A</color>

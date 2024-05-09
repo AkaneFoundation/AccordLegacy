@@ -60,6 +60,7 @@
         <item name="colorSurfaceContainer">@color/md_theme_surfaceContainer</item>
         <item name="colorSurfaceContainerHigh">@color/md_theme_surfaceContainerHigh</item>
         <item name="colorSurfaceContainerHighest">@color/md_theme_surfaceContainerHighest</item>
+        <item name="materialAlertDialogTheme">@style/Theme.App.MaterialAlertDialog</item>
     </style>
 
     <style name="MyDialog" parent="@android:style/Theme.Dialog">
@@ -150,6 +151,16 @@
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
         <item name="windowSplashScreenIconBackgroundColor">@color/contrast_colorBackground</item>
     </style>
+
+    <style name="Theme.App.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.App.Button</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.App.Button</item>
+    </style>
+
+    <style name="Widget.App.Button" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/contrast_themeColor</item>
+    </style>
+
 
     <style name="Day.Theme.Splash" parent="PreV31Day.Theme.Splash" />
     <style name="Night.Theme.Splash" parent="PreV31Night.Theme.Splash" />

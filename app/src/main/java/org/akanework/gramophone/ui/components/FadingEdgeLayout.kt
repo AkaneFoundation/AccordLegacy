@@ -204,13 +204,29 @@ class FadingEdgeLayout : FrameLayout {
             gradientDirtyFlags = gradientDirtyFlags and DIRTY_FLAG_RIGHT.inv()
             initRightGradient()
         }
-        val count = canvas.saveLayer(
-            0.0f,
-            0.0f,
-            width.toFloat(),
-            height.toFloat(),
+        val count1 = canvas.saveLayer(
             null,
-            Canvas.ALL_SAVE_FLAG
+            Paint().apply {
+                xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
+            }
+        )
+        super.dispatchDraw(canvas)
+        if (fadeTop && gradientSizeTop > 0) {
+            canvas.drawRect(gradientRectTop!!, gradientPaintTop!!)
+        }
+        if (fadeBottom && gradientSizeBottom > 0) {
+            canvas.drawRect(gradientRectBottom!!, gradientPaintBottom!!)
+        }
+        if (fadeLeft && gradientSizeLeft > 0) {
+            canvas.drawRect(gradientRectLeft!!, gradientPaintLeft!!)
+        }
+        if (fadeRight && gradientSizeRight > 0) {
+            canvas.drawRect(gradientRectRight!!, gradientPaintRight!!)
+        }
+        canvas.restoreToCount(count1)
+        val count = canvas.saveLayer(
+            null,
+            null
         )
         super.dispatchDraw(canvas)
         if (fadeTop && gradientSizeTop > 0) {

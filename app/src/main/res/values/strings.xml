@@ -185,4 +185,5 @@
     <string name="fgs_failed_channel">Playback failed to resume</string>
     <string name="fgs_failed_text">Click here to open the app and continue playback</string>
     <string name="fgs_failed_title">Failed to resume music playback</string>
+    <string name="lossless">Lossless</string>
 </resources>

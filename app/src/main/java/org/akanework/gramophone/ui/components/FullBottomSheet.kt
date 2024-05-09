@@ -14,6 +14,7 @@ import android.graphics.PorterDuffXfermode
 import android.os.Bundle
 import android.util.AttributeSet
 import android.util.DisplayMetrics
+import android.util.Log
 import android.util.Size
 import android.util.TypedValue
 import android.view.Gravity
@@ -33,9 +34,11 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.fluidrecyclerview.widget.LinearLayoutManager
 import androidx.fluidrecyclerview.widget.RecyclerView
 import androidx.media3.common.C
@@ -125,30 +128,39 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		const val LYRIC_REMOVE_HIGHLIGHT = 0
 		const val LYRIC_SET_HIGHLIGHT = 1
 		const val LYRIC_SCROLL_DURATION = 700L
-		const val SHRINK_VALUE = 0.93F
+		const val SHRINK_VALUE_DEFAULT = 0.93F
 		const val ALBUM_SHRINK_DURATION_ANIMATION = 300L
 		const val SHRINK_TRIGGER_DURATION = 150L
+		const val SHRINK_VALUE_PAUSE = 0.85F
 	}
 
-	private var isCoverShrink = false
-
-	private fun buildShrinkAnimator(isShrink: Boolean = true) {
-		val scaleX = PropertyValuesHolder.ofFloat(
-			View.SCALE_X,
-			if (isShrink) 1f else SHRINK_VALUE,
-			if (isShrink) SHRINK_VALUE else 1f
-		)
-		val scaleY = PropertyValuesHolder.ofFloat(
-			View.SCALE_Y,
-			if (isShrink) 1f else SHRINK_VALUE,
-			if (isShrink) SHRINK_VALUE else 1f
-		)
-		bottomSheetFullCoverFrame.apply {
-			val animator = ObjectAnimator.ofPropertyValuesHolder(this, scaleX, scaleY)
-			animator.duration = ALBUM_SHRINK_DURATION_ANIMATION
-			animator.interpolator = DecelerateInterpolator()
-			animator.start()
-			isCoverShrink = isShrink
+	private fun buildShrinkAnimator(
+		isShrink: Boolean = true,
+		shrinkValue: Float = SHRINK_VALUE_DEFAULT,
+		completion: (() -> Unit)? = null
+	) {
+		if (bottomSheetFullCoverFrame.isVisible) {
+			val scaleX = PropertyValuesHolder.ofFloat(
+				View.SCALE_X,
+				if (isShrink) 1f else shrinkValue,
+				if (isShrink) shrinkValue else 1f
+			)
+			val scaleY = PropertyValuesHolder.ofFloat(
+				View.SCALE_Y,
+				if (isShrink) 1f else shrinkValue,
+				if (isShrink) shrinkValue else 1f
+			)
+			bottomSheetFullCoverFrame.apply {
+				val animator = ObjectAnimator.ofPropertyValuesHolder(this, scaleX, scaleY)
+				animator.duration = ALBUM_SHRINK_DURATION_ANIMATION
+				animator.interpolator = DecelerateInterpolator()
+				animator.doOnEnd {
+					completion?.let {
+						it()
+					}
+				}
+				animator.start()
+			}
 		}
 	}
 
@@ -156,7 +168,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		override fun onStartTrackingTouch(slider: OverlaySlider) {
 			isUserTracking = true
 			handler.postDelayed({
-				if (isUserTracking) {
+				if (isUserTracking && bottomSheetFullCoverFrame.scaleX == 1.0F) {
 					buildShrinkAnimator()
 				}
 			}, SHRINK_TRIGGER_DURATION)
@@ -169,7 +181,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				updateLyric(slider.value.toLong())
 			}
 			isUserTracking = false
-			if (isCoverShrink) {
+			if (bottomSheetFullCoverFrame.scaleX >= 0.93F &&
+				bottomSheetFullCoverFrame.scaleX < 1.0F) {
 				buildShrinkAnimator(false)
 			}
 		}
@@ -200,7 +213,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private val bottomSheetFullLyricAdapter: LyricAdapter = LyricAdapter(bottomSheetFullLyricList)
 	private val bottomSheetFullLyricLinearLayoutManager = CustomLinearLayoutManager(context)
 	private val bottomSheetFullDragHandle: BottomSheetDragHandleView
-	private val bottomSheetFullTextLayout: LinearLayout
+	private val bottomSheetFullTextLayout: View
 	private val bottomSheetFullHeaderFrame: ConstraintLayout
 	private val bottomSheetFullPlaylistFrame: ConstraintLayout
 	private val bottomSheetFullPlaylistCover: ImageView
@@ -210,6 +223,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private val bottomSheetFullPlaylistRecyclerView: RecyclerView
 	private val bottomSheetFullPlaylistAdapter: PlaylistCardAdapter
 	private val bottomSheetFullPlaylistCoverFrame: MaterialCardView
+	private val bottomSheetQualityOverlay: View
+	private val bottomSheetQualityFrame: View
+	private val bottomSheetQualityCard: View
 	private val bottomSheetActionBar: LinearLayout
 	private val bottomSheetFadingEdgeLayout: FadingEdgeLayout
 	private var playlistNowPlaying: TextView? = null
@@ -266,6 +282,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetFullPlaylistRecyclerView = findViewById(R.id.playlist_recyclerview)
 		bottomSheetInfinityButton = findViewById(R.id.sheet_infinity)
 		bottomSheetActionBar = findViewById(R.id.actionBar)
+		bottomSheetQualityOverlay = findViewById(R.id.quality_overlay)
+		bottomSheetQualityFrame = findViewById(R.id.quality_frame)
+		bottomSheetQualityCard = findViewById(R.id.quality_card)
 		bottomSheetFadingEdgeLayout = findViewById(R.id.fadingEdgeLayout)
 
 		bottomSheetFullPlaylistAdapter = PlaylistCardAdapter(activity)
@@ -277,6 +296,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 		bottomSheetFullDuration.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
 		bottomSheetFullPosition.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
+		bottomSheetQualityOverlay.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
+		bottomSheetQualityFrame.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
 
 		ViewCompat.setOnApplyWindowInsetsListener(bottomSheetFullLyricRecyclerView) { v, insets ->
 			val myInsets = insets.getInsets(
@@ -375,12 +396,13 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				bottomSheetFullPlaylistFrame.fadInAnimation(VIEW_TRANSIT_DURATION)
 				bottomSheetFullBlendBackgroundView?.animateBlurRadius(false, VIEW_TRANSIT_DURATION)
 			} else if (bottomSheetFullLyricButton.isChecked) {
+				activity.window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 				triggerLock = true
 				bottomSheetFullLyricButton.isChecked = false
 				bottomSheetFullLyricRecyclerView.fadOutAnimation(VIEW_TRANSIT_DURATION)
 				bottomSheetFullPlaylistFrame.fadInAnimation(VIEW_TRANSIT_DURATION)
+				hideJob?.cancel()
 				if (bottomSheetFullControllerButton.visibility == View.GONE || bottomSheetFullControllerButton.visibility == View.INVISIBLE) {
-					hideJob?.cancel()
 					bottomSheetFullControllerFrame.fadInAnimation(VIEW_TRANSIT_DURATION) {
 						showSliderOverlay()
 					}
@@ -388,8 +410,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 					bottomSheetFullNextButton.fadInAnimation(VIEW_TRANSIT_DURATION)
 					bottomSheetFullPreviousButton.fadInAnimation(VIEW_TRANSIT_DURATION)
 					bottomSheetActionBar.fadInAnimation(VIEW_TRANSIT_DURATION)
-				} else {
-					hideJob?.cancel()
 				}
 			} else {
 				changeMovableFrame(true)
@@ -408,6 +428,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				return@addOnCheckedChangeListener
 			}
 			if (isChecked && !bottomSheetPlaylistButton.isChecked) {
+				activity.window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 				changeMovableFrame(false)
 				bottomSheetFullPlaylistSubtitle.setTextColor(Color.parseColor("#33FFFFFF"))
 				bottomSheetFullHeaderFrame.fadInAnimation(VIEW_TRANSIT_DURATION) {
@@ -426,6 +447,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				hideControllerJob()
 				bottomSheetFullBlendBackgroundView?.animateBlurRadius(false, VIEW_TRANSIT_DURATION)
 			} else if (bottomSheetPlaylistButton.isChecked) {
+				activity.window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 				triggerLock = true
 				bottomSheetPlaylistButton.isChecked = false
 				bottomSheetFullPlaylistFrame.fadOutAnimation(VIEW_TRANSIT_DURATION)
@@ -441,6 +463,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				bottomSheetFullLyricRecyclerView.fadInAnimation(VIEW_TRANSIT_DURATION)
 				hideControllerJob()
 			} else {
+				activity.window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 				changeMovableFrame(true)
 				bottomSheetFullPlaylistSubtitle.setTextColor(Color.parseColor("#33FFFFFF"))
 				bottomSheetFullHeaderFrame.fadOutAnimation(VIEW_TRANSIT_DURATION, View.GONE) {
@@ -448,8 +471,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				}
 				bottomSheetFullLyricRecyclerView.fadOutAnimation(VIEW_TRANSIT_DURATION, View.GONE)
 
+				hideJob?.cancel()
 				if (bottomSheetFullControllerButton.visibility == View.GONE || bottomSheetFullControllerButton.visibility == View.INVISIBLE) {
-					hideJob?.cancel()
 					bottomSheetFullControllerFrame.fadInAnimation(VIEW_TRANSIT_DURATION) {
 						showSliderOverlay()
 					}
@@ -457,8 +480,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 					bottomSheetFullNextButton.fadInAnimation(VIEW_TRANSIT_DURATION)
 					bottomSheetFullPreviousButton.fadInAnimation(VIEW_TRANSIT_DURATION)
 					bottomSheetActionBar.fadInAnimation(VIEW_TRANSIT_DURATION)
-				} else {
-					hideJob?.cancel()
 				}
 				bottomSheetFullBlendBackgroundView?.animateBlurRadius(true, VIEW_TRANSIT_DURATION)
 			}
@@ -466,6 +487,11 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 		bottomSheetFullControllerButton.setOnClickListener {
 			it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+			if (instance?.isPlaying == true && bottomSheetFullCoverFrame.scaleX == 1.0F) {
+				buildShrinkAnimator(shrinkValue = SHRINK_VALUE_PAUSE)
+			} else if (bottomSheetFullCoverFrame.scaleX == SHRINK_VALUE_PAUSE) {
+				buildShrinkAnimator(false, SHRINK_VALUE_PAUSE)
+			}
 			instance?.playOrPause()
 		}
 		bottomSheetFullPreviousButton.setOnClickListener {
@@ -629,6 +655,14 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetActionBar.fadInAnimation(VIEW_TRANSIT_DURATION)
 	}
 
+	private fun isHires(boolean: Boolean) {
+		if (!bottomSheetQualityCard.isVisible && boolean) {
+			bottomSheetQualityCard.fadInAnimation(VIEW_TRANSIT_DURATION)
+		} else if (bottomSheetQualityCard.isVisible && !boolean) {
+			bottomSheetQualityCard.fadOutAnimation(VIEW_TRANSIT_DURATION)
+		}
+	}
+
 	fun hideSliderOverlay() {
 		bottomSheetFullSlider.updateBottomTrackOverlayColor(secondaryTopOverlayInActivatedColor)
 		bottomSheetFullDuration.setTextColor(secondaryTopOverlayInActivatedColor)
@@ -694,12 +728,24 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			bottomSheetFullPlaylistCoverFrame.visibility = View.INVISIBLE
 			bottomSheetFullCoverFrame.visibility = View.VISIBLE
 		} else {
-			bottomSheetFullSubtitle.setTextColor(Color.parseColor("#33FFFFFF"))
-			bottomSheetFullTextLayout.fadOutAnimation(VIEW_TRANSIT_DURATION) {}
-			bottomSheetFullDragHandle.fadOutAnimation(VIEW_TRANSIT_DURATION) {}
-			TransitionManager.beginDelayedTransition(this, transformIn)
-			bottomSheetFullPlaylistCoverFrame.visibility = View.VISIBLE
-			bottomSheetFullCoverFrame.visibility = View.INVISIBLE
+			if (bottomSheetFullCoverFrame.scaleX == 1.0f) {
+				bottomSheetFullSubtitle.setTextColor(Color.parseColor("#33FFFFFF"))
+				bottomSheetFullTextLayout.fadOutAnimation(VIEW_TRANSIT_DURATION) {}
+				bottomSheetFullDragHandle.fadOutAnimation(VIEW_TRANSIT_DURATION) {}
+				TransitionManager.beginDelayedTransition(this, transformIn)
+				bottomSheetFullPlaylistCoverFrame.visibility = View.VISIBLE
+				bottomSheetFullCoverFrame.visibility = View.INVISIBLE
+			} else {
+				Log.d("TAG", "HERE")
+				bottomSheetFullSubtitle.setTextColor(Color.parseColor("#33FFFFFF"))
+				bottomSheetFullTextLayout.fadOutAnimation(VIEW_TRANSIT_DURATION) {}
+				bottomSheetFullDragHandle.fadOutAnimation(VIEW_TRANSIT_DURATION) {}
+				buildShrinkAnimator(false, bottomSheetFullCoverFrame.scaleX) {
+					TransitionManager.beginDelayedTransition(this, transformIn)
+					bottomSheetFullPlaylistCoverFrame.visibility = View.VISIBLE
+					bottomSheetFullCoverFrame.visibility = View.INVISIBLE
+				}
+			}
 		}
 	}
 
@@ -842,6 +888,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			bottomSheetFullPlaylistSubtitleUnder.setTextAnimation(
 				mediaItem?.mediaMetadata?.artist ?: context.getString(R.string.unknown_artist), skipAnimation = firstTime
 			)
+			isHires(mediaItem?.localConfiguration?.mimeType?.contains("flac") == true)
 			if (playlistNowPlaying != null) {
 				playlistNowPlaying!!.text = mediaItem?.mediaMetadata?.title
 				playlistNowPlayingCover!!.load(mediaItem?.mediaMetadata?.artworkUri) {
@@ -994,13 +1041,13 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	) : RecyclerView.Adapter<LyricAdapter.ViewHolder>() {
 
 		private var defaultTextColor =
-			Color.parseColor("#26FFFFFF")
+			ResourcesCompat.getColor(resources, R.color.contrast_lyric_defaultColor, null)
 
 		private var highlightTranslationTextColor =
-			Color.parseColor("#66FFFFFF")
+			ResourcesCompat.getColor(resources, R.color.contrast_lyric_highlightTranslationColor, null)
 
 		private var highlightTextColor =
-			Color.parseColor("#EBFFFFFF")
+			ResourcesCompat.getColor(resources, R.color.contrast_lyric_highlightColor, null)
 
 		private val sizeFactor = 1f
 		private val defaultSizeFactor = 0.98f

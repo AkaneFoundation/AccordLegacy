@@ -167,4 +167,5 @@
     <string name="add_notes_desc">为收藏的曲目添加备注，记录您的心情、想法或者属于您的的特殊回忆。</string>
     <string name="rearrange">重新排序</string>
     <string name="rearrange_desc">您可以随时回到列表中调整歌曲的顺序，个性化您的音乐体验。</string>
+    <string name="lossless">无损</string>
 </resources>
