@@ -17,12 +17,12 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:title="@string/settings_category_misc"
-        android:layout="@layout/preference_category_md">
+        android:layout="@layout/preference_category_md"
+        android:title="@string/settings_category_misc">
         <Preference
-            android:layout="@layout/basic_preference_iconless"
             android:key="crash"
-            android:title="@string/settings_crash_application"
-            android:summary="@string/settings_crash_application_summary" />
+            android:layout="@layout/basic_preference_iconless"
+            android:summary="@string/settings_crash_application_summary"
+            android:title="@string/settings_crash_application" />
     </PreferenceCategory>
 </PreferenceScreen>

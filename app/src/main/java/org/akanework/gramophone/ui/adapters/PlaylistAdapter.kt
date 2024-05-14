@@ -23,9 +23,9 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import org.akanework.gramophone.R
+import org.akanework.gramophone.logic.findBaseWrapperFragment
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
 import org.akanework.gramophone.ui.fragments.GeneralSubFragment
-import org.akanework.gramophone.ui.fragments.ManuscriptIntermediateFragment
 
 /**
  * [PlaylistAdapter] is an adapter for displaying artists.
@@ -53,9 +53,11 @@ class PlaylistAdapter(
                 is MediaStoreUtils.RecentlyAdded -> {
                     R.string.recently_added
                 }
+
                 is MediaStoreUtils.ManuScript -> {
                     R.string.manuscript
                 }
+
                 else -> {
                     R.string.unknown_playlist
                 }
@@ -64,15 +66,9 @@ class PlaylistAdapter(
     }
 
     override fun onClick(item: MediaStoreUtils.Playlist) {
-        if (item is MediaStoreUtils.ManuScript) {
-            mainActivity.startFragment(
-                ManuscriptIntermediateFragment()
-            )
-        } else {
-            mainActivity.startFragment(GeneralSubFragment()) {
-                putInt("Position", toRawPos(item))
-                putInt("Item", R.id.playlist)
-            }
+        fragment!!.findBaseWrapperFragment()!!.replaceFragment(GeneralSubFragment()) {
+            putInt("Position", toRawPos(item))
+            putInt("Item", R.id.playlist)
         }
     }
 
@@ -95,12 +91,13 @@ class PlaylistAdapter(
         }
     }
 
-    class PlaylistItemHelper(private val context: Context) : StoreItemHelper<MediaStoreUtils.Playlist>() {
+    class PlaylistItemHelper(private val context: Context) :
+        StoreItemHelper<MediaStoreUtils.Playlist>() {
         override fun getCover(item: MediaStoreUtils.Playlist): Uri? {
             // return if (item is MediaStoreUtils.ManuScript) {
             //    context.resourceUri(R.drawable.ic_default_cover_manuscript)
             //} else {
-                return super.getCover(item)
+            return super.getCover(item)
             //}
         }
     }

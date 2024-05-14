@@ -29,6 +29,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.akanework.gramophone.R
+import org.akanework.gramophone.logic.findBaseWrapperFragment
 import org.akanework.gramophone.ui.LibraryViewModel
 import org.akanework.gramophone.ui.fragments.ArtistSubFragment
 import org.akanework.gramophone.ui.fragments.DetailDialogFragment
@@ -56,7 +57,7 @@ class SongAdapter(
     naturalOrderHelper = if (canSort) helper else null,
     initialSortType = if (canSort)
         (if (helper != null) Sorter.Type.NaturalOrder else
-                (if (rawOrderExposed) Sorter.Type.NativeOrder else Sorter.Type.ByTitleAscending))
+            (if (rawOrderExposed) Sorter.Type.NativeOrder else Sorter.Type.ByTitleAscending))
     else Sorter.Type.None,
     canSort = canSort,
     pluralStr = R.plurals.songs,
@@ -135,10 +136,11 @@ class SongAdapter(
                             }
                         if (positionAlbum != null) {
                             withContext(Dispatchers.Main) {
-                                mainActivity.startFragment(GeneralSubFragment()) {
-                                    putInt("Position", positionAlbum)
-                                    putInt("Item", R.id.album)
-                                }
+                                fragment!!.findBaseWrapperFragment()!!
+                                    .replaceFragment(GeneralSubFragment()) {
+                                        putInt("Position", positionAlbum)
+                                        putInt("Item", R.id.album)
+                                    }
                             }
                         }
                     }
@@ -156,10 +158,11 @@ class SongAdapter(
                             }
                         if (positionArtist != null) {
                             withContext(Dispatchers.Main) {
-                                mainActivity.startFragment(ArtistSubFragment()) {
-                                    putInt("Position", positionArtist)
-                                    putInt("Item", R.id.artist)
-                                }
+                                fragment!!.findBaseWrapperFragment()!!
+                                    .replaceFragment(ArtistSubFragment()) {
+                                        putInt("Position", positionArtist)
+                                        putInt("Item", R.id.artist)
+                                    }
                             }
                         }
                     }
@@ -206,7 +209,7 @@ class SongAdapter(
                     val position = viewModel.mediaItemList.value?.indexOfFirst {
                         it.mediaId == item.mediaId
                     }
-                    mainActivity.startFragment(DetailDialogFragment()) {
+                    fragment!!.findBaseWrapperFragment()!!.replaceFragment(DetailDialogFragment()) {
                         putInt("Position", position!!)
                     }
                     true

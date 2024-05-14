@@ -35,8 +35,10 @@ fun ImageRequest.Builder.coolCrossfade(enable: Boolean, preferExactIntrinsicSize
     else transitionFactory(Transition.Factory.NONE)
 }
 
-fun ImageRequest.Builder.coolCrossfade(durationMillis: Int,
-                                       preferExactIntrinsicSize: Boolean = false) {
+fun ImageRequest.Builder.coolCrossfade(
+    durationMillis: Int,
+    preferExactIntrinsicSize: Boolean = false
+) {
     transitionFactory { target, result ->
         return@transitionFactory if (result !is SuccessResult) {
             Transition.Factory.NONE.create(target, result)
@@ -92,8 +94,10 @@ private class CoolCrossfadeDrawable @JvmOverloads constructor(
 
     private val callbacks = mutableListOf<Animatable2Compat.AnimationCallback>()
 
-    private val intrinsicWidth = computeIntrinsicDimension(start?.intrinsicWidth, end?.intrinsicWidth)
-    private val intrinsicHeight = computeIntrinsicDimension(start?.intrinsicHeight, end?.intrinsicHeight)
+    private val intrinsicWidth =
+        computeIntrinsicDimension(start?.intrinsicWidth, end?.intrinsicWidth)
+    private val intrinsicHeight =
+        computeIntrinsicDimension(start?.intrinsicHeight, end?.intrinsicHeight)
 
     private var startTimeMillis = 0L
     private var maxAlpha = 255
@@ -219,7 +223,8 @@ private class CoolCrossfadeDrawable @JvmOverloads constructor(
 
     override fun invalidateDrawable(who: Drawable) = invalidateSelf()
 
-    override fun scheduleDrawable(who: Drawable, what: Runnable, `when`: Long) = scheduleSelf(what, `when`)
+    override fun scheduleDrawable(who: Drawable, what: Runnable, `when`: Long) =
+        scheduleSelf(what, `when`)
 
     override fun setTint(tintColor: Int) {
         start?.setTint(tintColor)
@@ -289,8 +294,10 @@ private class CoolCrossfadeDrawable @JvmOverloads constructor(
 
         val targetWidth = targetBounds.width()
         val targetHeight = targetBounds.height()
-        val multiplier = DecodeUtils.computeSizeMultiplier(width, height, targetWidth, targetHeight,
-            if (placeholder) Scale.FIT else scale)
+        val multiplier = DecodeUtils.computeSizeMultiplier(
+            width, height, targetWidth, targetHeight,
+            if (placeholder) Scale.FIT else scale
+        )
         val dx = ((targetWidth - multiplier * width) / 2).roundToInt()
         val dy = ((targetHeight - multiplier * height) / 2).roundToInt()
 

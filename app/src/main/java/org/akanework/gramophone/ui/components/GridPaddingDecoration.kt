@@ -12,7 +12,8 @@ import org.akanework.gramophone.ui.adapters.BaseAdapter
 class GridPaddingDecoration(context: Context) : RecyclerView.ItemDecoration() {
     private var mPadding = context.resources.getDimensionPixelSize(R.dimen.grid_card_side_padding)
     private val columnSize = if (context.resources.configuration.orientation
-        == Configuration.ORIENTATION_PORTRAIT) 2 else 4
+        == Configuration.ORIENTATION_PORTRAIT
+    ) 2 else 4
 
     override fun getItemOffsets(
         outRect: Rect,
@@ -22,7 +23,8 @@ class GridPaddingDecoration(context: Context) : RecyclerView.ItemDecoration() {
     ) {
         if (parent.adapter !is ConcatAdapter
             || ((parent.adapter as ConcatAdapter).adapters[1] !is BaseAdapter<*>
-            && (parent.adapter as ConcatAdapter).adapters[0] !is ConcatAdapter)) {
+                    && (parent.adapter as ConcatAdapter).adapters[0] !is ConcatAdapter)
+        ) {
             throw IllegalArgumentException("Can't find desired adapter!")
         }
         if (parent.adapter is ConcatAdapter
@@ -34,7 +36,8 @@ class GridPaddingDecoration(context: Context) : RecyclerView.ItemDecoration() {
         }
 
         if ((parent.adapter as ConcatAdapter).adapters[1] !is BaseAdapter<*>
-                    && (parent.adapter as ConcatAdapter).adapters[0] is ConcatAdapter) {
+            && (parent.adapter as ConcatAdapter).adapters[0] is ConcatAdapter
+        ) {
             ((parent.adapter as ConcatAdapter).adapters[0] as ConcatAdapter).adapters[1].let {
                 val itemPosition = parent.getChildAdapterPosition(view)
                 if (itemPosition > it.itemCount) {

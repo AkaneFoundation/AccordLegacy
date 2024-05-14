@@ -37,9 +37,11 @@ import org.akanework.gramophone.BuildConfig
 import java.nio.charset.StandardCharsets
 
 @OptIn(UnstableApi::class)
-class LastPlayedManager(context: Context,
-                        private val controller: EndedWorkaroundPlayer,
-                        private val seedProvider: () -> CircularShuffleOrder.Persistent?) {
+class LastPlayedManager(
+    context: Context,
+    private val controller: EndedWorkaroundPlayer,
+    private val seedProvider: () -> CircularShuffleOrder.Persistent?
+) {
 
     companion object {
         private const val TAG = "LastPlayedManager"
@@ -129,7 +131,12 @@ class LastPlayedManager(context: Context,
             Log.d(TAG, "restoring playlist...")
         }
         CoroutineScope(Dispatchers.Default).launch {
-            val seed = CircularShuffleOrder.Persistent.deserialize(prefs.getString("shuffle_persist", null))
+            val seed = CircularShuffleOrder.Persistent.deserialize(
+                prefs.getString(
+                    "shuffle_persist",
+                    null
+                )
+            )
             try {
                 val lastPlayedLst = prefs.getStringSet("last_played_lst", null)
                 val lastPlayedGrp = prefs.getString("last_played_grp", null)
@@ -252,10 +259,14 @@ class LastPlayedManager(context: Context,
 }
 
 @OptIn(UnstableApi::class)
-private inline fun runCallback(crossinline callback: (MediaItemsWithStartPosition?,
-                                                      CircularShuffleOrder.Persistent) -> Unit,
-                               seed: CircularShuffleOrder.Persistent,
-                               noinline parameter: () -> MediaItemsWithStartPosition?) {
+private inline fun runCallback(
+    crossinline callback: (
+        MediaItemsWithStartPosition?,
+        CircularShuffleOrder.Persistent
+    ) -> Unit,
+    seed: CircularShuffleOrder.Persistent,
+    noinline parameter: () -> MediaItemsWithStartPosition?
+) {
     CoroutineScope(Dispatchers.Main).launch { callback(parameter(), seed) }
 }
 

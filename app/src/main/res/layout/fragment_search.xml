@@ -13,44 +13,90 @@
         android:background="@color/contrast_colorBackground"
         app:liftOnScroll="false">
 
-        <LinearLayout
-            android:id="@+id/topAppBar"
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsingtoolbar"
+            style="?attr/collapsingToolbarLayoutMediumStyle"
             android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="8dp">
+            android:layout_height="@dimen/top_app_bar_height"
+            android:layout_marginStart="0dp"
+            android:background="@color/contrast_colorBackground"
+            android:paddingStart="0dp"
+            app:collapsedTitleTextAppearance="@style/TextAppearance.App.TitleLarge"
+            app:collapsedTitleTextColor="@color/contrast_colorOnSurface"
+            app:contentScrim="@android:color/transparent"
+            app:expandedTitleMarginStart="24dp"
+            app:expandedTitleTextAppearance="@style/TextAppearance.App.HeadlineLarge"
+            app:expandedTitleTextColor="@color/contrast_colorOnSurface"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+            app:title="@string/search"
+            app:titleCollapseMode="scale">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/return_button"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:backgroundTint="@android:color/transparent"
-                app:icon="@drawable/ic_arrow_back"
-                app:iconGravity="textStart"
-                app:iconPadding="8dp"
-                app:iconSize="24dp"
-                app:iconTint="@color/contrast_colorOnSurface" />
-
-            <EditText
-                android:id="@+id/edit_text"
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/topAppBar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:autofillHints=""
-                android:backgroundTint="@android:color/transparent"
-                android:hint="@string/search"
-                android:inputType="text"
-                android:singleLine="true"
-                android:textColorHint="@color/contrast_colorOnSurfaceFainted"
-                android:textSize="20sp" />
+                android:layout_height="?attr/actionBarSize"
+                android:elevation="0dp"
+                android:paddingStart="24dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="0dp"
+                app:layout_collapseMode="pin"
+                app:menu="@menu/home_menu"
+                app:titleMarginStart="0dp" />
 
-        </LinearLayout>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/topAppBarCard"
+            style="?materialCardViewFilledStyle"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="24dp"
+            app:cardBackgroundColor="@color/contrast_colorBackgroundElevated"
+            app:cardCornerRadius="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/return_button"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="16dp"
+                    android:backgroundTint="@android:color/transparent"
+                    app:icon="@drawable/ic_search"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp"
+                    app:iconSize="24dp"
+                    app:iconTint="@color/contrast_themeColor" />
+
+                <EditText
+                    android:id="@+id/edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:autofillHints=""
+                    android:backgroundTint="@android:color/transparent"
+                    android:hint="@string/song_artist_album"
+                    android:inputType="text"
+                    android:padding="0dp"
+                    android:singleLine="true"
+                    android:textColorHint="@color/contrast_colorOnSurfaceFainted"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
     </com.google.android.material.appbar.AppBarLayout>
 
     <include
         layout="@layout/fragment_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="8dp"
         android:clipToPadding="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 

@@ -4,7 +4,8 @@
         <!-- fixes some UI issues on MIUI devices -->
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
         <!-- true edge-to-edge, no black bars in display notch -->
-        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">shortEdges</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">shortEdges
+        </item>
         <!-- Work around b/331383944: PreferenceFragmentCompat permanently mutates activity theme (enables vertical scrollbars) -->
         <item name="android:scrollbars">none</item>
         <item name="bottomSheetDialogTheme">@style/ThemeOverlay.App.BottomSheetDialog</item>
@@ -100,13 +101,14 @@
         <item name="android:textAllCaps">false</item>
         <item name="android:textSize">15sp</item>
         <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textFontWeight" tools:targetApi="p">500</item>
+        <item name="android:textFontWeight" tools:targetApi="p">600</item>
     </style>
 
     <style name="BottomPlayerSheetStyle" parent="Widget.Material3.BottomSheet">
         <item name="shapeAppearance">@style/BottomPlayerCornerShape</item>
         <item name="marginLeftSystemWindowInsets">false</item>
         <item name="marginRightSystemWindowInsets">false</item>
+        <item name="android:elevation">0dp</item>
         <item name="paddingBottomSystemWindowInsets">false</item>
         <item name="layout_behavior">org.akanework.gramophone.logic.ui.MyBottomSheetBehavior</item>
     </style>
@@ -138,6 +140,7 @@
         <item name="postSplashScreenTheme">@style/Theme.Gramophone</item>
         <item name="windowSplashScreenBackground">@color/contrast_colorBackground</item>
     </style>
+
     <style name="Base.Day.Theme.Splash" parent="Base.Night.Theme.Splash">
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
@@ -147,6 +150,7 @@
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
         <item name="windowSplashScreenIconBackgroundColor">@color/contrast_colorBackground</item>
     </style>
+
     <style name="PreV31Night.Theme.Splash" parent="Base.Night.Theme.Splash">
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
         <item name="windowSplashScreenIconBackgroundColor">@color/contrast_colorBackground</item>
@@ -161,8 +165,17 @@
         <item name="android:textColor">@color/contrast_themeColor</item>
     </style>
 
+    <style name="Widget.App.BottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.BottomNavigationView</item>
+    </style>
+
+    <style name="ThemeOverlay.App.BottomNavigationView" parent="">
+        <item name="colorPrimary">@color/contrast_themeColor</item>
+    </style>
+
 
     <style name="Day.Theme.Splash" parent="PreV31Day.Theme.Splash" />
+
     <style name="Night.Theme.Splash" parent="PreV31Night.Theme.Splash" />
 
     <style name="Theme.Splash" parent="Day.Theme.Splash" />

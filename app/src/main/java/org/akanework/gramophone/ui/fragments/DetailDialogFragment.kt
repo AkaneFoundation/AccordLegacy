@@ -9,8 +9,8 @@ import android.widget.TextView
 import androidx.fragment.app.activityViewModels
 import coil3.load
 import coil3.request.crossfade
-import coil3.request.placeholder
 import coil3.request.error
+import coil3.request.placeholder
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import org.akanework.gramophone.R
@@ -19,7 +19,7 @@ import org.akanework.gramophone.logic.getFile
 import org.akanework.gramophone.logic.utils.CalculationUtils.convertDurationToTimeStamp
 import org.akanework.gramophone.ui.LibraryViewModel
 
-class DetailDialogFragment : BaseFragment(false) {
+class DetailDialogFragment : BaseFragment(true) {
 
     private val libraryViewModel: LibraryViewModel by activityViewModels()
 
@@ -32,9 +32,10 @@ class DetailDialogFragment : BaseFragment(false) {
         rootView.findViewById<AppBarLayout>(R.id.appbarlayout).enableEdgeToEdgePaddingListener()
         rootView.findViewById<View>(R.id.scrollView).enableEdgeToEdgePaddingListener()
         rootView.findViewById<MaterialToolbar>(R.id.topAppBar).setNavigationOnClickListener {
-            requireActivity().supportFragmentManager.popBackStack()
+            (requireParentFragment() as BaseWrapperFragment).childFragmentManager.popBackStack()
         }
-        val mediaItem = libraryViewModel.mediaItemList.value!![requireArguments().getInt("Position")]
+        val mediaItem =
+            libraryViewModel.mediaItemList.value!![requireArguments().getInt("Position")]
         val mediaMetadata = mediaItem.mediaMetadata
         val albumCoverImageView = rootView.findViewById<ImageView>(R.id.album_cover)
         val titleTextView = rootView.findViewById<TextView>(R.id.title)
@@ -67,7 +68,8 @@ class DetailDialogFragment : BaseFragment(false) {
         if (mediaMetadata.releaseYear != null) {
             yearTextView.text = mediaMetadata.releaseYear?.toString()
         }
-        durationTextView.text = convertDurationToTimeStamp(mediaMetadata.extras!!.getLong("Duration"))
+        durationTextView.text =
+            convertDurationToTimeStamp(mediaMetadata.extras!!.getLong("Duration"))
         mimeTypeTextView.text = mediaItem.localConfiguration?.mimeType ?: "(null)"
         pathTextView.text = mediaItem.getFile()?.path
             ?: mediaItem.requestMetadata.mediaUri?.toString() ?: "(null)"

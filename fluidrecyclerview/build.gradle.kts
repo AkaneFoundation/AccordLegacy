@@ -21,7 +21,7 @@ plugins {
 
 android {
     namespace = "androidx.fluidrecyclerview"
-    compileSdk = 32
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 14

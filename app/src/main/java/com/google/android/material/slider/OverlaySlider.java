@@ -16,16 +16,17 @@
 
 package com.google.android.material.slider;
 
-import com.google.android.material.R;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.google.android.material.R;
 import com.google.android.material.slider.OverlaySlider.OnChangeListener;
 import com.google.android.material.slider.OverlaySlider.OnSliderTouchListener;
 
@@ -48,24 +49,6 @@ import com.google.android.material.slider.OverlaySlider.OnSliderTouchListener;
 @SuppressLint("RestrictedApi")
 public class OverlaySlider extends BaseOverlaySlider<OverlaySlider, OnChangeListener, OnSliderTouchListener> {
 
-    /** Interface definition for a callback invoked when a slider's value is changed. */
-    public interface OnChangeListener extends BaseOnChangeListener<OverlaySlider> {
-        @Override
-        void onValueChange(@NonNull OverlaySlider slider, float value, boolean fromUser);
-    }
-
-    /**
-     * Interface definition for callbacks invoked when a slider's touch event is being
-     * started/stopped.
-     */
-    public interface OnSliderTouchListener extends BaseOnSliderTouchListener<OverlaySlider> {
-        @Override
-        void onStartTrackingTouch(@NonNull OverlaySlider slider);
-
-        @Override
-        void onStopTrackingTouch(@NonNull OverlaySlider slider);
-    }
-
     public OverlaySlider(@NonNull Context context) {
         this(context, null);
     }
@@ -76,7 +59,7 @@ public class OverlaySlider extends BaseOverlaySlider<OverlaySlider, OnChangeList
 
     public OverlaySlider(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        TypedArray a = context.obtainStyledAttributes(attrs, new int[] {android.R.attr.value});
+        TypedArray a = context.obtainStyledAttributes(attrs, new int[]{android.R.attr.value});
         if (a.hasValue(0)) {
             setValue(a.getFloat(0, 0f));
         }
@@ -86,8 +69,8 @@ public class OverlaySlider extends BaseOverlaySlider<OverlaySlider, OnChangeList
     /**
      * Returns the value of the slider.
      *
-     * @see #setValue(float)
      * @attr ref com.google.android.material.R.styleable#Slider_android_value
+     * @see #setValue(float)
      */
     public float getValue() {
         return getValues().get(0);
@@ -106,8 +89,8 @@ public class OverlaySlider extends BaseOverlaySlider<OverlaySlider, OnChangeList
      * an {@link IllegalStateException} will be thrown when the view is laid out.
      *
      * @param value The value to which to set the slider
-     * @see #getValue()
      * @attr ref com.google.android.material.R.styleable#Slider_android_value
+     * @see #getValue()
      */
     public void setValue(float value) {
         setValues(value);
@@ -137,5 +120,25 @@ public class OverlaySlider extends BaseOverlaySlider<OverlaySlider, OnChangeList
         // Only one thumb to focus
         setActiveThumbIndex(0);
         return true;
+    }
+
+    /**
+     * Interface definition for a callback invoked when a slider's value is changed.
+     */
+    public interface OnChangeListener extends BaseOnChangeListener<OverlaySlider> {
+        @Override
+        void onValueChange(@NonNull OverlaySlider slider, float value, boolean fromUser);
+    }
+
+    /**
+     * Interface definition for callbacks invoked when a slider's touch event is being
+     * started/stopped.
+     */
+    public interface OnSliderTouchListener extends BaseOnSliderTouchListener<OverlaySlider> {
+        @Override
+        void onStartTrackingTouch(@NonNull OverlaySlider slider);
+
+        @Override
+        void onStopTrackingTouch(@NonNull OverlaySlider slider);
     }
 }

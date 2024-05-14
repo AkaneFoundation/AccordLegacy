@@ -21,16 +21,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
 import androidx.fluidrecyclerview.widget.ConcatAdapter
 import androidx.fluidrecyclerview.widget.RecyclerView
+import androidx.fragment.app.activityViewModels
 import me.zhanghai.android.fastscroll.PopupTextProvider
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.enableEdgeToEdgePaddingListener
 import org.akanework.gramophone.logic.ui.ItemHeightHelper
 import org.akanework.gramophone.logic.ui.MyRecyclerView
 import org.akanework.gramophone.ui.LibraryViewModel
-import org.akanework.gramophone.ui.MainActivity
 import org.akanework.gramophone.ui.adapters.AlbumAdapter
 import org.akanework.gramophone.ui.adapters.ArtistAdapter
 import org.akanework.gramophone.ui.adapters.DateAdapter
@@ -63,7 +62,7 @@ class AdapterFragment : BaseFragment(null) {
         recyclerView.enableEdgeToEdgePaddingListener()
         adapter = createAdapter(libraryViewModel)
         recyclerView.adapter = adapter.concatAdapter
-        recyclerView.setAppBar((requireParentFragment() as ViewPagerFragment).appBarLayout)
+        recyclerView.setAppBar((requireParentFragment() as BrowseFragment).appBarLayout)
         recyclerView.fastScroll(adapter, adapter.itemHeightHelper)
         return rootView
     }

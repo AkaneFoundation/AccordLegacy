@@ -10,24 +10,24 @@
     android:foreground="?selectableItemBackground"
     android:gravity="center_horizontal"
     android:paddingBottom="@dimen/grid_card_padding_bottom"
-    tools:targetApi="m"
-    tools:ignore="UnusedAttribute">
+    tools:ignore="UnusedAttribute"
+    tools:targetApi="m">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cover_frame"
         style="?materialCardViewFilledStyle"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="@dimen/grid_card_margin_top"
         android:layout_marginHorizontal="@dimen/grid_card_side_padding"
+        android:layout_marginTop="@dimen/grid_card_margin_top"
         app:cardCornerRadius="6dp"
+        app:layout_constraintBottom_toTopOf="@id/linearLayout"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/linearLayout"
-        app:strokeWidth="1.2dp"
-        app:strokeColor="@color/contrast_colorOutline">
+        app:strokeColor="@color/contrast_colorOutline"
+        app:strokeWidth="1.2dp">
 
         <ImageView
             android:id="@+id/cover"
@@ -45,16 +45,16 @@
         android:layout_width="0dp"
         android:layout_height="@dimen/grid_card_label_height"
         android:layout_marginVertical="@dimen/grid_card_margin_label"
-        app:layout_constraintTop_toBottomOf="@id/cover_frame"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@id/cover_frame"
-        app:layout_constraintEnd_toStartOf="@id/more"
         android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/more"
+        app:layout_constraintStart_toStartOf="@id/cover_frame"
+        app:layout_constraintTop_toBottomOf="@id/cover_frame"
         tools:ignore="RtlSymmetry">
 
         <TextView
             android:id="@+id/title"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
             android:gravity="start"
@@ -82,12 +82,12 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/more"
-        app:layout_constraintTop_toTopOf="@id/linearLayout"
-        app:layout_constraintBottom_toBottomOf="@id/linearLayout"
-        app:layout_constraintStart_toEndOf="@id/linearLayout"
-        app:layout_constraintEnd_toEndOf="@id/cover_frame"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/linearLayout"
+        app:layout_constraintEnd_toEndOf="@id/cover_frame"
+        app:layout_constraintStart_toEndOf="@id/linearLayout"
+        app:layout_constraintTop_toTopOf="@id/linearLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

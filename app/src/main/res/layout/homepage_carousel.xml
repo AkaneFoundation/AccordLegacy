@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="390dp"
+    android:orientation="vertical"
+    android:layout_marginStart="4dp"
+    android:layout_marginEnd="4dp">
+
+    <TextView
+        android:id="@+id/hint_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/new_songs"
+        android:textColor="@color/contrast_colorOnSurfaceSecondary"
+        android:fontFamily="sans-serif"
+        android:textFontWeight="400" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="284dp"
+        android:layout_height="358dp"
+        android:layout_marginTop="12dp"
+        app:strokeColor="@color/contrast_colorOutline"
+        app:strokeWidth="1dp">
+
+        <ImageView
+            android:id="@+id/cover"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="74dp"
+            android:src="@drawable/accord_mix_1"
+            android:scaleType="centerCrop"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="74dp"
+            android:layout_gravity="bottom">
+
+            <ImageView
+                android:id="@+id/banner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="bottom"
+                android:src="@drawable/accord_mix_1_banner" />
+
+            <TextView
+                android:id="@+id/hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/new_delivery"
+                android:textColor="#FFFFFF"
+                android:layout_gravity="center"
+                android:textFontWeight="500"
+                android:textSize="16sp"
+                android:fontFamily="sans-serif"
+                />
+
+        </FrameLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>

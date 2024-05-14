@@ -6,9 +6,9 @@ import org.junit.Test
 
 class LrcUtilsTest {
 
-	@Test
-	fun emptyInEmptyOut() {
-		assertTrue(LrcUtils.parseLrcString("", false).isEmpty())
-	}
+    @Test
+    fun emptyInEmptyOut() {
+        assertTrue(LrcUtils.parseLrcString("", false).isEmpty())
+    }
 
 }

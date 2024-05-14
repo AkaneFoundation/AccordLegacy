@@ -13,9 +13,9 @@
     <ImageView
         android:layout_width="52dp"
         android:layout_height="52dp"
+        android:importantForAccessibility="no"
         android:src="@drawable/ic_gramophone_monochrome"
-        app:tint="@color/contrast_colorOnSurface"
-        android:importantForAccessibility="no" />
+        app:tint="@color/contrast_colorOnSurface" />
 
 
     <LinearLayout

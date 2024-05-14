@@ -1,8 +1,10 @@
 <resources>
-    <color name="contrast_themeColor">#F5002E</color>
+    <color name="contrast_themeColor">#FA233B</color>
     <color name="contrast_colorOnSurface">#000000</color>
     <color name="contrast_colorBackground">#FFFFFF</color>
+    <color name="contrast_colorBackgroundAlpha">#26FFFFFF</color>
     <color name="contrast_colorBackgroundElevated">#F5F5F5</color>
+    <color name="contrast_colorBackgroundBottomNav">#FFFFFF</color>
     <color name="contrast_colorBackgroundContainer">#E6E6E6</color>
     <color name="contrast_colorOnSurfaceHalcyon">#DE000000</color>
     <color name="contrast_colorBackgroundContainerHalcyon">#B3FAFAFA</color>
@@ -14,13 +16,18 @@
     <color name="contrast_colorOverlayBlurHalcyon">#66FFFFFF</color>
     <color name="contrast_colorBackgroundSeparatorHalcyon">#B3E6E6EB</color>
 
-    <color name="contrast_colorSecondaryTopOverlayActivated">#4DFFFFFF</color>
-    <color name="contrast_colorSecondaryTopOverlayInActivated">#33FFFFFF</color>
-    <color name="contrast_colorSecondaryBackOverlayActivated">#1AFFFFFF</color>
-
     <color name="contrast_lyric_defaultColor">#2BFFFFFF</color>
     <color name="contrast_lyric_highlightTranslationColor">#66FFFFFF</color>
     <color name="contrast_lyric_highlightColor">#EBFFFFFF</color>
+
+    <color name="contrast_primaryOverlayShadeColor">#73FFFFFF</color>
+    <color name="contrast_primaryOverlayColor">#BFFFFFFF</color>
+
+    <color name="contrast_secondaryOverlayShadeColor">#33FFFFFF</color>
+    <color name="contrast_secondaryOverlayColor">#26FFFFFF</color>
+
+    <color name="contrast_tertiaryOverlayShadeColor">#1AFFFFFF</color>
+    <color name="contrast_tertiaryOverlayColor">#0DFFFFFF</color>
 
     <!-- Fallback -->
     <color name="md_theme_primary">#000000</color>

@@ -18,6 +18,7 @@
 package org.akanework.gramophone.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -57,7 +58,8 @@ class GeneralSubFragment : BaseFragment(true) {
 
         val rootView = inflater.inflate(R.layout.fragment_general_sub, container, false)
         val topAppBar = rootView.findViewById<MaterialToolbar>(R.id.topAppBar)
-        val collapsingToolbarLayout = rootView.findViewById<CollapsingToolbarLayout>(R.id.collapsingtoolbar)
+        val collapsingToolbarLayout =
+            rootView.findViewById<CollapsingToolbarLayout>(R.id.collapsingtoolbar)
         val recyclerView = rootView.findViewById<MyRecyclerView>(R.id.recyclerview)
         val appBarLayout = rootView.findViewById<AppBarLayout>(R.id.appbarlayout)
         appBarLayout.enableEdgeToEdgePaddingListener()
@@ -65,7 +67,7 @@ class GeneralSubFragment : BaseFragment(true) {
         if (libraryViewModel.albumItemList.value == null) {
             // TODO make it wait for lib load instead of breaking state restore
             // (still better than crashing, though)
-            requireActivity().supportFragmentManager.popBackStack()
+            requireParentFragment().childFragmentManager.popBackStack()
             return null
         }
         val bundle = requireArguments()
@@ -87,6 +89,23 @@ class GeneralSubFragment : BaseFragment(true) {
                             it.mediaMetadata.discNumber?.times(1000) ?: 0
                         ) ?: 0
                     }
+            }
+
+            R.id.special_album -> {
+                if (libraryViewModel.privateAlbumList.size != 0) {
+                    val item = libraryViewModel.privateAlbumList[position]
+                    title = item.title ?: requireContext().getString(R.string.unknown_album)
+                    itemList = item.songList
+                    helper =
+                        Sorter.NaturalOrderHelper {
+                            it.mediaMetadata.trackNumber?.plus(
+                                it.mediaMetadata.discNumber?.times(1000) ?: 0
+                            ) ?: 0
+                        }
+                } else {
+                    requireParentFragment().childFragmentManager.popBackStack()
+                    return null
+                }
             }
 
             /*R.id.artist -> {
@@ -141,7 +160,7 @@ class GeneralSubFragment : BaseFragment(true) {
                 true,
                 helper,
                 true,
-                true
+                isSubFragment = true
             )
 
         recyclerView.enableEdgeToEdgePaddingListener()
@@ -152,7 +171,8 @@ class GeneralSubFragment : BaseFragment(true) {
         recyclerView.fastScroll(songAdapter, songAdapter.itemHeightHelper)
 
         topAppBar.setNavigationOnClickListener {
-            requireActivity().supportFragmentManager.popBackStack()
+            Log.d("TAG", "ok${requireParentFragment().childFragmentManager.fragments.size}")
+            (requireParentFragment() as BaseWrapperFragment).childFragmentManager.popBackStack()
         }
 
         return rootView

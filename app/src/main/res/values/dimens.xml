@@ -12,6 +12,7 @@
     <dimen name="lyric_bottom_padding">612dp</dimen>
     <!-- https://github.com/zhanghai/AndroidFastScroll/issues/3 -->
     <dimen name="afs_min_touch_target_size">24dp</dimen>
+    <dimen name="general_side_padding_left">16dp</dimen>
     <dimen name="decor_height">48dp</dimen>
     <dimen name="list_height">66dp</dimen>
     <dimen name="list_height_larger">80dp</dimen>
@@ -26,4 +27,8 @@
     <dimen name="afs_md2_popup_text_size">34dp</dimen>
     <dimen name="list_height_artist">60dp</dimen>
     <dimen name="mtrl_slider_widget_height" tools:override="true">21dp</dimen>
+    <dimen name="mtrl_slider_track_side_padding" tools:override="true">0dp</dimen>
+    <dimen name="bottom_sheet_height">56dp</dimen>
+    <dimen name="top_app_bar_height">132dp</dimen>
+    <item name="top_divider_visibility" format="float" type="dimen">1.0</item>
 </resources>

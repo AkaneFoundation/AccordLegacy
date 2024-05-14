@@ -48,6 +48,9 @@
                 android:icon="@drawable/ic_playlist_play"
                 android:title="@string/category_playlists"
                 app:showAsAction="ifRoom" />
+            <item
+                android:id="@+id/special_album"
+                android:title="@string/category_albums" />
         </menu>
     </item>
     <item android:title="@string/operations">

@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 import org.akanework.gramophone.R
+import org.akanework.gramophone.logic.findBaseWrapperFragment
 import org.akanework.gramophone.logic.getBooleanStrict
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
 import org.akanework.gramophone.ui.fragments.ArtistSubFragment
@@ -61,7 +62,7 @@ class ArtistAdapter(
     }
 
     override fun onClick(item: MediaStoreUtils.Artist) {
-        mainActivity.startFragment(ArtistSubFragment()) {
+        fragment!!.findBaseWrapperFragment()!!.replaceFragment(ArtistSubFragment()) {
             putInt("Position", toRawPos(item))
             putInt(
                 "Item",

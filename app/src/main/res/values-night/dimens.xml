@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="top_divider_visibility" format="float" type="dimen">0</item>
+</resources>

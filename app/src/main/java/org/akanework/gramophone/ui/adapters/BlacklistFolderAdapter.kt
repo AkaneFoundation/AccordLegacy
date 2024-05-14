@@ -4,8 +4,8 @@ import android.content.SharedPreferences
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.fragment.app.Fragment
 import androidx.fluidrecyclerview.widget.RecyclerView
+import androidx.fragment.app.Fragment
 import com.google.android.material.checkbox.MaterialCheckBox
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.getStringSetStrict
@@ -16,15 +16,16 @@ class BlacklistFolderAdapter(
     private val folderArray: MutableList<String>,
     private val prefs: SharedPreferences
 ) : MyRecyclerView.Adapter<BlacklistFolderAdapter.ViewHolder>() {
-    private val folderFilter = prefs.getStringSetStrict("folderFilter", null)?.
-            toMutableSet() ?: mutableSetOf()
+    private val folderFilter =
+        prefs.getStringSetStrict("folderFilter", null)?.toMutableSet() ?: mutableSetOf()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         ViewHolder(
             fragment.layoutInflater.inflate(
-                    R.layout.adapter_blacklist_folder_card,
-                    parent,
-                    false
-                )
+                R.layout.adapter_blacklist_folder_card,
+                parent,
+                false
+            )
         )
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -41,11 +42,11 @@ class BlacklistFolderAdapter(
             prefs.edit()
                 .putStringSet("folderFilter",
                     folderFilter.also {
-                            if (holder.checkBox.isChecked)
-                                it.add(folderArray[position])
-                            else
-                                it.remove(folderArray[position])
-                        })
+                        if (holder.checkBox.isChecked)
+                            it.add(folderArray[position])
+                        else
+                            it.remove(folderArray[position])
+                    })
                 .apply()
         }
         holder.itemView.setOnClickListener {

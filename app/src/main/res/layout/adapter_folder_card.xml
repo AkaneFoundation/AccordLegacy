@@ -13,29 +13,29 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginEnd="48dp"
-        android:paddingStart="24dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingStart="24dp">
 
         <com.google.android.material.card.MaterialCardView
             style="?materialCardViewFilledStyle"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_gravity="center_vertical"
-            app:cardCornerRadius="4dp"
-            app:strokeWidth="1dp"
             app:cardBackgroundColor="@color/contrast_colorBackgroundContainer"
-            app:strokeColor="@color/contrast_colorOutline">
+            app:cardCornerRadius="4dp"
+            app:strokeColor="@color/contrast_colorOutline"
+            app:strokeWidth="1dp">
 
             <ImageView
                 android:id="@+id/cover"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
-                android:scaleType="centerCrop"
-                android:padding="12dp"
                 android:importantForAccessibility="no"
+                android:padding="12dp"
+                android:scaleType="centerCrop"
                 android:src="@drawable/ic_folder"
-                app:tint="@color/contrast_colorOnSurface"/>
+                app:tint="@color/contrast_colorOnSurface" />
 
         </com.google.android.material.card.MaterialCardView>
 
@@ -51,10 +51,10 @@
                 android:id="@+id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
                 android:singleLine="true"
                 android:textColor="@color/contrast_colorOnSurface"
                 android:textFontWeight="400"
-                android:fontFamily="sans-serif"
                 android:textSize="17sp"
                 tools:targetApi="p"
                 tools:text="Example Title" />
@@ -63,10 +63,10 @@
                 android:id="@+id/subtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
                 android:singleLine="true"
                 android:textColor="@color/contrast_colorOnSurfaceSecondary"
                 android:textFontWeight="400"
-                android:fontFamily="sans-serif"
                 android:textSize="12sp"
                 tools:targetApi="p"
                 tools:text="Example Artist" />
@@ -81,7 +81,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:layout_marginStart="90dp"
-        app:dividerThickness="0.5dp"
-        app:dividerColor="@color/contrast_colorBackgroundContainer" />
+        app:dividerColor="@color/contrast_colorBackgroundContainer"
+        app:dividerThickness="0.5dp" />
 
 </FrameLayout>

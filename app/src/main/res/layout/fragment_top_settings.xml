@@ -33,23 +33,23 @@
             style="?attr/collapsingToolbarLayoutLargeStyle"
             android:layout_width="match_parent"
             android:layout_height="?attr/collapsingToolbarLayoutLargeSize"
-            app:collapsedTitleTextColor="@color/contrast_colorOnSurface"
-            app:collapsedTitleTextAppearance="?textAppearanceTitleLarge"
-            app:expandedTitleTextColor="@color/contrast_colorOnSurface"
-            app:expandedTitleTextAppearance="?textAppearanceHeadlineLarge"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
-            app:contentScrim="@color/contrast_colorBackground"
             android:background="@color/contrast_colorBackground"
-            app:expandedTitleMarginStart="24dp">
+            app:collapsedTitleTextAppearance="?textAppearanceTitleLarge"
+            app:collapsedTitleTextColor="@color/contrast_colorOnSurface"
+            app:contentScrim="@color/contrast_colorBackground"
+            app:expandedTitleMarginStart="24dp"
+            app:expandedTitleTextAppearance="?textAppearanceHeadlineLarge"
+            app:expandedTitleTextColor="@color/contrast_colorOnSurface"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/topAppBar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                android:background="@color/contrast_colorBackground"
                 android:elevation="0dp"
                 android:paddingStart="6dp"
                 android:paddingEnd="8dp"
-                android:background="@color/contrast_colorBackground"
                 app:layout_collapseMode="pin"
                 app:navigationIcon="@drawable/ic_arrow_back"
                 app:navigationIconTint="@color/contrast_colorOnSurface" />
@@ -62,7 +62,6 @@
         android:id="@+id/settings"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
-        />
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/recently_added"
+    android:textColor="@color/contrast_colorOnSurface"
+    android:layout_marginTop="24dp"
+    android:layout_marginBottom="8dp"
+    android:textStyle="bold"
+    android:textSize="20sp"
+    android:layout_marginStart="24dp"/>

@@ -28,9 +28,6 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.PathInterpolator;
 
 import androidx.fluidrecyclerview.widget.RecyclerView;
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
-
-import com.google.android.material.motion.MotionUtils;
 
 /**
  * {@link RecyclerView.SmoothScroller} implementation which uses a {@link LinearInterpolator} until
@@ -44,12 +41,6 @@ import com.google.android.material.motion.MotionUtils;
  */
 public class CustomSmoothScroller extends RecyclerView.SmoothScroller {
 
-    private static final boolean DEBUG = false;
-
-    private static final float MILLISECONDS_PER_INCH = 25f;
-
-    private static final int TARGET_SEEK_SCROLL_DISTANCE_PX = 10000;
-
     /**
      * Align child view's left or top with parent view's left or top
      *
@@ -58,7 +49,6 @@ public class CustomSmoothScroller extends RecyclerView.SmoothScroller {
      * @see #calculateDyToMakeVisible(android.view.View, int)
      */
     public static final int SNAP_TO_START = -1;
-
     /**
      * Align child view's right or bottom with parent view's right or bottom
      *
@@ -67,7 +57,6 @@ public class CustomSmoothScroller extends RecyclerView.SmoothScroller {
      * @see #calculateDyToMakeVisible(android.view.View, int)
      */
     public static final int SNAP_TO_END = 1;
-
     /**
      * <p>Decides if the child should be snapped from start or end, depending on where it
      * currently is in relation to its parent.</p>
@@ -79,27 +68,24 @@ public class CustomSmoothScroller extends RecyclerView.SmoothScroller {
      * @see #calculateDyToMakeVisible(android.view.View, int)
      */
     public static final int SNAP_TO_ANY = 0;
-
+    private static final boolean DEBUG = false;
+    private static final float MILLISECONDS_PER_INCH = 25f;
+    private static final int TARGET_SEEK_SCROLL_DISTANCE_PX = 10000;
     // Trigger a scroll to a further distance than TARGET_SEEK_SCROLL_DISTANCE_PX so that if target
     // view is not laid out until interim target position is reached, we can detect the case before
     // scrolling slows down and reschedule another interim target scroll
     private static final float TARGET_SEEK_EXTRA_SCROLL_RATIO = 1.2f;
-
+    private final DisplayMetrics mDisplayMetrics;
     protected LinearInterpolator mLinearInterpolator = new LinearInterpolator();
-
     protected TimeInterpolator mDecelerateInterpolator =
             new PathInterpolator(0.4f, 0.2f, 0f, 1f);
-
     @SuppressLint("UnknownNullness") // b/240775049: Cannot annotate properly
     protected PointF mTargetVector;
-
-    private final DisplayMetrics mDisplayMetrics;
-    private boolean mHasCalculatedMillisPerPixel = false;
-    private float mMillisPerPixel;
-
     // Temporary variables to keep track of the interim scroll target. These values do not
     // point to a real item position, rather point to an estimated location pixels.
     protected int mInterimTargetDx = 0, mInterimTargetDy = 0;
+    private boolean mHasCalculatedMillisPerPixel = false;
+    private float mMillisPerPixel;
 
     @SuppressLint("UnknownNullness") // b/240775049: Cannot annotate properly
     public CustomSmoothScroller(Context context) {
@@ -208,7 +194,7 @@ public class CustomSmoothScroller extends RecyclerView.SmoothScroller {
         // area under curve (1-(1-x)^2) can be calculated as (1 - x/3) * x * x
         // which gives 0.100028 when x = .3356
         // this is why we divide linear scrolling time with .3356
-        return  (int) Math.ceil(calculateTimeForScrolling(dx) / .3356);
+        return (int) Math.ceil(calculateTimeForScrolling(dx) / .3356);
     }
 
     /**

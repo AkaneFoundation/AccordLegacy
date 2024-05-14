@@ -51,7 +51,11 @@ class CircularShuffleOrder private constructor(
             this(listener, firstIndex, length, Random(randomSeed))
 
     private constructor(listener: Listener, firstIndex: Int, length: Int, random: Random) :
-            this(listener, calculateListWithFirstIndex(calculateShuffledList(0, length, random), firstIndex), random)
+            this(
+                listener,
+                calculateListWithFirstIndex(calculateShuffledList(0, length, random), firstIndex),
+                random
+            )
 
     constructor(listener: Listener, shuffledIndices: IntArray, randomSeed: Long) :
             this(listener, shuffledIndices.copyOf(), Random(randomSeed))
@@ -85,7 +89,8 @@ class CircularShuffleOrder private constructor(
     override fun cloneAndInsert(insertionIndex: Int, insertionCount: Int): ShuffleOrder {
         if (shuffled.isEmpty()) {
             listener.onLazilySetShuffleOrder {
-                CircularShuffleOrder(listener, it, insertionCount, random.nextLong()) }
+                CircularShuffleOrder(listener, it, insertionCount, random.nextLong())
+            }
             return CircularShuffleOrder(listener, 0, insertionCount, random.nextLong())
                 .also { listener.onPersistableDataUpdated(Persistent(it)) }
         }
@@ -94,7 +99,7 @@ class CircularShuffleOrder private constructor(
         // would be 1 so we want to insert into shuffled at index 1 here.
         // If insertionIndex is 0, just add it to the very beginning.
         val ii = if (insertionIndex > 0) indexInShuffled[insertionIndex - 1] + 1 else 0
-        val insertionPoints = (ii..<(ii+insertionCount)).toList().toIntArray()
+        val insertionPoints = (ii..<(ii + insertionCount)).toList().toIntArray()
         val insertionValues = calculateShuffledList(insertionIndex, insertionCount, random)
         val newShuffled = IntArray(shuffled.size + insertionCount)
         var indexInInsertionList = 0
@@ -145,12 +150,15 @@ class CircularShuffleOrder private constructor(
 
     class Persistent private constructor(private val seed: Long, private val data: IntArray?) {
         constructor(order: CircularShuffleOrder) : this(order.random.nextLong(), order.shuffled)
+
         companion object {
             fun deserialize(data: String?): Persistent {
                 if (data == null || data.length < 2) return Persistent(Random.nextLong(), null)
                 val split = data.split(';')
-                return Persistent(split[0].toLong(), if (split.size > 1) split[1]
-                    .split(',').map(String::toInt).toIntArray() else null)
+                return Persistent(
+                    split[0].toLong(), if (split.size > 1) split[1]
+                        .split(',').map(String::toInt).toIntArray() else null
+                )
             }
         }
 
@@ -158,7 +166,10 @@ class CircularShuffleOrder private constructor(
             return if (data != null) "$seed;${data.joinToString(",")}" else seed.toString()
         }
 
-        fun toFactory(listener: Listener, controller: MediaController): (Int) -> CircularShuffleOrder {
+        fun toFactory(
+            listener: Listener,
+            controller: MediaController
+        ): (Int) -> CircularShuffleOrder {
             if (data == null) {
                 return { CircularShuffleOrder(listener, it, controller.mediaItemCount, seed) }
             } else {

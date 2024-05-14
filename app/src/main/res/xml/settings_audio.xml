@@ -17,8 +17,8 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:title="@string/preference_category_quality"
-        android:layout="@layout/preference_category_md">
+        android:layout="@layout/preference_category_md"
+        android:title="@string/preference_category_quality">
         <SwitchPreferenceCompat
             android:defaultValue="false"
             android:key="floatoutput"
@@ -33,8 +33,8 @@
             android:title="@string/settings_hardware_acceleration" />
     </PreferenceCategory>
     <PreferenceCategory
-        android:title="@string/settings_category_misc"
-        android:layout="@layout/preference_category_md">
+        android:layout="@layout/preference_category_md"
+        android:title="@string/settings_category_misc">
         <SwitchPreferenceCompat
             android:defaultValue="false"
             android:key="skip_silence"

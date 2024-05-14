@@ -16,12 +16,12 @@
             style="?attr/collapsingToolbarLayoutLargeStyle"
             android:layout_width="match_parent"
             android:layout_height="?attr/collapsingToolbarLayoutLargeSize"
-            app:collapsedTitleTextColor="?attr/colorOnSurface"
             app:collapsedTitleTextAppearance="?textAppearanceTitleLarge"
-            app:expandedTitleTextColor="?attr/colorOnSurface"
-            app:expandedTitleTextAppearance="?textAppearanceHeadlineLarge"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+            app:collapsedTitleTextColor="?attr/colorOnSurface"
             app:expandedTitleMarginStart="24dp"
+            app:expandedTitleTextAppearance="?textAppearanceHeadlineLarge"
+            app:expandedTitleTextColor="?attr/colorOnSurface"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:title="@string/gramophone_crashed"
             app:titleCollapseMode="scale">
 
@@ -48,13 +48,13 @@
 
         <TextView
             android:id="@+id/error"
-            android:textIsSelectable="true"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:textColor="?attr/colorOnSurface"
-            android:paddingTop="12dp"
             android:paddingStart="24dp"
+            android:paddingTop="12dp"
             android:paddingEnd="24dp"
+            android:textColor="?attr/colorOnSurface"
+            android:textIsSelectable="true"
             android:textSize="11sp" />
 
     </androidx.core.widget.NestedScrollView>

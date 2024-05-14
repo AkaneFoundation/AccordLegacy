@@ -41,7 +41,8 @@ class BehaviorSettingsTopFragment : BasePreferenceFragment() {
             val preference = findPreference<SwitchPreferenceCompat>("album_covers")!!
             preference.isPersistent = false
             preference.isChecked = requireContext().checkSelfPermission(
-                android.Manifest.permission.READ_MEDIA_IMAGES) ==
+                android.Manifest.permission.READ_MEDIA_IMAGES
+            ) ==
                     PackageManager.PERMISSION_GRANTED
         }
     }
@@ -63,10 +64,14 @@ class BehaviorSettingsTopFragment : BasePreferenceFragment() {
         // Prior to Android 13, this changes a setting which changes MediaStoreUtils behaviour
         // Android 13 and later, this displays state of images permission granted/denied
         if (hasScopedStorageWithMediaTypes() && preference.key == "album_covers") {
-            Toast.makeText(requireActivity(), if (requireContext().checkSelfPermission(
-                    android.Manifest.permission.READ_MEDIA_IMAGES)
-                == PackageManager.PERMISSION_GRANTED) R.string.deny_images else
-                R.string.grant_images, Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                requireActivity(), if (requireContext().checkSelfPermission(
+                        android.Manifest.permission.READ_MEDIA_IMAGES
+                    )
+                    == PackageManager.PERMISSION_GRANTED
+                ) R.string.deny_images else
+                    R.string.grant_images, Toast.LENGTH_LONG
+            ).show()
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
             intent.setData(Uri.parse("package:${requireContext().packageName}"))
             startActivity(intent)

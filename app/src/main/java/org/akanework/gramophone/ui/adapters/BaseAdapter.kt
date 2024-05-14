@@ -110,26 +110,32 @@ abstract class BaseAdapter<T>(
         canSort,
         fallbackSpans,
         isPrivateLayout
-    ) { this.fragment = fragment }
+    ) {
+        this.fragment = fragment
+    }
 
     companion object {
         // this relies on the assumption that all RecyclerViews always have same width
         // (though it does get invalidated if that is not the case, for eg rotation)
         private var gridHeightCache = 0
     }
+
     protected var fragment: Fragment? = null
     protected val mainActivity = context as MainActivity
     internal val layoutInflater: LayoutInflater
         get() = fragment?.layoutInflater ?: LayoutInflater.from(context)
     private val listHeight = context.resources.getDimensionPixelSize(R.dimen.list_height)
-    private val listHeightLarger = context.resources.getDimensionPixelSize(R.dimen.list_height_larger)
-    private val listHeightArtist = context.resources.getDimensionPixelSize(R.dimen.list_height_artist)
+    private val listHeightLarger =
+        context.resources.getDimensionPixelSize(R.dimen.list_height_larger)
+    private val listHeightArtist =
+        context.resources.getDimensionPixelSize(R.dimen.list_height_artist)
     private var gridHeight: Int? = null
     private val sorter = Sorter(sortHelper, naturalOrderHelper, rawOrderExposed)
     private val decorAdapter by lazy { createDecorAdapter() }
     override val concatAdapter by lazy { ConcatAdapter(decorAdapter, this) }
     override val itemHeightHelper by lazy {
-        DefaultItemHeightHelper.concatItemHeightHelper(decorAdapter, {1}, this) }
+        DefaultItemHeightHelper.concatItemHeightHelper(decorAdapter, { 1 }, this)
+    }
     private val handler = Handler(Looper.getMainLooper())
     private var bgHandlerThread: HandlerThread? = null
     private var bgHandler: Handler? = null
@@ -190,7 +196,7 @@ abstract class BaseAdapter<T>(
     private var reverseRaw = false
     var sortType: Sorter.Type
         get() = if (comparator == null && rawOrderExposed)
-                (if (reverseRaw) Sorter.Type.NativeOrderDescending else Sorter.Type.NativeOrder)
+            (if (reverseRaw) Sorter.Type.NativeOrderDescending else Sorter.Type.NativeOrder)
         else comparator?.type!!
         private set(value) {
             reverseRaw = value == Sorter.Type.NativeOrderDescending
@@ -204,7 +210,8 @@ abstract class BaseAdapter<T>(
     init {
         sortType =
             if (prefSortType != Sorter.Type.None && prefSortType != initialSortType
-                && sortTypes.contains(prefSortType) && !isSubFragment)
+                && sortTypes.contains(prefSortType) && !isSubFragment
+            )
                 prefSortType
             else
                 initialSortType
@@ -418,17 +425,23 @@ abstract class BaseAdapter<T>(
     // need to call notifyDataSetChanged() afterwards
     private fun calculateGridSizeIfNeeded(): Boolean {
         if (recyclerView != null && layoutType == LayoutType.GRID && gridHeight == null
-            && recyclerView!!.width != 0) {
-            val cardPadding = context.resources.getDimensionPixelSize(R.dimen.grid_card_side_padding)
+            && recyclerView!!.width != 0
+        ) {
+            val cardPadding =
+                context.resources.getDimensionPixelSize(R.dimen.grid_card_side_padding)
             val marginTop = context.resources.getDimensionPixelSize(R.dimen.grid_card_margin_top)
-            val marginLabel = context.resources.getDimensionPixelSize(R.dimen.grid_card_margin_label)
-            val paddingBottom = context.resources.getDimensionPixelSize(R.dimen.grid_card_padding_bottom)
-            val labelHeight = context.resources.getDimensionPixelSize(R.dimen.grid_card_label_height)
+            val marginLabel =
+                context.resources.getDimensionPixelSize(R.dimen.grid_card_margin_label)
+            val paddingBottom =
+                context.resources.getDimensionPixelSize(R.dimen.grid_card_padding_bottom)
+            val labelHeight =
+                context.resources.getDimensionPixelSize(R.dimen.grid_card_label_height)
             // first find out cover's width...
             var w = recyclerView!!.width
             w -= recyclerView!!.paddingLeft + recyclerView!!.paddingRight // view padding
             w -= 2 * cardPadding // item decoration
-            w /= (layoutManager as? GridLayoutManager)?.spanCount ?: fallbackSpans // we want width of one item
+            w /= (layoutManager as? GridLayoutManager)?.spanCount
+                ?: fallbackSpans // we want width of one item
             w -= 2 * cardPadding // side padding
             // ...then use it to calculate height
             var h = w // cover is constrained 1:1

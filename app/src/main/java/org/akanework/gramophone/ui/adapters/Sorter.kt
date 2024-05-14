@@ -78,6 +78,7 @@ class Sorter<T>(
         BySizeDescending, BySizeAscending,
         NaturalOrder, ByAddDateDescending, ByAddDateAscending,
         ByModifiedDateDescending, ByModifiedDateAscending,
+
         /* do not use nativeorder for smth other than title */
         None, NativeOrder, NativeOrderDescending
     }

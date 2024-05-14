@@ -23,8 +23,10 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import org.akanework.gramophone.R
+import org.akanework.gramophone.logic.findBaseWrapperFragment
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
 import org.akanework.gramophone.ui.LibraryViewModel
+import org.akanework.gramophone.ui.fragments.BaseWrapperFragment
 import org.akanework.gramophone.ui.fragments.GeneralSubFragment
 
 class AlbumAdapter(
@@ -59,7 +61,8 @@ class AlbumAdapter(
         null,
         false,
         isSubFragment = isSubFragment,
-        fallbackSpans = fallbackSpans) {
+        fallbackSpans = fallbackSpans
+    ) {
         updateList(albumList, now = true, false)
     }
 
@@ -81,7 +84,7 @@ class AlbumAdapter(
     }
 
     override fun onClick(item: MediaStoreUtils.Album) {
-        mainActivity.startFragment(GeneralSubFragment()) {
+        fragment!!.findBaseWrapperFragment()!!.replaceFragment(GeneralSubFragment()) {
             putInt("Position", item.let {
                 if (ownsView) toRawPos(it) else {
                     libraryViewModel.albumItemList.value!!.indexOf(it)

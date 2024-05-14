@@ -23,13 +23,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
-import org.akanework.gramophone.logic.ui.CustomSmoothScroller
 import androidx.fluidrecyclerview.widget.RecyclerView
 import androidx.media3.common.C
 import androidx.media3.common.Player.REPEAT_MODE_OFF
 import androidx.preference.PreferenceManager
 import com.google.android.material.button.MaterialButton
 import org.akanework.gramophone.R
+import org.akanework.gramophone.logic.ui.CustomSmoothScroller
 import org.akanework.gramophone.logic.ui.ItemHeightHelper
 import org.akanework.gramophone.logic.ui.MyRecyclerView
 import org.akanework.gramophone.logic.utils.FileOpUtils
@@ -40,6 +40,7 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
     private val pluralStr: Int,
     private val isSubFragment: Boolean = false,
     private val isPrivateLayout: Boolean = false,
+    private val viewType: Int = 0,
 ) : MyRecyclerView.Adapter<BaseDecorAdapter<T>.ViewHolder>(), ItemHeightHelper {
 
     protected val context: Context = adapter.context
@@ -51,7 +52,14 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
         parent: ViewGroup,
         viewType: Int,
     ): ViewHolder {
-        val view = adapter.layoutInflater.inflate(R.layout.general_decor, parent, false)
+        val view = adapter.layoutInflater.inflate(
+            when (viewType) {
+                0 -> R.layout.general_decor
+                else -> throw IllegalArgumentException()
+            },
+            parent,
+            false
+        )
         return ViewHolder(view)
     }
 
@@ -69,8 +77,10 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
             popupMenu.inflate(R.menu.sort_menu)
             val buttonMap = mapOf(
                 Pair(R.id.natural, Sorter.Type.NaturalOrder),
-                Pair(R.id.name, if (adapter.sortTypes.contains(Sorter.Type.NativeOrder))
-                    Sorter.Type.NativeOrder else Sorter.Type.ByTitleAscending),
+                Pair(
+                    R.id.name, if (adapter.sortTypes.contains(Sorter.Type.NativeOrder))
+                        Sorter.Type.NativeOrder else Sorter.Type.ByTitleAscending
+                ),
                 Pair(R.id.artist, Sorter.Type.ByArtistAscending),
                 Pair(R.id.album, Sorter.Type.ByAlbumTitleAscending),
                 Pair(R.id.size, Sorter.Type.BySizeDescending),

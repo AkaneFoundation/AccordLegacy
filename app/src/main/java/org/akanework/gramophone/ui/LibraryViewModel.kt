@@ -20,6 +20,8 @@ package org.akanework.gramophone.ui
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.media3.common.MediaItem
+import org.akanework.gramophone.logic.data.db.entity.Playlist
+import org.akanework.gramophone.logic.data.db.entity.PlaylistWithMediaItem
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
 
 /**
@@ -40,4 +42,7 @@ class LibraryViewModel : ViewModel() {
     val folderStructure: MutableLiveData<MediaStoreUtils.FileNode> = MutableLiveData()
     val shallowFolderStructure: MutableLiveData<MediaStoreUtils.FileNode> = MutableLiveData()
     val allFolderSet: MutableLiveData<Set<String>> = MutableLiveData()
+    val privatePlaylistList: MutableLiveData<List<PlaylistWithMediaItem>> = MutableLiveData()
+    val privateAlbumList: MutableList<MediaStoreUtils.Album> = mutableListOf()
+    var privatePlaylistId: Long = 0
 }

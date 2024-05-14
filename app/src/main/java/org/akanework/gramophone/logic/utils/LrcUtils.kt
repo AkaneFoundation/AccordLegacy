@@ -18,18 +18,25 @@ object LrcUtils {
     private const val TAG = "LrcUtils"
 
     @OptIn(UnstableApi::class)
-    fun extractAndParseLyrics(metadata: Metadata, trim: Boolean): MutableList<MediaStoreUtils.Lyric>? {
+    fun extractAndParseLyrics(
+        metadata: Metadata,
+        trim: Boolean
+    ): MutableList<MediaStoreUtils.Lyric>? {
         return extractLyrics(metadata)?.let {
             try {
                 parseLrcString(it, trim)
             } catch (e: Exception) {
                 Log.e(TAG, Log.getStackTraceString(e))
                 null
-            } }
+            }
+        }
     }
 
     @OptIn(UnstableApi::class)
-    fun loadAndParseLyricsFile(musicFile: File?, trim: Boolean): MutableList<MediaStoreUtils.Lyric>? {
+    fun loadAndParseLyricsFile(
+        musicFile: File?,
+        trim: Boolean
+    ): MutableList<MediaStoreUtils.Lyric>? {
         val lrcFile = musicFile?.let { File(it.parentFile, it.nameWithoutExtension + ".lrc") }
         return loadLrcFile(lrcFile)?.let {
             try {
@@ -37,7 +44,8 @@ object LrcUtils {
             } catch (e: Exception) {
                 Log.e(TAG, Log.getStackTraceString(e))
                 null
-            } }
+            }
+        }
     }
 
     @OptIn(UnstableApi::class)
@@ -96,7 +104,9 @@ object LrcUtils {
                 val lyricLine = line.substring(sequence.last().range.last + 1)
                     .let { if (trim) it.trim() else it }
                 sequence.forEach { match ->
-                    val ts = parseTime(match.groupValues.subList(1, match.groupValues.size).joinToString(""))
+                    val ts = parseTime(
+                        match.groupValues.subList(1, match.groupValues.size).joinToString("")
+                    )
                     if (!foundNonNull && ts > 0) {
                         foundNonNull = true
                         lyricsText = null
@@ -132,8 +142,10 @@ object LrcUtils {
         val millisecondsString = matchResult?.groupValues?.get(3)
         // if one specifies micro/pico/nano/whatever seconds for some insane reason,
         // scrap the extra information
-        val milliseconds = (millisecondsString?.substring(0,
-            millisecondsString.length.coerceAtMost(3)) ?.toLongOrNull() ?: 0) *
+        val milliseconds = (millisecondsString?.substring(
+            0,
+            millisecondsString.length.coerceAtMost(3)
+        )?.toLongOrNull() ?: 0) *
                 10f.pow(3 - (millisecondsString?.length ?: 0)).toLong()
 
         return minutes * 60000 + seconds * 1000 + milliseconds
@@ -216,7 +228,12 @@ private class UsltFrameDecoder {
                 2
         }
 
-        private fun decodeStringIfValid(data: ByteArray, from: Int, to: Int, charset: Charset): String {
+        private fun decodeStringIfValid(
+            data: ByteArray,
+            from: Int,
+            to: Int,
+            charset: Charset
+        ): String {
             return if (to <= from || to > data.size) {
                 ""
             } else String(data, from, to - from, charset)

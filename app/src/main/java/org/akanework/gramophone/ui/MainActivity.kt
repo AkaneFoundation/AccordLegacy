@@ -42,7 +42,7 @@ import androidx.fragment.app.FragmentManager.FragmentLifecycleCallbacks
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.DefaultMediaNotificationProvider
 import coil3.imageLoader
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -50,7 +50,6 @@ import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.enableEdgeToEdgeProperly
 import org.akanework.gramophone.logic.postAtFrontOfQueueAsync
 import org.akanework.gramophone.logic.utils.MediaStoreUtils.updateLibraryWithInCoroutine
-import org.akanework.gramophone.ui.components.HalcyonDialogFragment
 import org.akanework.gramophone.ui.components.PlayerBottomSheet
 import org.akanework.gramophone.ui.fragments.BaseFragment
 
@@ -69,7 +68,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Import our viewModels.
-    private val libraryViewModel: LibraryViewModel by viewModels()
+    val libraryViewModel: LibraryViewModel by viewModels()
     val startingActivity =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
 
@@ -80,7 +79,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var playerBottomSheet: PlayerBottomSheet
         private set
     private lateinit var intentSender: ActivityResultLauncher<IntentSenderRequest>
-        private set
+    lateinit var bottomNavigationView: BottomNavigationView
     private var intentSenderAction: (() -> Boolean)? = null
 
     private lateinit var container: FragmentContainerView
@@ -108,17 +107,21 @@ class MainActivity : AppCompatActivity() {
         installSplashScreen().setKeepOnScreenCondition { !ready }
         enableEdgeToEdgeProperly()
         autoPlay = intent?.extras?.getBoolean(PLAYBACK_AUTO_START_FOR_FGS, false) == true
-        intentSender = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
-            if (it.resultCode == RESULT_OK) {
-                if (intentSenderAction != null) {
-                    intentSenderAction!!()
-                } else {
-                    Toast.makeText(this, getString(
-                        R.string.delete_in_progress), Toast.LENGTH_LONG).show()
+        intentSender =
+            registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
+                if (it.resultCode == RESULT_OK) {
+                    if (intentSenderAction != null) {
+                        intentSenderAction!!()
+                    } else {
+                        Toast.makeText(
+                            this, getString(
+                                R.string.delete_in_progress
+                            ), Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
+                intentSenderAction = null
             }
-            intentSenderAction = null
-        }
 
         supportFragmentManager.registerFragmentLifecycleCallbacks(object :
             FragmentLifecycleCallbacks() {
@@ -135,18 +138,24 @@ class MainActivity : AppCompatActivity() {
 
         // Set content Views.
         setContentView(R.layout.activity_main)
-        window.decorView.setBackgroundColor(ContextCompat.getColor(this, R.color.contrast_colorBackground))
+        window.decorView.setBackgroundColor(
+            ContextCompat.getColor(
+                this,
+                R.color.contrast_colorBackground
+            )
+        )
         playerBottomSheet = findViewById(R.id.player_layout)
+        bottomNavigationView = findViewById(R.id.bottom_nav)
         container = findViewById(R.id.container)
+
         // Modifies FragmentContainerView's insets to account for bottom sheet size.
         ViewCompat.setOnApplyWindowInsetsListener(container) { _, insets ->
             playerBottomSheet.generateBottomSheetInsets(insets)
         }
 
-        val fab = findViewById<FloatingActionButton>(R.id.halcyon)
-        fab.setOnClickListener {
-            val fragment = HalcyonDialogFragment()
-            fragment.show(supportFragmentManager, null)
+        if (savedInstanceState != null) {
+            val translationY = savedInstanceState.getFloat("bottomNavigationTranslationY")
+            bottomNavigationView.translationY = translationY
         }
 
         // Check all permissions.
@@ -183,7 +192,9 @@ class MainActivity : AppCompatActivity() {
         } else {
             // If all permissions are granted, we can update library now.
             if (libraryViewModel.mediaItemList.value == null) {
-                updateLibrary()
+                updateLibrary {
+                    playerBottomSheet.fullPlayer.updateFavStatus()
+                }
             } else reportFullyDrawn() // <-- when recreating activity due to rotation
         }
     }
@@ -198,6 +209,10 @@ class MainActivity : AppCompatActivity() {
                 super.reportFullyDrawn()
             }
         }
+    }
+
+    fun retractNavigationViewWithProgress(progressHeight: Float) {
+        bottomNavigationView.translationY = progressHeight
     }
 
     /**
@@ -215,12 +230,19 @@ class MainActivity : AppCompatActivity() {
             if (grantResults.isNotEmpty() &&
                 grantResults[0] == PackageManager.PERMISSION_GRANTED
             ) {
-                updateLibrary()
+                updateLibrary {
+                    playerBottomSheet.fullPlayer.updateFavStatus()
+                }
             } else {
                 reportFullyDrawn()
                 // TODO: Show a prompt here
             }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putFloat("bottomNavigationTranslationY", bottomNavigationView.translationY)
     }
 
     /**
@@ -244,7 +266,8 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         // https://github.com/androidx/media/issues/805
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.UPSIDE_DOWN_CAKE
-            && (getPlayer()?.playWhenReady != true || getPlayer()?.mediaItemCount == 0)) {
+            && (getPlayer()?.playWhenReady != true || getPlayer()?.mediaItemCount == 0)
+        ) {
             val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             nm.cancel(DefaultMediaNotificationProvider.DEFAULT_NOTIFICATION_ID)
         }

@@ -79,7 +79,7 @@
     <string name="settings_default_progress_bar">启用默认进度条</string>
     <string name="home_menu_about">关于</string>
     <string name="settings_default_progress_bar_summary">使用 Material Design 样式的进度条</string>
-    <string name="playlist_favourite">收藏</string>
+    <string name="playlist_favourite">喜爱的歌曲</string>
     <string name="now_playing">正在播放</string>
     <string name="settings_content_based_color">启用基于内容生成的颜色</string>
     <string name="settings_content_based_color_summary">启用基于专辑封面生成的颜色方案</string>
@@ -168,4 +168,15 @@
     <string name="rearrange">重新排序</string>
     <string name="rearrange_desc">您可以随时回到列表中调整歌曲的顺序，个性化您的音乐体验。</string>
     <string name="lossless">无损</string>
+    <string name="home">主页</string>
+    <string name="browse">浏览</string>
+    <string name="library">资料库</string>
+    <string name="song_artist_album">曲名、艺人、专辑...</string>
+    <string name="new_delivery">新曲快递</string>
+    <string name="meet_again">阔别重逢</string>
+    <string name="daily_shuffle">每日电台</string>
+    <string name="genre_shuffle">主题狂欢</string>
+    <string name="recommendations">专属推荐</string>
+    <string name="new_songs">每日新曲</string>
+    <string name="recently_played">最近播放</string>
 </resources>

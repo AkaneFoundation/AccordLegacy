@@ -51,7 +51,12 @@ abstract class BaseFragment(val wantsPlayer: Boolean? = null) : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // Overlap colors.
-        view.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.contrast_colorBackground))
+        view.setBackgroundColor(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.contrast_colorBackground
+            )
+        )
     }
 
     override fun onHiddenChanged(hidden: Boolean) {

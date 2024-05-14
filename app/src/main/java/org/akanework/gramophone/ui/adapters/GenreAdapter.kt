@@ -21,6 +21,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import org.akanework.gramophone.R
+import org.akanework.gramophone.logic.findBaseWrapperFragment
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
 import org.akanework.gramophone.ui.fragments.GeneralSubFragment
 
@@ -49,7 +50,7 @@ class GenreAdapter(
     }
 
     override fun onClick(item: MediaStoreUtils.Genre) {
-        mainActivity.startFragment(GeneralSubFragment()) {
+        fragment!!.findBaseWrapperFragment()!!.replaceFragment(GeneralSubFragment()) {
             putInt("Position", toRawPos(item))
             putInt("Item", R.id.genres)
         }

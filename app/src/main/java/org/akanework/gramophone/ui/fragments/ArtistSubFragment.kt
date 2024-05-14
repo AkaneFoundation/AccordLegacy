@@ -22,11 +22,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
-import androidx.media3.common.util.UnstableApi
 import androidx.fluidrecyclerview.widget.ConcatAdapter
 import androidx.fluidrecyclerview.widget.GridLayoutManager
 import androidx.fluidrecyclerview.widget.GridLayoutManager.SpanSizeLookup
+import androidx.fragment.app.activityViewModels
+import androidx.media3.common.util.UnstableApi
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import me.zhanghai.android.fastscroll.PopupTextProvider
@@ -80,7 +80,8 @@ class ArtistSubFragment : BaseFragment(true), PopupTextProvider {
                 it.albumArtistItemList else it.artistItemList
         }.value!![position]
         spans = if (requireContext().resources.configuration.orientation
-            == Configuration.ORIENTATION_PORTRAIT) 2 else 4
+            == Configuration.ORIENTATION_PORTRAIT
+        ) 2 else 4
         albumAdapter = AlbumAdapter(
             this, item.albumList.toMutableList(), true,
             fallbackSpans = spans
@@ -101,7 +102,8 @@ class ArtistSubFragment : BaseFragment(true), PopupTextProvider {
             }
         }
         val ih = DefaultItemHeightHelper.concatItemHeightHelper(albumAdapter.itemHeightHelper,
-            { albumAdapter.concatAdapter.itemCount }, songAdapter.itemHeightHelper)
+            { albumAdapter.concatAdapter.itemCount }, songAdapter.itemHeightHelper
+        )
         recyclerView.enableEdgeToEdgePaddingListener()
         recyclerView.adapter = ConcatAdapter(albumAdapter.concatAdapter, songAdapter.concatAdapter)
         recyclerView.addItemDecoration(gridPaddingDecoration)
@@ -109,7 +111,7 @@ class ArtistSubFragment : BaseFragment(true), PopupTextProvider {
         recyclerView.fastScroll(this, ih)
 
         topAppBar.setNavigationOnClickListener {
-            requireActivity().supportFragmentManager.popBackStack()
+            (requireParentFragment() as BaseWrapperFragment).childFragmentManager.popBackStack()
         }
 
         topAppBar.title = item.title ?: requireContext().getString(R.string.unknown_artist)

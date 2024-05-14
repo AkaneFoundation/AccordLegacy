@@ -14,41 +14,40 @@ import org.akanework.gramophone.BuildConfig
  * to restore STATE_ENDED as well and fake it for media3 until it indeed wraps around playlist.
  */
 @UnstableApi
-class EndedWorkaroundPlayer(player: ExoPlayer)
-	: ForwardingPlayer(player), Player.Listener {
+class EndedWorkaroundPlayer(player: ExoPlayer) : ForwardingPlayer(player), Player.Listener {
 
-	companion object {
-		private const val TAG = "EndedWorkaroundPlayer"
-	}
+    companion object {
+        private const val TAG = "EndedWorkaroundPlayer"
+    }
 
-	val exoPlayer
-		get() = wrappedPlayer as ExoPlayer
-	var isEnded = false
-		set(value) {
-			if (BuildConfig.DEBUG) {
-				Log.d(TAG, "isEnded set to $value (was $field)")
-			}
-			field = value
-			if (field) {
-				wrappedPlayer.addListener(this)
-			} else {
-				wrappedPlayer.removeListener(this)
-			}
-		}
+    val exoPlayer
+        get() = wrappedPlayer as ExoPlayer
+    var isEnded = false
+        set(value) {
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "isEnded set to $value (was $field)")
+            }
+            field = value
+            if (field) {
+                wrappedPlayer.addListener(this)
+            } else {
+                wrappedPlayer.removeListener(this)
+            }
+        }
 
-	override fun onPositionDiscontinuity(
-		oldPosition: Player.PositionInfo,
-		newPosition: Player.PositionInfo,
-		reason: Int
-	) {
-		if (reason == DISCONTINUITY_REASON_SEEK) {
-			isEnded = false
-		}
-		super.onPositionDiscontinuity(oldPosition, newPosition, reason)
-	}
+    override fun onPositionDiscontinuity(
+        oldPosition: Player.PositionInfo,
+        newPosition: Player.PositionInfo,
+        reason: Int
+    ) {
+        if (reason == DISCONTINUITY_REASON_SEEK) {
+            isEnded = false
+        }
+        super.onPositionDiscontinuity(oldPosition, newPosition, reason)
+    }
 
-	override fun getPlaybackState(): Int {
-		if (isEnded) return STATE_ENDED
-		return super.getPlaybackState()
-	}
+    override fun getPlaybackState(): Int {
+        if (isEnded) return STATE_ENDED
+        return super.getPlaybackState()
+    }
 }

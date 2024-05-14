@@ -43,7 +43,12 @@ abstract class BasePreferenceFragment : PreferenceFragmentCompat(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        view.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.contrast_colorBackground))
+        view.setBackgroundColor(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.contrast_colorBackground
+            )
+        )
         view.findViewById<RecyclerView>(androidx.preference.R.id.recycler_view).apply {
             setPadding(paddingLeft, paddingTop + 12.dpToPx(context), paddingRight, paddingBottom)
             enableEdgeToEdgePaddingListener()

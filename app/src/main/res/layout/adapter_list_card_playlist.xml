@@ -8,8 +8,8 @@
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
     android:paddingStart="32.5dp"
-    android:paddingEnd="32.5dp"
     android:paddingTop="4dp"
+    android:paddingEnd="32.5dp"
     android:paddingBottom="4dp"
     tools:background="@color/contrast_colorOnSurface">
 
@@ -26,17 +26,17 @@
             android:background="@android:color/transparent"
             app:cardBackgroundColor="@android:color/transparent"
             app:cardCornerRadius="4dp"
-            app:strokeWidth="0.7dp"
+            app:cardPreventCornerOverlap="false"
             app:strokeColor="#0DFFFFFF"
-            app:cardPreventCornerOverlap="false">
+            app:strokeWidth="0.7dp">
 
             <ImageView
                 android:id="@+id/cover"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
-                android:scaleType="centerCrop"
                 android:importantForAccessibility="no"
+                android:scaleType="centerCrop"
                 android:src="@drawable/ic_default_cover_fixed" />
 
         </com.google.android.material.card.MaterialCardView>
@@ -54,11 +54,11 @@
                 android:id="@+id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:includeFontPadding="false"
                 android:singleLine="true"
                 android:textColor="#EBFFFFFF"
                 android:textFontWeight="400"
-                android:fontFamily="sans-serif"
-                android:includeFontPadding="false"
                 android:textSize="17sp"
                 tools:targetApi="p"
                 tools:text="Example Title" />
@@ -67,11 +67,11 @@
                 android:id="@+id/artist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:includeFontPadding="false"
                 android:singleLine="true"
                 android:textColor="#66FFFFFF"
                 android:textFontWeight="400"
-                android:fontFamily="sans-serif"
-                android:includeFontPadding="false"
                 android:textSize="14sp"
                 tools:targetApi="p"
                 tools:text="Example Artist" />

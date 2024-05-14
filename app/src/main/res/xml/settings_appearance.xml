@@ -18,8 +18,8 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory
-        android:title="@string/settings_preference_category_application"
-        android:layout="@layout/preference_category_md">
+        android:layout="@layout/preference_category_md"
+        android:title="@string/settings_preference_category_application">
         <DropDownPreference
             android:defaultValue="0"
             android:entries="@array/theme_switch"

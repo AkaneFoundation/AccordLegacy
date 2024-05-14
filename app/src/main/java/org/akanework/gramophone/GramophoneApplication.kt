@@ -82,12 +82,16 @@ class GramophoneApplication : Application(), SingletonImageLoader.Factory {
         if (BuildConfig.DEBUG) {
             // Use StrictMode to find anti-patterns issues (as of writing, no known violations)
             // (of course not counting SharedPreferences which just is like that by nature)
-            StrictMode.setThreadPolicy(ThreadPolicy.Builder()
-                .detectAll().permitDiskReads() // permit disk reads due to media3 setMetadata()
-                .penaltyLog().penaltyDialog().build())
-            StrictMode.setVmPolicy(VmPolicy.Builder()
-                .detectAll()
-                .penaltyLog().penaltyDeath().build())
+            StrictMode.setThreadPolicy(
+                ThreadPolicy.Builder()
+                    .detectAll().permitDiskReads() // permit disk reads due to media3 setMetadata()
+                    .penaltyLog().penaltyDialog().build()
+            )
+            StrictMode.setVmPolicy(
+                VmPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog().penaltyDeath().build()
+            )
         }
 
         // https://github.com/androidx/media/issues/805
@@ -130,7 +134,8 @@ class GramophoneApplication : Application(), SingletonImageLoader.Factory {
                                 ThumbnailUtils.createAudioThumbnail(file, options.size.let {
                                     Size(it.width.pxOrElse { size?.width ?: 10000 },
                                         it.height.pxOrElse { size?.height ?: 10000 })
-                                }, null).asCoilImage(), true, DataSource.DISK)
+                                }, null).asCoilImage(), true, DataSource.DISK
+                            )
                         }
                     })
                 }
@@ -153,7 +158,8 @@ class GramophoneApplication : Application(), SingletonImageLoader.Factory {
                             // Let's keep the log readable and ignore normal events' stack traces.
                             if (throwable != null && throwable !is NullRequestDataException
                                 && (throwable !is FileNotFoundException
-                                        || throwable.message != "No album art found")) {
+                                        || throwable.message != "No album art found")
+                            ) {
                                 Log.println(priority, tag, Log.getStackTraceString(throwable))
                             }
                         }
