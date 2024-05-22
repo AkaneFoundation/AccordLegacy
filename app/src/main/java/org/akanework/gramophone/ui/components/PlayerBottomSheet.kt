@@ -57,16 +57,19 @@ import coil3.size.Scale
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import org.akanework.gramophone.BuildConfig
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.GramophonePlaybackService
 import org.akanework.gramophone.logic.clone
+import org.akanework.gramophone.logic.dpToPx
 import org.akanework.gramophone.logic.getBooleanStrict
 import org.akanework.gramophone.logic.playOrPause
 import org.akanework.gramophone.logic.ui.MyBottomSheetBehavior
 import org.akanework.gramophone.logic.utils.EnvUtils
+import org.akanework.gramophone.logic.visibilityChanged
 import org.akanework.gramophone.ui.MainActivity
 
 
@@ -92,7 +95,8 @@ class PlayerBottomSheet private constructor(
     private val bottomSheetPreviewTitle: TextView
     private val bottomSheetPreviewControllerButton: MaterialButton
     private val bottomSheetPreviewNextButton: MaterialButton
-    private val bottomSheetBlendBackgroundView: BlendBackgroundView
+    private val bottomSheetPreviewCoverFrame: MaterialCardView
+    private val bottomSheetBlendView: BlendView
     private var shouldRetractBottomSheet = false
 
     private val activity
@@ -143,7 +147,18 @@ class PlayerBottomSheet private constructor(
         bottomSheetPreviewCover = findViewById(R.id.preview_album_cover)
         bottomSheetPreviewControllerButton = findViewById(R.id.preview_control)
         bottomSheetPreviewNextButton = findViewById(R.id.preview_next)
-        bottomSheetBlendBackgroundView = findViewById(R.id.blend)
+        bottomSheetBlendView = findViewById(R.id.blend)
+        bottomSheetPreviewCoverFrame = findViewById(R.id.preview_album_frame)
+        bottomSheetPreviewCoverFrame.visibilityChanged { view ->
+            when (view.visibility) {
+                View.VISIBLE -> {
+                    animateAlbumCover(1f)
+                }
+                else -> {
+                    animateAlbumCover(0f)
+                }
+            }
+        }
 
         setOnClickListener {
             if (standardBottomSheetBehavior!!.state == BottomSheetBehavior.STATE_COLLAPSED) {
@@ -171,10 +186,11 @@ class PlayerBottomSheet private constructor(
                 BottomSheetBehavior.STATE_COLLAPSED -> {
                     fullPlayer.visibility = View.GONE
                     previewPlayer.visibility = View.VISIBLE
+                    bottomSheetPreviewCoverFrame.visibility = View.VISIBLE
                     previewPlayer.alpha = 1f
+                    bottomSheetBlendView.alpha = 0f
                     fullPlayer.alpha = 0f
-                    bottomSheetBlendBackgroundView.alpha = 0f
-                    bottomSheetBlendBackgroundView.stopRotationAnimation()
+                    bottomSheetBlendView.stopRotationAnimation()
                     bottomSheetBackCallback!!.isEnabled = false
                     bottomSheetBackCallback!!.remove()
                     if (!isDarkMode && !insetController.isAppearanceLightStatusBars) {
@@ -187,9 +203,15 @@ class PlayerBottomSheet private constructor(
                 BottomSheetBehavior.STATE_DRAGGING, BottomSheetBehavior.STATE_SETTLING -> {
                     fullPlayer.visibility = View.VISIBLE
                     previewPlayer.visibility = View.VISIBLE
+                    bottomSheetPreviewCoverFrame.visibility = View.VISIBLE
                     if (instance?.isPlaying == true) {
-                        bottomSheetBlendBackgroundView.startRotationAnimation()
+                        bottomSheetBlendView.startRotationAnimation()
                     }
+                    if (!isDarkMode && !insetController.isAppearanceLightStatusBars) {
+                        WindowCompat.getInsetsController(activity.window, this@PlayerBottomSheet)
+                            .isAppearanceLightStatusBars = true
+                    }
+                    fullPlayer.changeBottomCoverVisibility(View.INVISIBLE)
                 }
 
                 BottomSheetBehavior.STATE_EXPANDED, BottomSheetBehavior.STATE_HALF_EXPANDED -> {
@@ -201,9 +223,10 @@ class PlayerBottomSheet private constructor(
                     }
                     previewPlayer.alpha = 0f
                     fullPlayer.alpha = 1f
-                    bottomSheetBlendBackgroundView.alpha = 1f
+                    bottomSheetPreviewCoverFrame.visibility = View.GONE
+                    fullPlayer.changeBottomCoverVisibility(View.VISIBLE)
                     if (instance?.isPlaying == true) {
-                        bottomSheetBlendBackgroundView.startRotationAnimation()
+                        bottomSheetBlendView.startRotationAnimation()
                     }
                     bottomSheetBackCallback!!.isEnabled = true
                     activity.onBackPressedDispatcher.addCallback(
@@ -218,16 +241,17 @@ class PlayerBottomSheet private constructor(
                 BottomSheetBehavior.STATE_HIDDEN -> {
                     previewPlayer.visibility = View.GONE
                     fullPlayer.visibility = View.GONE
-                    previewPlayer.alpha = 0f
                     fullPlayer.alpha = 0f
-                    bottomSheetBlendBackgroundView.alpha = 0f
-                    bottomSheetBlendBackgroundView.stopRotationAnimation()
+                    previewPlayer.alpha = 0f
+                    bottomSheetBlendView.alpha = 0f
+                    bottomSheetBlendView.stopRotationAnimation()
                     bottomSheetBackCallback!!.isEnabled = false
                     bottomSheetBackCallback!!.remove()
                     if (!isDarkMode && !insetController.isAppearanceLightStatusBars) {
                         WindowCompat.getInsetsController(activity.window, this@PlayerBottomSheet)
                             .isAppearanceLightStatusBars = true
                     }
+                    activity.scaleContainer(0f)
                 }
             }
             dispatchBottomSheetInsets()
@@ -240,26 +264,65 @@ class PlayerBottomSheet private constructor(
             if (slideOffset < 0) {
                 // hidden state
                 previewPlayer.alpha = 1 - (-1 * slideOffset)
-                fullPlayer.alpha = 0f
-                bottomSheetBlendBackgroundView.alpha = 0f
+                bottomSheetBlendView.alpha = 0f
                 if (shouldRetractBottomSheet) {
                     activity.retractNavigationViewWithProgress(
                         previewPlayer.measuredHeight - fullPlayer.measuredHeight - getDistanceToBottom(
                             bottomSheet
                         ).toFloat()
                     )
+                } else {
+                    activity.retractNavigationViewWithProgress(
+                        0f
+                    )
                 }
                 return
             }
-            previewPlayer.alpha = 1 - (slideOffset)
-            fullPlayer.alpha = slideOffset
-            bottomSheetBlendBackgroundView.alpha = slideOffset
             activity.retractNavigationViewWithProgress(
                 fullPlayer.measuredHeight - previewPlayer.measuredHeight + getDistanceToBottom(
                     bottomSheet
                 ).toFloat()
             )
+            activity.scaleContainer(slideOffset)
+            animateAlbumCover(slideOffset)
+            if (slideOffset <= 0.1) {
+                bottomSheetBlendView.alpha = slideOffset * 10
+                fullPlayer.alpha = slideOffset * 10
+                previewPlayer.alpha = 1 - (slideOffset * 10)
+            } else {
+                bottomSheetBlendView.alpha = 1f
+                fullPlayer.alpha = 1f
+                previewPlayer.alpha = 0f
+            }
         }
+    }
+
+    private fun animateAlbumCover(progress: Float) {
+        val targetCoordinateX =
+            if (fullPlayer.isPlaylistEnabled)
+                fullPlayer.playlistCoverCoordinateX
+            else
+                fullPlayer.fullCoverFrameCoordinateX
+        val targetCoordinateY =
+            if (fullPlayer.isPlaylistEnabled)
+                fullPlayer.playlistCoverCoordinateY
+            else
+                fullPlayer.fullCoverFrameCoordinateY
+        val targetScale =
+            if (fullPlayer.isPlaylistEnabled)
+                fullPlayer.playlistCoverScale
+            else
+                fullPlayer.fullCoverFrameScale
+        bottomSheetPreviewCoverFrame.translationX = progress * (targetCoordinateX - bottomSheetPreviewCoverFrame.left)
+        bottomSheetPreviewCoverFrame.translationY = progress * (targetCoordinateY - bottomSheetPreviewCoverFrame.top)
+        bottomSheetPreviewCoverFrame.scaleX = 1f + progress * (targetScale)
+        bottomSheetPreviewCoverFrame.scaleY = 1f + progress * (targetScale)
+        if (!fullPlayer.isPlaylistEnabled) {
+            bottomSheetPreviewCoverFrame.radius = (4f - progress * 3f).dpToPx(context)
+        } else {
+            bottomSheetPreviewCoverFrame.radius = 4f.dpToPx(context)
+        }
+        bottomSheetPreviewCoverFrame.strokeWidth = ((1f - progress) * 0.75f).dpToPx(context).toInt()
     }
 
     private fun getDistanceToBottom(view: View): Int {
@@ -280,7 +343,7 @@ class PlayerBottomSheet private constructor(
             fullPlayer.minimize = {
                 standardBottomSheetBehavior!!.state = BottomSheetBehavior.STATE_COLLAPSED
             }
-            fullPlayer.bottomSheetFullBlendBackgroundView = bottomSheetBlendBackgroundView
+            fullPlayer.bottomSheetFullBlendView = bottomSheetBlendView
             bottomSheetBackCallback = object : OnBackPressedCallback(enabled = false) {
                 override fun handleOnBackStarted(backEvent: BackEventCompat) {
                     standardBottomSheetBehavior!!.startBackProgress(backEvent)
@@ -316,7 +379,7 @@ class PlayerBottomSheet private constructor(
         lastActuallyVisible = null
         lastMeasuredHeight = null
         fullPlayer.minimize = null
-        fullPlayer.bottomSheetFullBlendBackgroundView = null
+        fullPlayer.bottomSheetFullBlendView = null
         lifecycleOwner.lifecycle.removeObserver(this)
         standardBottomSheetBehavior!!.removeBottomSheetCallback(bottomSheetCallback)
         bottomSheetBackCallback!!.remove()
@@ -428,7 +491,7 @@ class PlayerBottomSheet private constructor(
                 error(R.drawable.ic_default_cover)
             }.build())
             mediaItem?.mediaMetadata?.artworkUri?.let {
-                bottomSheetBlendBackgroundView.setImageUri(
+                bottomSheetBlendView.setImageUri(
                     it
                 )
             }
@@ -463,12 +526,12 @@ class PlayerBottomSheet private constructor(
             bottomSheetPreviewControllerButton.icon =
                 AppCompatResources.getDrawable(context, R.drawable.ic_nowplaying_mp_pause)
             bottomSheetPreviewControllerButton.setTag(R.id.play_next, 1)
-            bottomSheetBlendBackgroundView.startRotationAnimation()
+            bottomSheetBlendView.startRotationAnimation()
         } else if (instance?.isPlaying == false && myTag != 2) {
             bottomSheetPreviewControllerButton.icon =
                 AppCompatResources.getDrawable(context, R.drawable.ic_nowplaying_mp_play)
             bottomSheetPreviewControllerButton.setTag(R.id.play_next, 2)
-            bottomSheetBlendBackgroundView.stopRotationAnimation()
+            bottomSheetBlendView.stopRotationAnimation()
         }
     }
 

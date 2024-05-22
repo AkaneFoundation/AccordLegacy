@@ -1710,6 +1710,16 @@ abstract class BaseOverlaySlider<
         invalidate();
     }
 
+    public void setTrackColorInactiveOverlay(@ColorInt int color) {
+        inactiveTrackPaintUnder.setColor(color);
+        invalidate();
+    }
+
+    public void setTrackColorActiveOverlay(@ColorInt int color) {
+        activeTrackPaintUnder.setColor(color);
+        invalidate();
+    }
+
     @Override
     protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
         super.onVisibilityChanged(changedView, visibility);

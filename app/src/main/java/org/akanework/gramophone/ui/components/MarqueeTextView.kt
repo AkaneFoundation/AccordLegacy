@@ -32,46 +32,30 @@ import androidx.appcompat.widget.AppCompatTextView
  * will reload and cause a fake "jitter". Use this wisely, don't
  * make it everywhere.
  */
-class MarqueeTextView
-@JvmOverloads
-constructor(
+class MarqueeTextView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0,
-) : AppCompatTextView(
-    context,
-    attrs,
-    defStyleAttr,
-) {
+    defStyleAttr: Int = 0
+) : AppCompatTextView(context, attrs, defStyleAttr) {
+
     init {
         isSingleLine = true
-        ellipsize =
-            android
-                .text
-                .TextUtils
-                .TruncateAt
-                .MARQUEE
+        ellipsize = android.text.TextUtils.TruncateAt.MARQUEE
         marqueeRepeatLimit = -1
         isFocusable = true
         isFocusableInTouchMode = true
         isHorizontalFadingEdgeEnabled = true
+        // Enable hardware acceleration
+        setLayerType(LAYER_TYPE_HARDWARE, null)
     }
 
-    override fun isFocused(): Boolean = true
+    override fun isFocused() = true
 
-    override fun onFocusChanged(
-        focused: Boolean,
-        direction: Int,
-        previouslyFocusedRect: Rect?,
-    ) {
-        if (focused) {
-            super.onFocusChanged(true, direction, previouslyFocusedRect)
-        }
+    override fun onFocusChanged(focused: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
+        if (focused) super.onFocusChanged(true, direction, previouslyFocusedRect)
     }
 
     override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
-        if (hasWindowFocus) {
-            super.onWindowFocusChanged(true)
-        }
+        if (hasWindowFocus) super.onWindowFocusChanged(true)
     }
 }

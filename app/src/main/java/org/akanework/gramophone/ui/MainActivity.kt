@@ -277,6 +277,11 @@ class MainActivity : AppCompatActivity() {
         imageLoader.memoryCache?.clear()
     }
 
+    fun scaleContainer(factor: Float) {
+        container.scaleX = 1f - factor * 0.10f
+        container.scaleY = 1f - factor * 0.10f
+    }
+
     /**
      * getPlayer:
      *   Returns a media controller.

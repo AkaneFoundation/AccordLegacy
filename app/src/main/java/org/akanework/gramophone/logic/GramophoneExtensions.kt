@@ -169,6 +169,18 @@ fun View.fadInAnimation(duration: Long = 300, completion: (() -> Unit)? = null) 
         }
 }
 
+fun View.visibilityChanged(action: (View) -> Unit) {
+    this.viewTreeObserver.addOnGlobalLayoutListener {
+        val newVis: Int = this.visibility
+        if (this.tag as Int? != newVis) {
+            this.tag = this.visibility
+
+            // visibility has changed
+            action(this)
+        }
+    }
+}
+
 @Suppress("NOTHING_TO_INLINE")
 inline fun Int.dpToPx(context: Context): Int =
     (this.toFloat() * context.resources.displayMetrics.density).toInt()

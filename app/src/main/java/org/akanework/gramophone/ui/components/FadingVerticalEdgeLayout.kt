@@ -109,6 +109,12 @@ class FadingVerticalEdgeLayout : FrameLayout {
 
     private var previousPaddingBottom = 0
     private var previousPaddingTop = 0
+    private var shouldDrawOverlayLayer: Boolean = false
+
+    fun changeOverlayVisibility(visible: Boolean) {
+        shouldDrawOverlayLayer = visible
+        invalidate()
+    }
 
     override fun dispatchDraw(canvas: Canvas) {
         if (previousPaddingBottom != paddingBottom || previousPaddingTop != paddingTop) {
@@ -116,10 +122,12 @@ class FadingVerticalEdgeLayout : FrameLayout {
             previousPaddingBottom = paddingBottom
             previousPaddingTop = paddingTop
         }
-        val count1 = canvas.saveLayer(null, overlayPaint)
-        super.dispatchDraw(canvas)
-        drawFade(canvas)
-        canvas.restoreToCount(count1)
+        if (shouldDrawOverlayLayer) {
+            val count1 = canvas.saveLayer(null, overlayPaint)
+            super.dispatchDraw(canvas)
+            drawFade(canvas)
+            canvas.restoreToCount(count1)
+        }
         val count = canvas.saveLayer(null, null)
         super.dispatchDraw(canvas)
         drawFade(canvas)
