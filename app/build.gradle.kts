@@ -47,11 +47,11 @@ android {
         minSdk = 31
         targetSdk = 34
         versionCode = 18
-        versionName = "Beta 1"
+        versionName = "beta1"
         buildConfigField(
             "String",
             "MY_VERSION_NAME",
-            "\"$versionName\""
+            "Beta 1"
         )
         buildConfigField(
             "String",
