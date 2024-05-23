@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.widget.NestedScrollView
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import org.akanework.gramophone.BuildConfig
@@ -23,10 +24,12 @@ class AboutFragment : BaseFragment(null) {
         val tagTextView = rootView.findViewById<TextView>(R.id.version_tag)
         val versionTag = BuildConfig.MY_VERSION_NAME + " · " + BuildConfig.RELEASE_TYPE
         val materialToolbar = rootView.findViewById<MaterialToolbar>(R.id.topAppBar)
+        val nestedScrollView = rootView.findViewById<NestedScrollView>(R.id.nested)
 
         tagTextView.text = versionTag
 
         appBarLayout.enableEdgeToEdgePaddingListener()
+        nestedScrollView.enableEdgeToEdgePaddingListener()
 
         materialToolbar.setNavigationOnClickListener {
             Log.d("TAG", "ok${requireParentFragment().childFragmentManager.fragments.size}")

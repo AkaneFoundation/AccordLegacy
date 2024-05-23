@@ -41,6 +41,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.doOnNextLayout
+import androidx.core.view.setPadding
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.media3.common.MediaItem
@@ -313,6 +314,7 @@ class PlayerBottomSheet private constructor(
                 fullPlayer.playlistCoverScale
             else
                 fullPlayer.fullCoverFrameScale
+        if (targetCoordinateX < bottomSheetPreviewCoverFrame.left) return
         bottomSheetPreviewCoverFrame.translationX = progress * (targetCoordinateX - bottomSheetPreviewCoverFrame.left)
         bottomSheetPreviewCoverFrame.translationY = progress * (targetCoordinateY - bottomSheetPreviewCoverFrame.top)
         bottomSheetPreviewCoverFrame.scaleX = 1f + progress * (targetScale)

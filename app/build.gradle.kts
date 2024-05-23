@@ -51,7 +51,7 @@ android {
         buildConfigField(
             "String",
             "MY_VERSION_NAME",
-            "Beta 1"
+            "\"Beta 1\""
         )
         buildConfigField(
             "String",
