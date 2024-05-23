@@ -21,6 +21,7 @@ import android.os.Bundle
 import androidx.preference.Preference
 import org.akanework.gramophone.R
 import org.akanework.gramophone.ui.MainActivity
+import org.akanework.gramophone.ui.fragments.AboutFragment
 import org.akanework.gramophone.ui.fragments.BasePreferenceFragment
 import org.akanework.gramophone.ui.fragments.BaseSettingFragment
 
@@ -60,7 +61,7 @@ class MainSettingsTopFragment : BasePreferenceFragment() {
                     .beginTransaction()
                     .addToBackStack(System.currentTimeMillis().toString())
                     .hide(supportFragmentManager.fragments.let { it[it.size - 1] })
-                    .add(R.id.container, AboutSettingsFragment())
+                    .add(R.id.container, AboutFragment())
                     .commit()
             }
 

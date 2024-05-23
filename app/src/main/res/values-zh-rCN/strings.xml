@@ -179,4 +179,8 @@
     <string name="recommendations">专属推荐</string>
     <string name="new_songs">每日新曲</string>
     <string name="recently_played">最近播放</string>
+    <string name="main_developers">主要开发者</string>
+    <string name="side_developers">其他开发者</string>
+    <string name="acknowledgements">致谢名单</string>
+    <string name="app_libraries">代码库</string>
 </resources>

@@ -197,4 +197,39 @@
     <string name="recommendations">Recommendations</string>
     <string name="new_songs">New songs</string>
     <string name="recently_played">Recently played</string>
+    <string name="main_developers">Main developers</string>
+    <string name="akane" translatable="false">あかね</string>
+    <string name="akanetan" translatable="false">\@AkaneTan</string>
+    <string name="akane_job" translatable="false"><![CDATA[Coder &\nDesigner]]></string>
+    <string name="duo3" translatable="false">123哆3</string>
+    <string name="duo3_tag" translatable="false">\@123Duo3\n</string>
+    <string name="duo3_job" translatable="false">Lead\nDesigner</string>
+    <string name="nick" translatable="false">nift4</string>
+    <string name="nick_tag" translatable="false">\@nift4</string>
+    <string name="nick_job" translatable="false">Lead\nDeveloper</string>
+    <string name="side_developers">Side developers</string>
+    <string name="lazar" translatable="false">Lazar</string>
+    <string name="lazar_tag" translatable="false">\@lazrdev</string>
+    <string name="awainatsu_tag" translatable="false">\@awainatsu</string>
+    <string name="awainatsu" translatable="false">淡い夏</string>
+    <string name="luka" translatable="false">Luka Lanczos</string>
+    <string name="luka_tag" translatable="false">\@LukaLanczos</string>
+    <string name="skyd" translatable="false">SkyD666</string>
+    <string name="skyd_tag" translatable="false">\@SkyD666</string>
+    <string name="acknowledgements">Acknowledgements</string>
+    <string name="ack1" translatable="false">maximiliaan</string>
+    <string name="ack1_desc" translatable="false">\@maximiliaan</string>
+    <string name="ack2" translatable="false">Alexander Brunswig</string>
+    <string name="ack2_desc" translatable="false">\@NurKeinNeid</string>
+    <string name="ack3" translatable="false">ash az</string>
+    <string name="ack3_desc" translatable="false">\@nabpeepol</string>
+    <string name="app_libraries">Libraries</string>
+    <string name="lib1" translatable="false">AndroidX</string>
+    <string name="lib1_desc" translatable="false">https://github.com/androidx/androidx</string>
+    <string name="lib2" translatable="false">Coil</string>
+    <string name="lib2_desc" translatable="false">https://github.com/coil-kt/coil</string>
+    <string name="lib3" translatable="false">FluidRecyclerView</string>
+    <string name="lib3_desc" translatable="false">https://github.com/Helixform/FluidRecyclerView</string>
+    <string name="lib4" translatable="false">AndroidFastScroll</string>
+    <string name="lib4_desc" translatable="false">https://github.com/zhanghai/AndroidFastScroll</string>
 </resources>

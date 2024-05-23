@@ -141,6 +141,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
         const val ALBUM_SHRINK_DURATION_ANIMATION = 300L
         const val SHRINK_TRIGGER_DURATION = 300L
         const val SHRINK_VALUE_PAUSE = 0.85F
+        const val BOTTOM_TRANSIT_DURATION = 250L
         const val VOLUME_CHANGED_ACTION = "android.media.VOLUME_CHANGED_ACTION"
     }
 
@@ -301,7 +302,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
     var playlistCoverCoordinateX: Int = 0
     var playlistCoverCoordinateY: Int = 0
     var fullCoverFrameScale: Float = 0f
-    var playlistCoverScale: Float = 0.25f
+    var playlistCoverScale: Float = 0f
     var isPlaylistEnabled: Boolean = false
 
     private val overlayPaint = Paint().apply {
@@ -543,6 +544,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
                     manipulateTopOverlayVisibility(View.VISIBLE)
                     playlistCoverCoordinateX = bottomSheetFullPlaylistCoverFrame.left + bottomSheetFullHeaderFrame.left
                     playlistCoverCoordinateY = bottomSheetFullPlaylistCoverFrame.top + bottomSheetFullHeaderFrame.top
+                    playlistCoverScale = bottomSheetFullPlaylistCoverFrame.height / 48.dpToPx(context).toFloat() - 1f
                 }
                 bottomSheetFullPlaylistFrame.fadInAnimation(VIEW_TRANSIT_DURATION)
                 bottomSheetFullBlendView?.animateBlurRadius(false, VIEW_TRANSIT_DURATION)
@@ -579,6 +581,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
                     manipulateTopOverlayVisibility(View.VISIBLE)
                     playlistCoverCoordinateX = bottomSheetFullPlaylistCoverFrame.left + bottomSheetFullHeaderFrame.left
                     playlistCoverCoordinateY = bottomSheetFullPlaylistCoverFrame.top + bottomSheetFullHeaderFrame.top
+                    playlistCoverScale = bottomSheetFullPlaylistCoverFrame.height / 48.dpToPx(context).toFloat() - 1f
                 }
                 bottomSheetFadingVerticalEdgeLayout.setPadding(
                     bottomSheetFadingVerticalEdgeLayout.paddingLeft,
@@ -710,7 +713,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
                             animator.doOnEnd {
                                 animationBroadcastLock = false
                             }
-                            animator.duration = VIEW_TRANSIT_DURATION / 3 * 2
+                            animator.duration = BOTTOM_TRANSIT_DURATION / 3 * 2
                             animator.start()
                             hideControllerJob()
                         } else if (!animationBroadcastLock && isScrollingDown) {
@@ -732,7 +735,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
                             animator.doOnEnd {
                                 animationBroadcastLock = false
                             }
-                            animator.duration = VIEW_TRANSIT_DURATION / 3 * 2
+                            animator.duration = BOTTOM_TRANSIT_DURATION / 3 * 2
                             animator.start()
                         }
                     }
@@ -811,7 +814,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
                         hasScheduledShowJob = false
                     }
                 }
-                animator.duration = VIEW_TRANSIT_DURATION / 3 * 2
+                animator.duration = BOTTOM_TRANSIT_DURATION / 3 * 2
                 animator.start()
             }
         }
@@ -827,21 +830,21 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
     private fun hideEveryController() {
         manipulateBottomOverlayVisibility(View.INVISIBLE)
-        bottomSheetFullControllerFrame.fadOutAnimation(VIEW_TRANSIT_DURATION)
-        bottomSheetFullControllerButton.fadOutAnimation(VIEW_TRANSIT_DURATION)
-        bottomSheetVolumeSliderFrame.fadOutAnimation(VIEW_TRANSIT_DURATION)
-        bottomSheetFullNextButton.fadOutAnimation(VIEW_TRANSIT_DURATION)
-        bottomSheetFullPreviousButton.fadOutAnimation(VIEW_TRANSIT_DURATION)
-        bottomSheetActionBar.fadOutAnimation(VIEW_TRANSIT_DURATION)
+        bottomSheetFullControllerFrame.fadOutAnimation(BOTTOM_TRANSIT_DURATION)
+        bottomSheetFullControllerButton.fadOutAnimation(BOTTOM_TRANSIT_DURATION)
+        bottomSheetVolumeSliderFrame.fadOutAnimation(BOTTOM_TRANSIT_DURATION)
+        bottomSheetFullNextButton.fadOutAnimation(BOTTOM_TRANSIT_DURATION)
+        bottomSheetFullPreviousButton.fadOutAnimation(BOTTOM_TRANSIT_DURATION)
+        bottomSheetActionBar.fadOutAnimation(BOTTOM_TRANSIT_DURATION)
     }
 
     private fun showEveryController() {
-        bottomSheetFullControllerFrame.fadInAnimation(VIEW_TRANSIT_DURATION) { manipulateBottomOverlayVisibility(View.VISIBLE) }
-        bottomSheetFullControllerButton.fadInAnimation(VIEW_TRANSIT_DURATION)
-        bottomSheetVolumeSliderFrame.fadInAnimation(VIEW_TRANSIT_DURATION)
-        bottomSheetFullNextButton.fadInAnimation(VIEW_TRANSIT_DURATION)
-        bottomSheetFullPreviousButton.fadInAnimation(VIEW_TRANSIT_DURATION)
-        bottomSheetActionBar.fadInAnimation(VIEW_TRANSIT_DURATION)
+        bottomSheetFullControllerFrame.fadInAnimation(BOTTOM_TRANSIT_DURATION) { manipulateBottomOverlayVisibility(View.VISIBLE) }
+        bottomSheetFullControllerButton.fadInAnimation(BOTTOM_TRANSIT_DURATION)
+        bottomSheetVolumeSliderFrame.fadInAnimation(BOTTOM_TRANSIT_DURATION)
+        bottomSheetFullNextButton.fadInAnimation(BOTTOM_TRANSIT_DURATION)
+        bottomSheetFullPreviousButton.fadInAnimation(BOTTOM_TRANSIT_DURATION)
+        bottomSheetActionBar.fadInAnimation(BOTTOM_TRANSIT_DURATION)
     }
 
     private fun isHires(boolean: Boolean) {
@@ -1261,7 +1264,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
             ResourcesCompat.getColor(resources, R.color.contrast_lyric_highlightColor, null)
 
         private val sizeFactor = 1f
-        private val defaultSizeFactor = .965f
+        private val defaultSizeFactor = .97f
 
         var currentFocusPos = -1
         private var currentTranslationPos = -1

@@ -5,13 +5,13 @@
     <color name="contrast_colorBackgroundElevated">#0C0C0C</color>
     <color name="contrast_colorBackgroundBottomNav">@color/contrast_colorBackgroundElevated</color>
     <color name="contrast_colorBackgroundContainer">#191919</color>
-    <color name="contrast_colorOnSurfaceHalcyon">#DEFFFFFF</color>
-    <color name="contrast_colorBackgroundContainerHalcyon">#B3161616</color>
-    <color name="contrast_colorBackgroundElevatedHalcyon">#B3282828</color>
     <color name="contrast_colorOnSurfaceFainted">#80FFFFFF</color>
     <color name="contrast_colorOnSurfaceSecondary">#B3FFFFFF</color>
     <color name="contrast_colorOutline">#0DFFFFFF</color>
     <color name="contrast_blendOverlayColor">#66000000</color>
+
+    <color name="contrast_listBackground">@color/contrast_colorBackground</color>
+    <color name="contrast_cardBackground">#1C1C1E</color>
 
     <!-- Fallback -->
     <color name="md_theme_primary">#C6C6C6</color>

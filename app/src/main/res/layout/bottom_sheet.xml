@@ -101,6 +101,7 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_gravity="center"
+        android:background="@color/contrast_colorBackgroundContainer"
         android:scrollbars="none" />
 
     <!-- Full Player -->
