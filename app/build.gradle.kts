@@ -30,7 +30,7 @@ android {
 
     packaging {
         jniLibs {
-            useLegacyPackaging = false
+            useLegacyPackaging = true
         }
         resources {
             excludes += "META-INF/*.version"
@@ -142,11 +142,6 @@ android {
     dependenciesInfo {
         includeInApk = false
         includeInBundle = false
-    }
-    packagingOptions {
-        jniLibs {
-            useLegacyPackaging = true
-        }
     }
 
     // https://stackoverflow.com/a/77745844
