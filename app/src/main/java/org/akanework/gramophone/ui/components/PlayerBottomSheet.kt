@@ -445,6 +445,15 @@ class PlayerBottomSheet private constructor(
             myInsets.right,
             myInsets.bottom + bottomNavigationHeight
         )
+        bottomSheetPreviewCoverFrame.setPadding(
+            myInsets.left,
+            bottomSheetPreviewCoverFrame.paddingTop,
+            bottomSheetPreviewCoverFrame.paddingRight,
+            bottomSheetPreviewCoverFrame.paddingBottom
+        )
+        val marginLayoutParams = bottomSheetPreviewCoverFrame.layoutParams as MarginLayoutParams
+        marginLayoutParams.marginStart = myInsets.left + resources.getDimensionPixelSize(R.dimen.preview_album_cover_start)
+        bottomSheetPreviewCoverFrame.layoutParams = marginLayoutParams
         // Let fullPlayer handle insets itself (and discard result as it's irrelevant to hierarchy)
         ViewCompat.dispatchApplyWindowInsets(fullPlayer, insets.clone())
         // Now make sure BottomSheetBehaviour has the correct View height set.

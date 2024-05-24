@@ -116,7 +116,7 @@
         style="?materialCardViewFilledStyle"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="@dimen/preview_album_cover_start"
         android:layout_marginTop="9dp"
         android:layout_marginBottom="9dp"
         android:transformPivotX="0dp"

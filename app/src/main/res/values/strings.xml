@@ -200,7 +200,7 @@
     <string name="main_developers">Main developers</string>
     <string name="akane" translatable="false">あかね</string>
     <string name="akanetan" translatable="false">\@AkaneTan</string>
-    <string name="akane_job" translatable="false"><![CDATA[Coder &\nDesigner]]></string>
+    <string name="akane_job" translatable="false">Coder &amp;\nDesigner</string>
     <string name="duo3" translatable="false">123哆3</string>
     <string name="duo3_tag" translatable="false">\@123Duo3\n</string>
     <string name="duo3_job" translatable="false">Lead\nDesigner</string>

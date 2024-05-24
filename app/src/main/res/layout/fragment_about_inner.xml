@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbarlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/contrast_listBackground"
+        app:liftOnScroll="false">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsingtoolbar"
+            style="?attr/collapsingToolbarLayoutMediumStyle"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/top_app_bar_height"
+            android:layout_marginStart="0dp"
+            android:background="@color/contrast_listBackground"
+            android:paddingStart="0dp"
+            app:collapsedTitleTextAppearance="@style/TextAppearance.App.TitleLarge"
+            app:collapsedTitleTextColor="@color/contrast_colorOnSurface"
+            app:contentScrim="@android:color/transparent"
+            app:expandedTitleMarginStart="24dp"
+            app:expandedTitleTextAppearance="@style/TextAppearance.App.HeadlineLarge"
+            app:expandedTitleTextColor="@color/contrast_colorOnSurface"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+            app:title="@string/settings_contributors"
+            app:titleCollapseMode="scale">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/topAppBar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/contrast_listBackground"
+                android:elevation="0dp"
+                android:paddingStart="6dp"
+                android:paddingEnd="8dp"
+                app:layout_collapseMode="pin"
+                app:navigationIcon="@drawable/ic_arrow_back"
+                app:navigationIconTint="@color/contrast_themeColor" />
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nested"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:clipChildren="false"
+        android:clipToOutline="false"
+        android:background="@color/contrast_listBackground"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/contributors"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/acknowledgements"
+                android:layout_marginStart="40dp"
+                android:textColor="@color/contrast_colorOnSurfaceSecondary"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="20dp"
+                android:textSize="13sp"
+                />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/contributor_frame"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/contributors"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                app:cardCornerRadius="12dp"
+                app:cardBackgroundColor="@color/contrast_cardBackground"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="58dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?selectableItemBackground">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif"
+                                android:textFontWeight="500"
+                                android:textColor="@color/contrast_colorOnSurface"
+                                android:text="@string/ack1"
+                                />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="monospace"
+                                android:textFontWeight="400"
+                                android:textSize="13sp"
+                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
+                                android:text="@string/ack1_desc"
+                                />
+
+                        </LinearLayout>
+
+                        <com.google.android.material.divider.MaterialDivider
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:dividerThickness="0.5dp"
+                            app:dividerColor="@color/contrast_colorOutline"
+                            android:layout_gravity="bottom"
+                            android:layout_marginStart="16dp"
+                            />
+
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="58dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?selectableItemBackground">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif"
+                                android:textFontWeight="500"
+                                android:textColor="@color/contrast_colorOnSurface"
+                                android:text="@string/ack2"
+                                />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="monospace"
+                                android:textFontWeight="400"
+                                android:textSize="13sp"
+                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
+                                android:text="@string/ack2_desc"
+                                />
+
+                        </LinearLayout>
+
+                        <com.google.android.material.divider.MaterialDivider
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:dividerThickness="0.5dp"
+                            app:dividerColor="@color/contrast_colorOutline"
+                            android:layout_gravity="bottom"
+                            android:layout_marginStart="16dp"
+                            />
+
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="58dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?selectableItemBackground">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif"
+                                android:textFontWeight="500"
+                                android:textColor="@color/contrast_colorOnSurface"
+                                android:text="@string/ack3"
+                                />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="monospace"
+                                android:textFontWeight="400"
+                                android:textSize="13sp"
+                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
+                                android:text="@string/ack3_desc"
+                                />
+
+                        </LinearLayout>
+
+                    </FrameLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/source"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_libraries"
+                android:layout_marginStart="40dp"
+                android:textColor="@color/contrast_colorOnSurfaceSecondary"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/contributor_frame"
+                android:layout_marginTop="20dp"
+                android:textSize="13sp"
+                />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/source_frame"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/source"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                app:cardCornerRadius="12dp"
+                android:layout_marginBottom="128dp"
+                app:cardBackgroundColor="@color/contrast_cardBackground"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="58dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?selectableItemBackground">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="16dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif"
+                                android:text="@string/lib1"
+                                android:textColor="@color/contrast_colorOnSurface"
+                                android:textFontWeight="500" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="monospace"
+                                android:maxLines="1"
+                                android:textSize="13sp"
+                                android:text="@string/lib1_desc"
+                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
+                                android:textFontWeight="400" />
+
+                        </LinearLayout>
+
+                        <com.google.android.material.divider.MaterialDivider
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:dividerThickness="0.5dp"
+                            app:dividerColor="@color/contrast_colorOutline"
+                            android:layout_gravity="bottom"
+                            android:layout_marginStart="16dp"
+                            />
+
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="58dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?selectableItemBackground">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif"
+                                android:textFontWeight="500"
+                                android:textColor="@color/contrast_colorOnSurface"
+                                android:text="@string/lib2"
+                                />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="monospace"
+                                android:textFontWeight="400"
+                                android:textSize="13sp"
+                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
+                                android:text="@string/lib2_desc"
+                                android:maxLines="1"
+                                />
+
+                        </LinearLayout>
+
+                        <com.google.android.material.divider.MaterialDivider
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:dividerThickness="0.5dp"
+                            app:dividerColor="@color/contrast_colorOutline"
+                            android:layout_gravity="bottom"
+                            android:layout_marginStart="16dp"
+                            />
+
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="58dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?selectableItemBackground">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif"
+                                android:textFontWeight="500"
+                                android:textColor="@color/contrast_colorOnSurface"
+                                android:text="@string/lib3"
+                                />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="monospace"
+                                android:textFontWeight="400"
+                                android:textSize="13sp"
+                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
+                                android:text="@string/lib3_desc"
+                                android:maxLines="1"
+                                />
+
+                        </LinearLayout>
+
+                        <com.google.android.material.divider.MaterialDivider
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:dividerThickness="0.5dp"
+                            app:dividerColor="@color/contrast_colorOutline"
+                            android:layout_gravity="bottom"
+                            android:layout_marginStart="16dp"
+                            />
+
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="58dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?selectableItemBackground">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif"
+                                android:textFontWeight="500"
+                                android:textColor="@color/contrast_colorOnSurface"
+                                android:text="@string/lib4"
+                                />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="monospace"
+                                android:textFontWeight="400"
+                                android:textSize="13sp"
+                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
+                                android:text="@string/lib4_desc"
+                                android:maxLines="1"
+                                />
+
+                        </LinearLayout>
+
+                    </FrameLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

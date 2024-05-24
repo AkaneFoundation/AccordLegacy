@@ -30,5 +30,6 @@
     <dimen name="mtrl_slider_track_side_padding" tools:override="true">0dp</dimen>
     <dimen name="bottom_sheet_height">56dp</dimen>
     <dimen name="top_app_bar_height">132dp</dimen>
+    <dimen name="preview_album_cover_start">24dp</dimen>
     <item name="top_divider_visibility" format="float" type="dimen">1.0</item>
 </resources>

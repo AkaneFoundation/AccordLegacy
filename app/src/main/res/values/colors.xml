@@ -13,6 +13,8 @@
 
     <color name="contrast_listBackground">#EFEFF4</color>
     <color name="contrast_cardBackground">@color/contrast_colorBackground</color>
+    <color name="contrast_colorBackgroundFixed">#FFFFFF</color>
+    <color name="contrast_themeColorFixed">#FA233B</color>
 
     <color name="contrast_lyric_defaultColor">#2EFFFFFF</color>
     <color name="contrast_lyric_highlightTranslationColor">#66FFFFFF</color>
