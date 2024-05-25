@@ -232,4 +232,6 @@
     <string name="lib3_desc" translatable="false">https://github.com/Helixform/FluidRecyclerView</string>
     <string name="lib4" translatable="false">AndroidFastScroll</string>
     <string name="lib4_desc" translatable="false">https://github.com/zhanghai/AndroidFastScroll</string>
+    <string name="blur_lyrics">Blur lyrics</string>
+    <string name="blur_lyrics_summary">Enable blur with lyrics (May impact performance)</string>
 </resources>

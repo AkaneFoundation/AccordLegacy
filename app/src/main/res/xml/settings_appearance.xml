@@ -28,5 +28,12 @@
             android:layout="@layout/icon_dropdown_preference"
             android:title="@string/settings_app_theme"
             app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
+            android:key="lyric_blur"
+            android:defaultValue="false"
+            android:layout="@layout/icon_switch_preference"
+            android:title="@string/blur_lyrics"
+            android:summary="@string/blur_lyrics_summary"
+            />
     </PreferenceCategory>
 </PreferenceScreen>

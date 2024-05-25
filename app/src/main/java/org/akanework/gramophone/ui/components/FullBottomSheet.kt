@@ -8,12 +8,15 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.graphics.BlendMode
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
+import android.graphics.RenderEffect
+import android.graphics.Shader
 import android.media.AudioManager
 import android.os.Bundle
 import android.util.AttributeSet
@@ -53,6 +56,7 @@ import androidx.media3.common.Timeline
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
+import androidx.preference.PreferenceManager
 import androidx.transition.TransitionManager
 import coil3.annotation.ExperimentalCoilApi
 import coil3.dispose
@@ -86,6 +90,7 @@ import org.akanework.gramophone.logic.checkIfNegativeOrNullOrMaxedOut
 import org.akanework.gramophone.logic.dpToPx
 import org.akanework.gramophone.logic.fadInAnimation
 import org.akanework.gramophone.logic.fadOutAnimation
+import org.akanework.gramophone.logic.getBooleanStrict
 import org.akanework.gramophone.logic.getFile
 import org.akanework.gramophone.logic.getLyrics
 import org.akanework.gramophone.logic.getTimer
@@ -108,7 +113,7 @@ import kotlin.math.absoluteValue
 
 @SuppressLint("SetTextI18n")
 class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
-    ConstraintLayout(context, attrs, defStyleAttr, defStyleRes), Player.Listener {
+    ConstraintLayout(context, attrs, defStyleAttr, defStyleRes), Player.Listener, SharedPreferences.OnSharedPreferenceChangeListener {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
             this(context, attrs, defStyleAttr, 0)
 
@@ -128,6 +133,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
     private var isUserTracking = false
     private var runnableRunning = false
     private var firstTime = false
+    private val prefs = PreferenceManager.getDefaultSharedPreferences(context)
 
     val interpolator = PathInterpolator(0.4f, 0.2f, 0f, 1f)
 
@@ -143,6 +149,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
         const val SHRINK_VALUE_PAUSE = 0.85F
         const val BOTTOM_TRANSIT_DURATION = 250L
         const val VOLUME_CHANGED_ACTION = "android.media.VOLUME_CHANGED_ACTION"
+        const val LYRIC_UPDATE_BLUR = 2
+        const val BLUR_TRANSITION_INTERVAL = 200L
+        const val LYRIC_CLEAR_ALL = 3
     }
 
     private fun buildShrinkAnimator(
@@ -286,6 +295,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
     private var lastDisposable: Disposable? = null
     private var animationLock: Boolean = false
     private var hideJob: CoroutineScope? = null
+    private var blurTransitionJob: CoroutineScope? = null
     private var startY = 0f
     private var isScrollingDown = false
     private var animationBroadcastLock = false
@@ -304,6 +314,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
     var fullCoverFrameScale: Float = 0f
     var playlistCoverScale: Float = 0f
     var isPlaylistEnabled: Boolean = false
+    var blurLock: Boolean = false
+    var isBlurEnabled: Boolean = false
 
     private val overlayPaint = Paint().apply {
         blendMode = BlendMode.OVERLAY
@@ -377,6 +389,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
         bottomSheetStarButtonPlaylistBackground.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
         bottomSheetMoreButtonBackground.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
         bottomSheetMoreButtonPlaylistBackground.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
+
+        prefs.registerOnSharedPreferenceChangeListener(this)
+        isBlurEnabled = prefs.getBooleanStrict("lyric_blur", false)
 
         doOnLayout {
             fullCoverFrameCoordinateX = bottomSheetFullCoverFrame.left
@@ -685,6 +700,10 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
                 when (e.action) {
                     MotionEvent.ACTION_DOWN -> {
                         startY = e.y
+                        if (!blurLock && isBlurEnabled) {
+                            blurLock = true
+                            clearAllBlur()
+                        }
                     }
 
                     MotionEvent.ACTION_MOVE -> {
@@ -741,6 +760,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
                     }
 
                     MotionEvent.ACTION_UP -> {
+                        if (isBlurEnabled) {
+                            setDelayedTransition()
+                        }
                     }
                 }
                 return false
@@ -1281,6 +1303,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
             )
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            onBindViewHolder(holder, position, mutableListOf())
         }
 
         override fun onBindViewHolder(
@@ -1288,6 +1311,31 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
             position: Int,
             payloads: MutableList<Any>
         ) {
+            if (isBlurEnabled) {
+                val blurPayload = payloads.isNotEmpty() && (payloads[0] == LYRIC_UPDATE_BLUR || payloads[0] == LYRIC_CLEAR_ALL)
+                if (blurPayload && !blurLock) {
+                    val positionTillFocus = (position - currentFocusPos)
+                    val startAbs = positionTillFocus.absoluteValue + 1
+                    val endAbs = positionTillFocus.absoluteValue
+
+                    val blurAnimator = ValueAnimator.ofFloat(
+                        3f * startAbs,
+                        3f * endAbs
+                    )
+                    blurAnimator.duration = LYRIC_SCROLL_DURATION
+                    blurAnimator.addUpdateListener {
+                        val animatedValue = it.animatedValue as Float
+                        holder.lyricTextView.setRenderEffect(
+                            RenderEffect.createBlurEffect(
+                                animatedValue, animatedValue, Shader.TileMode.MIRROR
+                            )
+                        )
+                    }
+                    blurAnimator.start()
+                    return
+                }
+            }
+
             val lyric = lyricList[position]
             val isHighlightPayload =
                 payloads.isNotEmpty() && (payloads[0] == LYRIC_SET_HIGHLIGHT || payloads[0] == LYRIC_REMOVE_HIGHLIGHT)
@@ -1308,6 +1356,22 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
                 text = lyric.content
                 gravity = if (isLyricCentered) Gravity.CENTER else Gravity.START
                 translationY = 0f
+                if (isBlurEnabled && !blurLock) {
+                    val positionTillFocus = (position - currentFocusPos).absoluteValue
+                    if (positionTillFocus != 0) {
+                        setRenderEffect(
+                            RenderEffect.createBlurEffect(
+                                3f * positionTillFocus,
+                                3f * positionTillFocus,
+                                Shader.TileMode.MIRROR
+                            )
+                        )
+                    } else {
+                        setRenderEffect(null)
+                    }
+                } else {
+                    setRenderEffect(null)
+                }
 
                 val textSize = if (lyric.isTranslation) 20f else 34.25f
                 val paddingTop = if (lyric.isTranslation) 2 else 18
@@ -1516,6 +1580,16 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
         }
     }
 
+    fun setDelayedTransition() {
+        blurTransitionJob?.cancel()
+        blurTransitionJob = null
+        blurTransitionJob = CoroutineScope(Dispatchers.Default)
+        blurTransitionJob!!.launch {
+            delay(5000)
+            blurLock = false
+        }
+    }
+
     fun updateLyric(duration: Long?) {
         if (bottomSheetFullLyricList.isNotEmpty()) {
             val newIndex = updateNewIndex()
@@ -1566,26 +1640,41 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
             }
 
             override fun afterTargetFound() {
-                if (!noAnimation) {
-                    val newIndex = updateNewIndex()
-                    if (newIndex > 1) {
-                        val firstVisibleItemPosition: Int = targetPosition + 1
-                        val lastVisibleItemPosition: Int =
-                            bottomSheetFullLyricLinearLayoutManager.findLastVisibleItemPosition() + 1
-                        for (i in firstVisibleItemPosition..lastVisibleItemPosition) {
-                            val view: View? =
-                                bottomSheetFullLyricLinearLayoutManager.findViewByPosition(i)
-                            if (view != null) {
+                if (targetPosition > 1) {
+                    val firstVisibleItemPosition: Int = targetPosition + 1
+                    val lastVisibleItemPosition: Int =
+                        bottomSheetFullLyricLinearLayoutManager.findLastVisibleItemPosition() + 1
+                    for (i in firstVisibleItemPosition..lastVisibleItemPosition) {
+                        val view: View? =
+                            bottomSheetFullLyricLinearLayoutManager.findViewByPosition(i)
+                        if (view != null) {
+                            if (!blurLock && isBlurEnabled) {
+                                bottomSheetFullLyricAdapter.notifyItemChanged(i, LYRIC_UPDATE_BLUR)
+                            }
+                            if (i == targetPosition + 1 && bottomSheetFullLyricList[i].isTranslation) {
+                                continue
+                            }
+                            if (!noAnimation) {
                                 val ii = i - firstVisibleItemPosition -
                                         if (bottomSheetFullLyricList[i].isTranslation) 1 else 0
-                                if (i == newIndex + 1 && bottomSheetFullLyricList[i].isTranslation) {
-                                    continue
-                                }
                                 applyAnimation(view, ii)
                             }
                         }
                     }
                 }
+            }
+        }
+    }
+
+    fun clearAllBlur() {
+        val firstVisibleItemPosition: Int = bottomSheetFullLyricLinearLayoutManager.findFirstVisibleItemPosition()
+        val lastVisibleItemPosition: Int =
+            bottomSheetFullLyricLinearLayoutManager.findLastVisibleItemPosition() + 1
+        for (i in firstVisibleItemPosition..lastVisibleItemPosition) {
+            val view: View? =
+                bottomSheetFullLyricLinearLayoutManager.findViewByPosition(i)
+            if (view != null) {
+                bottomSheetFullLyricAdapter.notifyItemChanged(i, LYRIC_CLEAR_ALL)
             }
         }
     }
@@ -1732,5 +1821,16 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
         bottomSheetVolumeEndOverlayImageView.visibility = visibility
         bottomSheetQualityOverlay.visibility = visibility
         bottomSheetQualityFrame.visibility = visibility
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        if (key == "lyric_blur") {
+            isBlurEnabled = prefs.getBooleanStrict("lyric_blur", false)
+            if (!isBlurEnabled) {
+                clearAllBlur()
+            } else {
+                updateLyric(instance?.duration)
+            }
+        }
     }
 }
