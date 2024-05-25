@@ -70,6 +70,10 @@ android {
 
     signingConfigs {
         create("release") {
+            storeFile = file("/Users/nemanjamijailovic/Documents/GitHub/Accord/test.jks")
+            storePassword = "12345678"
+            keyAlias = "key0"
+            keyPassword = "12345678"
             if (project.hasProperty("AKANE_RELEASE_KEY_ALIAS")) {
                 storeFile = file(project.properties["AKANE_RELEASE_STORE_FILE"].toString())
                 storePassword = project.properties["AKANE_RELEASE_STORE_PASSWORD"].toString()
@@ -101,6 +105,7 @@ android {
 
     buildTypes {
         release {
+            signingConfig = signingConfigs.getByName("release")
             if (releaseType != "Profile") {
                 isMinifyEnabled = true
                 isShrinkResources = true

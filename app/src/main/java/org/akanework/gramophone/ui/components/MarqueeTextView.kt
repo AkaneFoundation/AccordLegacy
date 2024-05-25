@@ -1,24 +1,8 @@
-/*
- *     Copyright (C) 2024 Akane Foundation
- *
- *     Gramophone is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     Gramophone is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package org.akanework.gramophone.ui.components
 
 import android.content.Context
 import android.graphics.Rect
+import android.text.TextUtils
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
 
@@ -38,24 +22,50 @@ class MarqueeTextView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : AppCompatTextView(context, attrs, defStyleAttr) {
 
+    private var isMarqueeEnabled = false
+
     init {
+        // Set default properties
         isSingleLine = true
-        ellipsize = android.text.TextUtils.TruncateAt.MARQUEE
+        ellipsize = TextUtils.TruncateAt.MARQUEE
         marqueeRepeatLimit = -1
-        isFocusable = true
-        isFocusableInTouchMode = true
-        isHorizontalFadingEdgeEnabled = true
-        // Enable hardware acceleration
-        setLayerType(LAYER_TYPE_HARDWARE, null)
+        isFocusable = false // Disable focus when not scrolling
+        isHorizontalFadingEdgeEnabled = false // Disable fading edge
+        setLayerType(LAYER_TYPE_NONE, null) // Use software layer when not scrolling
     }
 
-    override fun isFocused() = true
-
-    override fun onFocusChanged(focused: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
-        if (focused) super.onFocusChanged(true, direction, previouslyFocusedRect)
+    override fun setText(text: CharSequence?, type: BufferType?) {
+        super.setText(text, type)
+        post { checkMarquee() }
     }
 
-    override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
-        if (hasWindowFocus) super.onWindowFocusChanged(true)
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        post { checkMarquee() }
+    }
+
+    private fun checkMarquee() {
+        val textWidth = paint.measureText(text.toString())
+        val viewWidth = width - paddingLeft - paddingRight
+        val shouldBeMarquee = textWidth > viewWidth
+
+        if (isMarqueeEnabled != shouldBeMarquee) {
+            isMarqueeEnabled = shouldBeMarquee
+            if (shouldBeMarquee) {
+                setHorizontallyScrolling(true)
+                isSelected = true
+                isFocusable = true // Enable focus when scrolling
+                isHorizontalFadingEdgeEnabled = true // Enable fading edge when scrolling
+                setLayerType(LAYER_TYPE_SOFTWARE, null) // Use hardware layer when scrolling
+            } else {
+                setHorizontallyScrolling(false)
+                isSelected = false
+                isFocusable = false
+                isHorizontalFadingEdgeEnabled = false
+                setLayerType(LAYER_TYPE_NONE, null) // Use software layer when not scrolling
+            }
+        }
     }
 }
+
+

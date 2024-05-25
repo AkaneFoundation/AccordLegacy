@@ -1,5 +1,7 @@
 package org.akanework.gramophone.ui.components
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
@@ -11,6 +13,7 @@ import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.graphics.BlendMode
+import android.graphics.BlurMaskFilter
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PorterDuff
@@ -19,6 +22,9 @@ import android.graphics.RenderEffect
 import android.graphics.Shader
 import android.media.AudioManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.provider.MediaStore.Audio.Media
 import android.util.AttributeSet
 import android.util.Log
 import android.util.Size
@@ -32,13 +38,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
 import android.view.WindowManager
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.AnticipateInterpolator
+import android.view.animation.BounceInterpolator
 import android.view.animation.DecelerateInterpolator
+import android.view.animation.Interpolator
+import android.view.animation.LinearInterpolator
 import android.view.animation.PathInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.animation.addListener
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -49,6 +61,7 @@ import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.fluidrecyclerview.widget.LinearLayoutManager
 import androidx.fluidrecyclerview.widget.RecyclerView
+import androidx.fragment.app.activityViewModels
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -108,8 +121,11 @@ import org.akanework.gramophone.logic.updateMargin
 import org.akanework.gramophone.logic.utils.CalculationUtils
 import org.akanework.gramophone.logic.utils.DatabaseUtils
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
+import org.akanework.gramophone.ui.LibraryViewModel
 import org.akanework.gramophone.ui.MainActivity
 import kotlin.math.absoluteValue
+import kotlin.math.max
+import kotlin.math.pow
 
 @SuppressLint("SetTextI18n")
 class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
@@ -137,6 +153,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
     val interpolator = PathInterpolator(0.4f, 0.2f, 0f, 1f)
 
+
+
+
     companion object {
         const val SLIDER_UPDATE_INTERVAL = 100L
         const val VIEW_TRANSIT_DURATION = 350L
@@ -150,9 +169,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
         const val BOTTOM_TRANSIT_DURATION = 250L
         const val VOLUME_CHANGED_ACTION = "android.media.VOLUME_CHANGED_ACTION"
         const val LYRIC_UPDATE_BLUR = 2
-        const val BLUR_TRANSITION_INTERVAL = 200L
         const val LYRIC_CLEAR_ALL = 3
     }
+
 
     private fun buildShrinkAnimator(
         isShrink: Boolean = true,
@@ -189,6 +208,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
             }
         }
     }
+
 
     private val touchListener = object : OverlaySlider.OnSliderTouchListener {
         override fun onStartTrackingTouch(slider: OverlaySlider) {
@@ -377,18 +397,15 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
         bottomSheetFullPlaylistSubtitleUnder.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
         bottomSheetFullSubtitleUnder.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
+        bottomSheetFullPlaylistSubtitle.setLayerType(LAYER_TYPE_HARDWARE,overlayPaint)
 
         bottomSheetFullDurationBack.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
         bottomSheetFullPositionBack.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
         bottomSheetQualityOverlay.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
         bottomSheetQualityFrame.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
 
-        bottomSheetVolumeStartOverlayImageView.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
-        bottomSheetVolumeEndOverlayImageView.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
-        bottomSheetStarButtonBackground.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
-        bottomSheetStarButtonPlaylistBackground.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
-        bottomSheetMoreButtonBackground.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
-        bottomSheetMoreButtonPlaylistBackground.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
+        bottomSheetFadingVerticalEdgeLayout.setLayerType(LAYER_TYPE_HARDWARE,null)
+
 
         prefs.registerOnSharedPreferenceChangeListener(this)
         isBlurEnabled = prefs.getBooleanStrict("lyric_blur", false)
@@ -1311,30 +1328,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
             position: Int,
             payloads: MutableList<Any>
         ) {
-            if (isBlurEnabled) {
-                val blurPayload = payloads.isNotEmpty() && (payloads[0] == LYRIC_UPDATE_BLUR || payloads[0] == LYRIC_CLEAR_ALL)
-                if (blurPayload && !blurLock) {
-                    val positionTillFocus = (position - currentFocusPos)
-                    val startAbs = positionTillFocus.absoluteValue + 1
-                    val endAbs = positionTillFocus.absoluteValue
-
-                    val blurAnimator = ValueAnimator.ofFloat(
-                        3f * startAbs,
-                        3f * endAbs
-                    )
-                    blurAnimator.duration = LYRIC_SCROLL_DURATION
-                    blurAnimator.addUpdateListener {
-                        val animatedValue = it.animatedValue as Float
-                        holder.lyricTextView.setRenderEffect(
-                            RenderEffect.createBlurEffect(
-                                animatedValue, animatedValue, Shader.TileMode.MIRROR
-                            )
-                        )
-                    }
-                    blurAnimator.start()
-                    return
-                }
-            }
 
             val lyric = lyricList[position]
             val isHighlightPayload =
@@ -1352,80 +1345,137 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
             }
 
             with(holder.lyricTextView) {
-                visibility = if (lyric.content.isNotEmpty()) View.VISIBLE else View.GONE
-                text = lyric.content
-                gravity = if (isLyricCentered) Gravity.CENTER else Gravity.START
-                translationY = 0f
-                if (isBlurEnabled && !blurLock) {
-                    val positionTillFocus = (position - currentFocusPos).absoluteValue
-                    if (positionTillFocus != 0) {
-                        setRenderEffect(
-                            RenderEffect.createBlurEffect(
-                                3f * positionTillFocus,
-                                3f * positionTillFocus,
-                                Shader.TileMode.MIRROR
-                            )
-                        )
-                    } else {
-                        setRenderEffect(null)
-                    }
-                } else {
-                    setRenderEffect(null)
+                fun applyBlurEffect(textPaint: Paint, blurRadius: Float, shouldApplyBlur: Boolean) {
+                    val blurMaskFilter = if (shouldApplyBlur) BlurMaskFilter(blurRadius, BlurMaskFilter.Blur.NORMAL) else null
+                    textPaint.maskFilter = blurMaskFilter
                 }
 
-                val textSize = if (lyric.isTranslation) 20f else 34.25f
-                val paddingTop = if (lyric.isTranslation) 2 else 18
-                val paddingBottom =
-                    if (position + 1 < lyricList.size && lyricList[position + 1].isTranslation) 2 else 18
+                if (isBlurEnabled) {
+                    this.setLayerType(LAYER_TYPE_HARDWARE, null)
+                    visibility = if (lyric.content.isNotEmpty()) View.VISIBLE else View.GONE
+                    text = lyric.content
+                    gravity = if (isLyricCentered) Gravity.CENTER else Gravity.START
+                    translationY = 0f
 
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
-                setPadding(
-                    (12.5f).dpToPx(context).toInt(),
-                    paddingTop.dpToPx(context),
-                    (12.5f).dpToPx(context).toInt(),
-                    paddingBottom.dpToPx(context)
-                )
-                pivotX = 0f
-                pivotY = height.toFloat() / 2
+                    val blurRadius = 8f // Adjust blur radius as needed
+                    val isHighlight = position == currentFocusPos || position == currentTranslationPos
+                    val shouldApplyBlur = (!lyric.isTranslation || (lyric.isTranslation && !isHighlightPayload)) && !isHighlight
 
-                when {
-                    isHighlightPayload -> {
-                        val targetScale =
-                            if (payloads[0] == LYRIC_SET_HIGHLIGHT) sizeFactor else defaultSizeFactor
-                        val targetColor =
-                            if (payloads[0] == LYRIC_SET_HIGHLIGHT && lyric.isTranslation)
-                                highlightTranslationTextColor
-                            else if (payloads[0] == LYRIC_SET_HIGHLIGHT)
-                                highlightTextColor
-                            else
-                                defaultTextColor
-                        animateText(targetScale, targetColor)
+                    val textPaint = paint
+                    applyBlurEffect(textPaint, blurRadius, shouldApplyBlur)
+
+                    val textSize = if (lyric.isTranslation) 20f else 34.25f
+                    val paddingTop = if (lyric.isTranslation) 2 else 18
+                    val paddingBottom =
+                        if (position + 1 < lyricList.size && lyricList[position + 1].isTranslation) 2 else 18
+
+                    setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
+                    setPadding(
+                        (12.5f).dpToPx(context).toInt(),
+                        paddingTop.dpToPx(context),
+                        (12.5f).dpToPx(context).toInt(),
+                        paddingBottom.dpToPx(context)
+                    )
+                    pivotX = 0f
+                    pivotY = height.toFloat() / 2
+
+                    when {
+                        isHighlightPayload -> {
+                            val targetScale =
+                                if (payloads[0] == LYRIC_SET_HIGHLIGHT) sizeFactor else defaultSizeFactor
+                            val targetColor =
+                                if (payloads[0] == LYRIC_SET_HIGHLIGHT && lyric.isTranslation)
+                                    highlightTranslationTextColor
+                                else if (payloads[0] == LYRIC_SET_HIGHLIGHT)
+                                    highlightTextColor
+                                else
+                                    defaultTextColor
+                            animateText(targetScale, targetColor)
+                        }
+
+                        position == currentFocusPos -> {
+                            scaleText(sizeFactor)
+                            setTextColor(highlightTextColor)
+                        }
+
+                        position == currentTranslationPos -> {
+                            scaleText(sizeFactor)
+                            setTextColor(highlightTranslationTextColor)
+                        }
+
+                        else -> {
+                            scaleText(defaultSizeFactor)
+                            setTextColor(defaultTextColor)
+                        }
                     }
 
-                    position == currentFocusPos -> {
-                        scaleText(sizeFactor)
-                        setTextColor(highlightTextColor)
-                    }
 
-                    position == currentTranslationPos -> {
-                        scaleText(sizeFactor)
-                        setTextColor(highlightTranslationTextColor)
-                    }
+            } else {
+                    // If blur is not enabled, perform other operations without applying blur
+                    setLayerType(LAYER_TYPE_NONE, null)
+                    visibility = if (lyric.content.isNotEmpty()) View.VISIBLE else View.GONE
+                    text = lyric.content
+                    gravity = if (isLyricCentered) Gravity.CENTER else Gravity.START
+                    translationY = 0f
 
-                    else -> {
-                        scaleText(defaultSizeFactor)
-                        setTextColor(defaultTextColor)
+                    val textSize = if (lyric.isTranslation) 20f else 34.25f
+                    val paddingTop = if (lyric.isTranslation) 2 else 18
+                    val paddingBottom =
+                        if (position + 1 < lyricList.size && lyricList[position + 1].isTranslation) 2 else 18
+
+                    setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
+                    setPadding(
+                        (12.5f).dpToPx(context).toInt(),
+                        paddingTop.dpToPx(context),
+                        (12.5f).dpToPx(context).toInt(),
+                        paddingBottom.dpToPx(context)
+                    )
+                    pivotX = 0f
+                    pivotY = height.toFloat() / 2
+
+                    when {
+                        isHighlightPayload -> {
+                            val targetScale =
+                                if (payloads[0] == LYRIC_SET_HIGHLIGHT) sizeFactor else defaultSizeFactor
+                            val targetColor =
+                                if (payloads[0] == LYRIC_SET_HIGHLIGHT && lyric.isTranslation)
+                                    highlightTranslationTextColor
+                                else if (payloads[0] == LYRIC_SET_HIGHLIGHT)
+                                    highlightTextColor
+                                else
+                                    defaultTextColor
+                            animateText(targetScale, targetColor)
+                        }
+
+                        position == currentFocusPos -> {
+                            scaleText(sizeFactor)
+                            setTextColor(highlightTextColor)
+                        }
+
+                        position == currentTranslationPos -> {
+                            scaleText(sizeFactor)
+                            setTextColor(highlightTranslationTextColor)
+                        }
+
+                        else -> {
+                            scaleText(defaultSizeFactor)
+                            setTextColor(defaultTextColor)
+                        }
                     }
                 }
             }
+
         }
 
         private fun TextView.animateText(targetScale: Float, targetColor: Int) {
+            
             val animator = ValueAnimator.ofFloat(scaleX, targetScale)
             animator.addUpdateListener { animation ->
                 val animatedValue = animation.animatedValue as Float
-                scaleX = animatedValue
-                scaleY = animatedValue
+                if (scaleX != animatedValue) {
+                    scaleX = animatedValue
+                    scaleY = animatedValue
+                }
             }
             animator.duration = LYRIC_SCROLL_DURATION
             animator.interpolator = interpolator
@@ -1434,12 +1484,15 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
             val colorAnimator = ValueAnimator.ofArgb(textColors.defaultColor, targetColor)
             colorAnimator.addUpdateListener { animation ->
                 val animatedValue = animation.animatedValue as Int
-                setTextColor(animatedValue)
+                if (currentTextColor != animatedValue) {
+                    setTextColor(animatedValue)
+                }
             }
             colorAnimator.duration = LYRIC_SCROLL_DURATION
             colorAnimator.interpolator = interpolator
             colorAnimator.start()
         }
+
 
         private fun TextView.scaleText(scale: Float) {
             scaleX = scale
@@ -1457,21 +1510,16 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
         fun updateHighlight(position: Int) {
             if (currentFocusPos == position) return
-            if (position >= 0) {
-                currentFocusPos.let {
-                    notifyItemChanged(it, LYRIC_REMOVE_HIGHLIGHT)
-                    currentFocusPos = position
-                    notifyItemChanged(currentFocusPos, LYRIC_SET_HIGHLIGHT)
-                }
 
-                if (position + 1 < lyricList.size &&
-                    lyricList[position + 1].isTranslation
-                ) {
-                    currentTranslationPos.let {
-                        notifyItemChanged(it, LYRIC_REMOVE_HIGHLIGHT)
-                        currentTranslationPos = position + 1
-                        notifyItemChanged(currentTranslationPos, LYRIC_SET_HIGHLIGHT)
-                    }
+            if (position >= 0) {
+                notifyItemChanged(currentFocusPos, LYRIC_REMOVE_HIGHLIGHT)
+                currentFocusPos = position
+                notifyItemChanged(currentFocusPos, LYRIC_SET_HIGHLIGHT)
+
+                if (position + 1 < lyricList.size && lyricList[position + 1].isTranslation) {
+                    notifyItemChanged(currentTranslationPos, LYRIC_REMOVE_HIGHLIGHT)
+                    currentTranslationPos = position + 1
+                    notifyItemChanged(currentTranslationPos, LYRIC_SET_HIGHLIGHT)
                 } else if (currentTranslationPos != -1) {
                     notifyItemChanged(currentTranslationPos, LYRIC_REMOVE_HIGHLIGHT)
                     currentTranslationPos = -1
@@ -1481,6 +1529,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
                 currentTranslationPos = -1
             }
         }
+
     }
 
 
@@ -1678,6 +1727,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
             }
         }
     }
+    
 
     private fun applyAnimation(view: View, ii: Int) {
         val depth = 15.dpToPx(context).toFloat()
