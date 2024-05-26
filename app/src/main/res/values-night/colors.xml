@@ -12,6 +12,7 @@
 
     <color name="contrast_listBackground">@color/contrast_colorBackground</color>
     <color name="contrast_cardBackground">#1C1C1E</color>
+    <color name="contrast_listButtonTint">#424245</color>
 
     <!-- Fallback -->
     <color name="md_theme_primary">#C6C6C6</color>
