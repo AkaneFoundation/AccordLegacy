@@ -957,12 +957,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
                     bottomSheetTimerButton.isChecked = controller.hasTimer()
                 }
 
-                GramophonePlaybackService.SERVICE_SHUFFLE_CHANGED -> {
-                    bottomSheetFullPlaylistAdapter.updatePlaylistWhenShuffle(
-                        dumpPlaylist()
-                    )
-                }
-
                 GramophonePlaybackService.SERVICE_GET_LYRICS -> {
                     val parsedLyrics = instance?.getLyrics()
                     if (bottomSheetFullLyricList != parsedLyrics) {
@@ -1144,9 +1138,12 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
     override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
         bottomSheetShuffleButton.isChecked = shuffleModeEnabled
-        bottomSheetFullPlaylistAdapter.updatePlaylistWhenShuffle(
-            dumpPlaylist()
-        )
+        bottomSheetFullPlaylistAdapter.isShuffleEvent = true
+        if (!shuffleModeEnabled) {
+            bottomSheetFullPlaylistAdapter.updatePlaylist(
+                dumpPlaylist()
+            )
+        }
     }
 
     private fun startQueryFavourite() {
@@ -1488,7 +1485,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
     ) : RecyclerView.Adapter<PlaylistCardAdapter.ViewHolder>() {
 
         private var playlist = Pair(mutableListOf<Int>(), mutableListOf<MediaItem>())
-        private var ignoreCount = 0
+        var ignoreCount = 0
+        var isShuffleEvent = false
         private lateinit var mRecyclerView: RecyclerView
 
         override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -1502,16 +1500,17 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
                 ignoreCount--
                 return
             }
+            if (isShuffleEvent) handleShuffleEvent()
             if (content == playlist) return
             playlist = content
             notifyDataSetChanged()
         }
 
-        fun updatePlaylistWhenShuffle(content: Pair<MutableList<Int>, MutableList<MediaItem>>) {
-            updatePlaylist(content)
+        private fun handleShuffleEvent() {
             mRecyclerView.scrollToPosition(
                 playlist.first.indexOf(activity.getPlayer()?.currentMediaItemIndex ?: 0)
             )
+            isShuffleEvent = false
         }
 
         override fun onCreateViewHolder(
