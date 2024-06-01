@@ -396,15 +396,19 @@ inline fun Semaphore.runInBg(crossinline runnable: suspend () -> Unit) {
 
 // the whole point of this function is to do literally nothing at all (but without impacting
 // performance) in release builds and ignore StrictMode violations in debug builds
-inline fun <reified T> allowDiskAccessInStrictMode(doIt: () -> T): T {
+inline fun <reified T> allowDiskAccessInStrictMode(relax: Boolean = false, doIt: () -> T): T {
     return if (BuildConfig.DEBUG) {
-        if (Looper.getMainLooper() != Looper.myLooper()) throw IllegalStateException()
-        val policy = StrictMode.allowThreadDiskReads()
-        try {
-            StrictMode.allowThreadDiskWrites()
-            doIt()
-        } finally {
-            StrictMode.setThreadPolicy(policy)
+        if (Looper.getMainLooper() != Looper.myLooper()) {
+            if (relax) doIt() else
+                throw IllegalStateException("allowDiskAccessInStrictMode(false) on wrong thread")
+        } else {
+            val policy = StrictMode.allowThreadDiskReads()
+            try {
+                StrictMode.allowThreadDiskWrites()
+                doIt()
+            } finally {
+                StrictMode.setThreadPolicy(policy)
+            }
         }
     } else doIt()
 }
@@ -419,8 +423,8 @@ fun Float?.checkIfNegativeOrNullOrMaxedOut(maxedOut: Float): Float {
     }
 }
 
-inline fun <reified T> SharedPreferences.use(doIt: SharedPreferences.() -> T): T {
-    return allowDiskAccessInStrictMode { doIt() }
+inline fun <reified T> SharedPreferences.use(relax: Boolean = false, doIt: SharedPreferences.() -> T): T {
+    return allowDiskAccessInStrictMode(relax) { doIt() }
 }
 
 // use below functions if accessing from UI thread only

@@ -43,12 +43,14 @@ import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.Insets
+import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.fluidrecyclerview.widget.LinearLayoutManager
 import androidx.fluidrecyclerview.widget.RecyclerView
+import androidx.fluidrecyclerview.widget.ItemTouchHelper
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -109,6 +111,7 @@ import org.akanework.gramophone.logic.utils.CalculationUtils
 import org.akanework.gramophone.logic.utils.DatabaseUtils
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
 import org.akanework.gramophone.ui.MainActivity
+import java.util.LinkedList
 import kotlin.math.absoluteValue
 
 @SuppressLint("SetTextI18n")
@@ -372,8 +375,11 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
         bottomSheetFadingVerticalEdgeLayout = findViewById(R.id.fadingEdgeLayout)
 
         bottomSheetFullPlaylistAdapter = PlaylistCardAdapter(activity)
+        val callback: ItemTouchHelper.Callback = PlaylistCardMoveCallback(bottomSheetFullPlaylistAdapter::onRowMoved)
+        val touchHelper = ItemTouchHelper(callback)
         bottomSheetFullPlaylistRecyclerView.layoutManager = LinearLayoutManager(context)
         bottomSheetFullPlaylistRecyclerView.adapter = bottomSheetFullPlaylistAdapter
+        touchHelper.attachToRecyclerView(bottomSheetFullPlaylistRecyclerView)
 
         bottomSheetFullPlaylistSubtitleUnder.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
         bottomSheetFullSubtitleUnder.setLayerType(LAYER_TYPE_HARDWARE, overlayPaint)
@@ -551,9 +557,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
             }
             if (isChecked && !bottomSheetFullLyricButton.isChecked) {
                 changeMovableFrame(false)
-                bottomSheetFullPlaylistRecyclerView.scrollToPosition(dumpPlaylist().indexOfFirst { item ->
-                    item.first == (instance?.currentMediaItemIndex ?: 0)
-                })
+                bottomSheetFullPlaylistRecyclerView.scrollToPosition(
+                    dumpPlaylist().first.indexOf(instance?.currentMediaItemIndex ?: 0))
                 isPlaylistEnabled = true
                 bottomSheetFullHeaderFrame.fadInAnimation(VIEW_TRANSIT_DURATION) {
                     manipulateTopOverlayVisibility(View.VISIBLE)
@@ -1101,11 +1106,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
                     error(R.drawable.ic_default_cover)
                 }
             }
-            if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED) {
-                bottomSheetFullPlaylistAdapter.updatePlaylist(
-                    dumpPlaylist()
-                )
-            }
         } else {
             lastDisposable?.dispose()
             lastDisposable = null
@@ -1252,20 +1252,19 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
         }
     }
 
-    private fun dumpPlaylist(): MutableList<Pair<Int, MediaItem>> {
-        val items = mutableListOf<Pair<Int, MediaItem>>()
-        if (instance != null && instance!!.shuffleModeEnabled) {
-            var i = instance!!.currentTimeline.getFirstWindowIndex(true)
-            while (i != C.INDEX_UNSET) {
-                items.add(Pair(i, instance!!.getMediaItemAt(i)))
-                i = instance!!.currentTimeline.getNextWindowIndex(i, Player.REPEAT_MODE_OFF, true)
-            }
-        } else if (instance != null) {
-            for (i in 0 until instance!!.mediaItemCount) {
-                items.add(Pair(i, instance!!.getMediaItemAt(i)))
-            }
+    private fun dumpPlaylist(): Pair<MutableList<Int>, MutableList<MediaItem>> {
+        val items = LinkedList<MediaItem>()
+        for (i in 0 until instance!!.mediaItemCount) {
+            items.add(instance!!.getMediaItemAt(i))
         }
-        return items
+        val indexes = LinkedList<Int>()
+        val s = instance!!.shuffleModeEnabled
+        var i = instance!!.currentTimeline.getFirstWindowIndex(s)
+        while (i != C.INDEX_UNSET) {
+            indexes.add(i)
+            i = instance!!.currentTimeline.getNextWindowIndex(i, Player.REPEAT_MODE_OFF, s)
+        }
+        return Pair(indexes, items)
     }
 
     private inner class LyricAdapter(
@@ -1488,7 +1487,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
         private val activity: MainActivity
     ) : RecyclerView.Adapter<PlaylistCardAdapter.ViewHolder>() {
 
-        private val playlist: MutableList<Pair<Int, MediaItem>> = mutableListOf()
+        private var playlist = Pair(mutableListOf<Int>(), mutableListOf<MediaItem>())
+        private var ignoreCount = 0
         private lateinit var mRecyclerView: RecyclerView
 
         override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -1497,20 +1497,21 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
         }
 
         @SuppressLint("NotifyDataSetChanged")
-        fun updatePlaylist(content: MutableList<Pair<Int, MediaItem>>) {
-            playlist.clear()
-            playlist.addAll(content)
+        fun updatePlaylist(content: Pair<MutableList<Int>, MutableList<MediaItem>>) {
+            if (ignoreCount > 0) {
+                ignoreCount--
+                return
+            }
+            if (content == playlist) return
+            playlist = content
             notifyDataSetChanged()
         }
 
-        fun updatePlaylistWhenShuffle(content: MutableList<Pair<Int, MediaItem>>) {
-            playlist.clear()
-            playlist.addAll(content)
-            notifyItemRangeRemoved(0, itemCount)
-            notifyItemRangeInserted(0, itemCount)
-            mRecyclerView.scrollToPosition(playlist.indexOfFirst { item ->
-                item.first == (activity.getPlayer()?.currentMediaItemIndex ?: 0)
-            })
+        fun updatePlaylistWhenShuffle(content: Pair<MutableList<Int>, MutableList<MediaItem>>) {
+            updatePlaylist(content)
+            mRecyclerView.scrollToPosition(
+                playlist.first.indexOf(activity.getPlayer()?.currentMediaItemIndex ?: 0)
+            )
         }
 
         override fun onCreateViewHolder(
@@ -1524,27 +1525,28 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
             )
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.songName.text =
-                playlist[holder.bindingAdapterPosition].second.mediaMetadata.title
-            holder.songArtist.text =
-                playlist[holder.bindingAdapterPosition].second.mediaMetadata.artist
-            holder.songCover.load(playlist[position].second.mediaMetadata.artworkUri) {
+            val item = playlist.second[playlist.first[holder.bindingAdapterPosition]]
+            holder.songName.text = item.mediaMetadata.title
+            holder.songArtist.text = item.mediaMetadata.artist
+            holder.songCover.load(item.mediaMetadata.artworkUri) {
                 coolCrossfade(true)
                 placeholder(R.drawable.ic_default_cover)
                 error(R.drawable.ic_default_cover)
             }
-            holder.closeButton.setOnClickListener {
-                it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+            holder.closeButton.setOnClickListener { v ->
+                ViewCompat.performHapticFeedback(v, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
                 val instance = activity.getPlayer()
-                val pos = playlist[holder.absoluteAdapterPosition].first
-                playlist.removeAt(pos)
+                val pos = holder.bindingAdapterPosition
+                val idx = playlist.first.removeAt(pos)
+                playlist.first.replaceAll { if (it > idx) it - 1 else it }
+                instance?.removeMediaItem(idx)
+                playlist.second.removeAt(idx)
                 notifyItemRemoved(pos)
-                instance?.removeMediaItem(pos)
             }
             holder.itemView.setOnClickListener {
-                it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
                 val instance = activity.getPlayer()
-                instance?.seekToDefaultPosition(playlist[holder.absoluteAdapterPosition].first)
+                instance?.seekToDefaultPosition(playlist.first[holder.absoluteAdapterPosition])
             }
         }
 
@@ -1553,7 +1555,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
             holder.songCover.dispose()
         }
 
-        override fun getItemCount(): Int = playlist.size
+        override fun getItemCount(): Int = if (playlist.first.size != playlist.second.size)
+            throw IllegalStateException()
+        else playlist.first.size
 
         inner class ViewHolder(
             view: View,
@@ -1564,6 +1568,19 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
             val closeButton: MaterialButton = view.findViewById(R.id.close)
         }
 
+        fun onRowMoved(from: Int, to: Int) {
+            val mediaController = activity.getPlayer()
+            val from1 = playlist.first.removeAt(from)
+            playlist.first.replaceAll { if (it > from1) it - 1 else it }
+            val movedItem = playlist.second.removeAt(from1)
+            val to1 = if (to > 0) playlist.first[to - 1] + 1 else 0
+            playlist.first.replaceAll { if (it >= to1) it + 1 else it }
+            playlist.first.add(to, to1)
+            playlist.second.add(to1, movedItem)
+            ignoreCount++
+            mediaController?.moveMediaItem(from1, to1)
+            notifyItemMoved(from, to)
+        }
     }
 
     private fun updateNewIndex(): Int {
@@ -1587,6 +1604,38 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
         blurTransitionJob!!.launch {
             delay(5000)
             blurLock = false
+        }
+    }
+
+    private class PlaylistCardMoveCallback(private val touchHelperContract: (Int, Int) -> Unit) :
+        ItemTouchHelper.Callback() {
+        override fun isLongPressDragEnabled(): Boolean {
+            return true
+        }
+
+        override fun isItemViewSwipeEnabled(): Boolean {
+            return false
+        }
+
+        override fun getMovementFlags(
+            recyclerView: RecyclerView,
+            viewHolder:RecyclerView.ViewHolder
+        ): Int {
+            val dragFlag = ItemTouchHelper.UP or ItemTouchHelper.DOWN
+            return makeMovementFlags(dragFlag, 0)
+        }
+
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            touchHelperContract(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
+            return false
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            throw IllegalStateException()
         }
     }
 

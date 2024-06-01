@@ -18,18 +18,28 @@ object LrcUtils {
     private const val TAG = "LrcUtils"
 
     @OptIn(UnstableApi::class)
-    fun extractAndParseLyrics(
-        metadata: Metadata,
-        trim: Boolean
-    ): MutableList<MediaStoreUtils.Lyric>? {
-        return extractLyrics(metadata)?.let {
-            try {
-                parseLrcString(it, trim)
-            } catch (e: Exception) {
-                Log.e(TAG, Log.getStackTraceString(e))
-                null
+    fun extractAndParseLyrics(metadata: Metadata, trim: Boolean): MutableList<MediaStoreUtils.Lyric>? {
+        for (i in 0..<metadata.length()) {
+            val meta = metadata.get(i)
+            val data =
+                if (meta is VorbisComment && meta.key == "LYRICS") // ogg / flac
+                    meta.value
+                else if (meta is BinaryFrame && (meta.id == "USLT" || meta.id == "SYLT")) // mp3 / other id3 based
+                    UsltFrameDecoder.decode(ParsableByteArray(meta.data))
+                else if (meta is TextInformationFrame && (meta.id == "USLT" || meta.id == "SYLT")) // m4a
+                    meta.values.joinToString("\n")
+                else null
+            val lyrics = data?.let {
+                try {
+                    parseLrcString(it, trim)
+                } catch (e: Exception) {
+                    Log.e(TAG, Log.getStackTraceString(e))
+                    null
+                }
             }
+            return lyrics ?: continue
         }
+        return null
     }
 
     @OptIn(UnstableApi::class)
@@ -46,20 +56,6 @@ object LrcUtils {
                 null
             }
         }
-    }
-
-    @OptIn(UnstableApi::class)
-    private fun extractLyrics(metadata: Metadata): String? {
-        for (i in 0..<metadata.length()) {
-            val meta = metadata.get(i)
-            if (meta is VorbisComment && meta.key == "LYRICS") // ogg / flac
-                return meta.value
-            if (meta is BinaryFrame && (meta.id == "USLT" || meta.id == "SYLT")) // mp3 / other id3 based
-                return UsltFrameDecoder.decode(ParsableByteArray(meta.data))
-            if (meta is TextInformationFrame && (meta.id == "USLT" || meta.id == "SYLT")) // m4a
-                return meta.values.joinToString("\n")
-        }
-        return null
     }
 
     private fun loadLrcFile(lrcFile: File?): String? {
