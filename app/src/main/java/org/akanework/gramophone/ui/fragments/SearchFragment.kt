@@ -43,6 +43,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.akanework.gramophone.R
+import org.akanework.gramophone.logic.applyGeneralMenuItem
 import org.akanework.gramophone.logic.enableEdgeToEdgePaddingListener
 import org.akanework.gramophone.logic.ui.MyRecyclerView
 import org.akanework.gramophone.ui.LibraryViewModel
@@ -130,79 +131,7 @@ class SearchFragment : BaseFragment(null) {
             }
         }
 
-        topAppBar.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.equalizer -> {
-                    val intent = Intent("android.media.action.DISPLAY_AUDIO_EFFECT_CONTROL_PANEL")
-                        .addCategory("android.intent.category.CATEGORY_CONTENT_MUSIC")
-                    try {
-                        (requireActivity() as MainActivity).startingActivity.launch(intent)
-                    } catch (e: ActivityNotFoundException) {
-                        // Let's show a toast here if no system inbuilt EQ was found.
-                        Toast.makeText(
-                            requireContext(),
-                            R.string.equalizer_not_found,
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                }
-
-                R.id.refresh -> {
-                    val activity = requireActivity() as MainActivity
-                    val playerLayout = activity.playerBottomSheet
-                    activity.updateLibrary {
-                        val snackBar =
-                            Snackbar.make(
-                                requireView(),
-                                getString(
-                                    R.string.refreshed_songs,
-                                    libraryViewModel.mediaItemList.value!!.size,
-                                ),
-                                Snackbar.LENGTH_LONG,
-                            )
-                        snackBar.setAction(R.string.dismiss) {
-                            snackBar.dismiss()
-                        }
-
-                        /*
-                         * Let's override snack bar's color here so it would
-                         * adapt dark mode.
-                         */
-                        snackBar.setBackgroundTint(
-                            MaterialColors.getColor(
-                                snackBar.view,
-                                com.google.android.material.R.attr.colorSurface,
-                            ),
-                        )
-                        snackBar.setActionTextColor(
-                            MaterialColors.getColor(
-                                snackBar.view,
-                                com.google.android.material.R.attr.colorPrimary,
-                            ),
-                        )
-                        snackBar.setTextColor(
-                            MaterialColors.getColor(
-                                snackBar.view,
-                                com.google.android.material.R.attr.colorOnSurface,
-                            ),
-                        )
-
-                        // Set an anchor for snack bar.
-                        if (playerLayout.visible && playerLayout.actuallyVisible)
-                            snackBar.anchorView = playerLayout
-                        snackBar.show()
-                    }
-                }
-
-                R.id.settings -> {
-                    (activity as MainActivity).playerBottomSheet.shouldRetractBottomNavigation(true)
-                    (requireActivity() as MainActivity).startFragment(MainSettingsFragment())
-                }
-
-                else -> throw IllegalStateException()
-            }
-            true
-        }
+        topAppBar.applyGeneralMenuItem(this, libraryViewModel)
 
         return rootView
     }

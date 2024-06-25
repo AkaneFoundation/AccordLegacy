@@ -720,6 +720,12 @@ object MediaStoreUtils {
             libraryViewModel.folderStructure.value = pairObject.folderStructure
             libraryViewModel.shallowFolderStructure.value = pairObject.shallowFolder
             libraryViewModel.allFolderSet.value = pairObject.folders
+            if (libraryViewModel.recommendList.value == null) {
+                libraryViewModel.recommendList.value = RecommendationFactory(
+                    context = context,
+                    libraryViewModel = libraryViewModel
+                ).fetchRecommendList()
+            }
             getPrivatePlaylist(libraryViewModel, context)
             Log.d("TAG", "FINISHED BUILDING!")
             then?.let { it() }

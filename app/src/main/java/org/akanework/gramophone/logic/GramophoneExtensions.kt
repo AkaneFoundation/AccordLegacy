@@ -17,10 +17,14 @@
 
 package org.akanework.gramophone.logic
 
+import android.animation.TimeInterpolator
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -39,10 +43,12 @@ import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.WindowInsets
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
+import androidx.core.animation.doOnEnd
 import androidx.core.graphics.Insets
 import androidx.core.net.toFile
 import androidx.core.os.BundleCompat
@@ -60,16 +66,24 @@ import androidx.media3.session.SessionCommand
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
+import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.color.MaterialColors
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import org.akanework.gramophone.BuildConfig
+import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.GramophonePlaybackService.Companion.SERVICE_GET_LYRICS
 import org.akanework.gramophone.logic.GramophonePlaybackService.Companion.SERVICE_QUERY_TIMER
 import org.akanework.gramophone.logic.GramophonePlaybackService.Companion.SERVICE_SET_TIMER
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
+import org.akanework.gramophone.ui.LibraryViewModel
+import org.akanework.gramophone.ui.MainActivity
+import org.akanework.gramophone.ui.components.FullBottomSheet
 import org.akanework.gramophone.ui.fragments.BaseWrapperFragment
+import org.akanework.gramophone.ui.fragments.settings.MainSettingsFragment
 import java.io.File
 import kotlin.reflect.KClass
 
@@ -468,6 +482,119 @@ fun Context.resourceUri(resourceId: Int): Uri = with(resources) {
         .appendPath(getResourceTypeName(resourceId))
         .appendPath(getResourceEntryName(resourceId))
         .build()
+}
+
+fun TextView.animateText(targetScale: Float, targetColor: Int, interpolator: TimeInterpolator) {
+    val animator = ValueAnimator.ofFloat(scaleX, targetScale)
+    animator.addUpdateListener { animation ->
+        val animatedValue = animation.animatedValue as Float
+        scaleX = animatedValue
+        scaleY = animatedValue
+    }
+    animator.doOnEnd {
+        scaleX = targetScale
+        scaleY = targetScale
+    }
+    animator.duration = FullBottomSheet.LYRIC_SCROLL_DURATION
+    animator.interpolator = interpolator
+    animator.start()
+
+    val colorAnimator = ValueAnimator.ofArgb(textColors.defaultColor, targetColor)
+    colorAnimator.addUpdateListener { animation ->
+        val animatedValue = animation.animatedValue as Int
+        setTextColor(animatedValue)
+    }
+    colorAnimator.doOnEnd {
+        setTextColor(targetColor)
+    }
+    colorAnimator.duration = FullBottomSheet.LYRIC_SCROLL_DURATION
+    colorAnimator.interpolator = interpolator
+    colorAnimator.start()
+}
+
+fun TextView.scaleText(scale: Float) {
+    scaleX = scale
+    scaleY = scale
+}
+
+@SuppressLint("StringFormatInvalid")
+fun MaterialToolbar.applyGeneralMenuItem(
+    fragment: Fragment,
+    libraryViewModel: LibraryViewModel
+) {
+    this.setOnMenuItemClickListener {
+        when (it.itemId) {
+            R.id.equalizer -> {
+                val intent = Intent("android.media.action.DISPLAY_AUDIO_EFFECT_CONTROL_PANEL")
+                    .addCategory("android.intent.category.CATEGORY_CONTENT_MUSIC")
+                try {
+                    (fragment.requireActivity() as MainActivity).startingActivity.launch(intent)
+                } catch (e: ActivityNotFoundException) {
+                    // Let's show a toast here if no system inbuilt EQ was found.
+                    Toast.makeText(
+                        fragment.requireContext(),
+                        R.string.equalizer_not_found,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+
+            R.id.refresh -> {
+                val activity = fragment.requireActivity() as MainActivity
+                val playerLayout = activity.playerBottomSheet
+                activity.updateLibrary {
+                    val snackBar =
+                        Snackbar.make(
+                            fragment.requireView(),
+                            fragment.getString(
+                                R.string.refreshed_songs,
+                                libraryViewModel.mediaItemList.value!!.size,
+                            ),
+                            Snackbar.LENGTH_LONG,
+                        )
+                    snackBar.setAction(R.string.dismiss) {
+                        snackBar.dismiss()
+                    }
+
+                    /*
+                     * Let's override snack bar's color here so it would
+                     * adapt dark mode.
+                     */
+                    snackBar.setBackgroundTint(
+                        MaterialColors.getColor(
+                            snackBar.view,
+                            com.google.android.material.R.attr.colorSurface,
+                        ),
+                    )
+                    snackBar.setActionTextColor(
+                        MaterialColors.getColor(
+                            snackBar.view,
+                            com.google.android.material.R.attr.colorPrimary,
+                        ),
+                    )
+                    snackBar.setTextColor(
+                        MaterialColors.getColor(
+                            snackBar.view,
+                            com.google.android.material.R.attr.colorOnSurface,
+                        ),
+                    )
+
+                    // Set an anchor for snack bar.
+                    if (playerLayout.visible && playerLayout.actuallyVisible)
+                        snackBar.anchorView = playerLayout
+                    snackBar.show()
+                }
+            }
+
+            R.id.settings -> {
+                (fragment.requireActivity() as MainActivity).playerBottomSheet.shouldRetractBottomNavigation(true)
+                (fragment.requireActivity() as MainActivity).startFragment(MainSettingsFragment())
+            }
+
+            else -> throw IllegalStateException()
+        }
+        true
+    }
 }
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)

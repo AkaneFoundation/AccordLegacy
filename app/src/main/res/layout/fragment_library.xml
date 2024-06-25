@@ -27,7 +27,7 @@
             app:expandedTitleTextColor="@color/contrast_colorOnSurface"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:title="@string/library"
-            app:titleCollapseMode="scale">
+            >
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/topAppBar"

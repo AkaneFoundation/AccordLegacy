@@ -11,7 +11,7 @@
     <color name="contrast_blendOverlayColor">#66000000</color>
 
     <color name="contrast_listBackground">@color/contrast_colorBackground</color>
-    <color name="contrast_cardBackground">#1C1C1E</color>
+    <color name="contrast_cardBackground">#141416</color>
     <color name="contrast_listButtonTint">#424245</color>
 
     <!-- Fallback -->

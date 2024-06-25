@@ -12,6 +12,9 @@
     app:cardBackgroundColor="@android:color/transparent"
     app:cardElevation="0dp"
     app:strokeColor="@android:color/transparent"
+    android:clipToPadding="false"
+    android:clipToOutline="false"
+    android:clipChildren="false"
     tools:cardBackgroundColor="@color/contrast_colorOnSurface">
 
     <TextView

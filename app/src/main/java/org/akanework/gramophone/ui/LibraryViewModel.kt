@@ -23,6 +23,7 @@ import androidx.media3.common.MediaItem
 import org.akanework.gramophone.logic.data.db.entity.Playlist
 import org.akanework.gramophone.logic.data.db.entity.PlaylistWithMediaItem
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
+import org.akanework.gramophone.logic.utils.RecommendationFactory
 
 /**
  * LibraryViewModel:
@@ -44,5 +45,6 @@ class LibraryViewModel : ViewModel() {
     val allFolderSet: MutableLiveData<Set<String>> = MutableLiveData()
     val privatePlaylistList: MutableLiveData<List<PlaylistWithMediaItem>> = MutableLiveData()
     val privateAlbumList: MutableList<MediaStoreUtils.Album> = mutableListOf()
+    val recommendList: MutableLiveData<RecommendationFactory.RecommendList> = MutableLiveData()
     var privatePlaylistId: Long = 0
 }

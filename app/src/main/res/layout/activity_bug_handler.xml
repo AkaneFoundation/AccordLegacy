@@ -23,7 +23,7 @@
             app:expandedTitleTextColor="?attr/colorOnSurface"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:title="@string/gramophone_crashed"
-            app:titleCollapseMode="scale">
+            >
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/topAppBar"

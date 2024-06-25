@@ -1,38 +1,37 @@
 package org.akanework.gramophone.ui.fragments
 
 import android.annotation.SuppressLint
-import android.content.ActivityNotFoundException
-import android.content.Intent
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.widget.NestedScrollView
 import androidx.fluidrecyclerview.widget.LinearLayoutManager
-import androidx.fluidrecyclerview.widget.LinearSnapHelper
 import androidx.fluidrecyclerview.widget.RecyclerView
-import androidx.fluidrecyclerview.widget.SnapHelper
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.color.MaterialColors
-import com.google.android.material.snackbar.Snackbar
 import org.akanework.gramophone.R
+import org.akanework.gramophone.logic.applyGeneralMenuItem
 import org.akanework.gramophone.logic.enableEdgeToEdgePaddingListener
+import org.akanework.gramophone.logic.utils.RecommendationFactory
 import org.akanework.gramophone.ui.LibraryViewModel
 import org.akanework.gramophone.ui.MainActivity
 import org.akanework.gramophone.ui.adapters.HomepageCarouselAdapter
+import org.akanework.gramophone.ui.adapters.RecommendAdapter
 import org.akanework.gramophone.ui.components.ItemSnapHelper
-import org.akanework.gramophone.ui.fragments.settings.MainSettingsFragment
 
 
-class HomepageFragment : BaseFragment(null) {
+class HomepageFragment : BaseFragment(null), Observer<RecommendationFactory.RecommendList> {
 
     private lateinit var appBarLayout: AppBarLayout
     private val libraryViewModel: LibraryViewModel by activityViewModels()
+    private lateinit var recommendTitle: TextView
+    private lateinit var recommendRecyclerView: RecyclerView
+    private lateinit var recommendAdapter: RecommendAdapter
 
     @SuppressLint("StringFormatInvalid", "StringFormatMatches")
     override fun onCreateView(
@@ -44,6 +43,12 @@ class HomepageFragment : BaseFragment(null) {
         val topAppBar = rootView.findViewById<MaterialToolbar>(R.id.topAppBar)
         val recyclerView = rootView.findViewById<RecyclerView>(R.id.recyclerview_top)
         val nestedScrollView = rootView.findViewById<NestedScrollView>(R.id.nested)
+
+        recommendRecyclerView = rootView.findViewById(R.id.rv_r)
+        recommendTitle = rootView.findViewById(R.id.recommend)
+        recommendAdapter = RecommendAdapter(requireActivity() as MainActivity)
+
+        libraryViewModel.recommendList.observeForever(this)
 
         appBarLayout = rootView.findViewById(R.id.appbarlayout)
         appBarLayout.enableEdgeToEdgePaddingListener()
@@ -60,82 +65,26 @@ class HomepageFragment : BaseFragment(null) {
         recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         recyclerView.adapter = HomepageCarouselAdapter(requireContext())
 
+        recommendRecyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        recommendRecyclerView.adapter = recommendAdapter
+
         ItemSnapHelper().attachToRecyclerView(recyclerView)
+        ItemSnapHelper().attachToRecyclerView(recommendRecyclerView)
 
-        topAppBar.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.equalizer -> {
-                    val intent = Intent("android.media.action.DISPLAY_AUDIO_EFFECT_CONTROL_PANEL")
-                        .addCategory("android.intent.category.CATEGORY_CONTENT_MUSIC")
-                    try {
-                        (requireActivity() as MainActivity).startingActivity.launch(intent)
-                    } catch (e: ActivityNotFoundException) {
-                        // Let's show a toast here if no system inbuilt EQ was found.
-                        Toast.makeText(
-                            requireContext(),
-                            R.string.equalizer_not_found,
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                }
-
-                R.id.refresh -> {
-                    val activity = requireActivity() as MainActivity
-                    val playerLayout = activity.playerBottomSheet
-                    activity.updateLibrary {
-                        val snackBar =
-                            Snackbar.make(
-                                requireView(),
-                                getString(
-                                    R.string.refreshed_songs,
-                                    libraryViewModel.mediaItemList.value!!.size,
-                                ),
-                                Snackbar.LENGTH_LONG,
-                            )
-                        snackBar.setAction(R.string.dismiss) {
-                            snackBar.dismiss()
-                        }
-
-                        /*
-                         * Let's override snack bar's color here so it would
-                         * adapt dark mode.
-                         */
-                        snackBar.setBackgroundTint(
-                            MaterialColors.getColor(
-                                snackBar.view,
-                                com.google.android.material.R.attr.colorSurface,
-                            ),
-                        )
-                        snackBar.setActionTextColor(
-                            MaterialColors.getColor(
-                                snackBar.view,
-                                com.google.android.material.R.attr.colorPrimary,
-                            ),
-                        )
-                        snackBar.setTextColor(
-                            MaterialColors.getColor(
-                                snackBar.view,
-                                com.google.android.material.R.attr.colorOnSurface,
-                            ),
-                        )
-
-                        // Set an anchor for snack bar.
-                        if (playerLayout.visible && playerLayout.actuallyVisible)
-                            snackBar.anchorView = playerLayout
-                        snackBar.show()
-                    }
-                }
-
-                R.id.settings -> {
-                    (activity as MainActivity).playerBottomSheet.shouldRetractBottomNavigation(true)
-                    (requireActivity() as MainActivity).startFragment(MainSettingsFragment())
-                }
-
-                else -> throw IllegalStateException()
-            }
-            true
-        }
+        topAppBar.applyGeneralMenuItem(this, libraryViewModel)
 
         return rootView
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        libraryViewModel.recommendList.removeObserver(this)
+    }
+
+    override fun onChanged(value: RecommendationFactory.RecommendList) {
+        value.getTitle(libraryViewModel).let {
+            recommendTitle.text = it
+        }
+        recommendAdapter.updateList(value.recommendationList.toMutableList())
     }
 }

@@ -19,7 +19,7 @@
 
     <color name="contrast_lyric_defaultColor">#2EFFFFFF</color>
     <color name="contrast_lyric_highlightTranslationColor">#66FFFFFF</color>
-    <color name="contrast_lyric_highlightColor">#EBFFFFFF</color>
+    <color name="contrast_lyric_highlightColor">#FFFFFF</color>
 
     <color name="contrast_primaryOverlayShadeColor">#73FFFFFF</color>
     <color name="contrast_primaryOverlayColor">#BFFFFFFF</color>

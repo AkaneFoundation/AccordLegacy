@@ -28,7 +28,7 @@
             app:expandedTitleTextColor="@color/contrast_colorOnSurface"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:title="@string/home"
-            app:titleCollapseMode="scale">
+            >
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/topAppBar"
@@ -70,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:text="@string/recommendations"
-                android:textSize="22sp"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 android:layout_marginStart="24dp"
                 android:textColor="@color/contrast_colorOnSurface"
@@ -85,15 +85,24 @@
                 android:layout_height="wrap_content" />
 
             <TextView
+                android:id="@+id/recommend"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
                 android:text="@string/recently_played"
-                android:textSize="22sp"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 android:layout_marginStart="24dp"
                 android:textColor="@color/contrast_colorOnSurface"
                 />
+
+            <androidx.fluidrecyclerview.widget.RecyclerView
+                android:id="@+id/rv_r"
+                android:layout_width="match_parent"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:clipToPadding="false"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 

@@ -28,7 +28,7 @@
             app:expandedTitleTextColor="@color/contrast_colorOnSurface"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:title="@string/settings_about_app"
-            app:titleCollapseMode="scale">
+            >
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/topAppBar"
@@ -399,7 +399,8 @@
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:layout_gravity="center_vertical"
-                            android:layout_marginStart="64dp">
+                            android:layout_marginStart="64dp"
+                            android:layout_marginEnd="16dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -460,7 +461,8 @@
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:layout_gravity="center_vertical"
-                            android:layout_marginStart="64dp">
+                            android:layout_marginStart="64dp"
+                            android:layout_marginEnd="16dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -521,7 +523,8 @@
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:layout_gravity="center_vertical"
-                            android:layout_marginStart="64dp">
+                            android:layout_marginStart="64dp"
+                            android:layout_marginEnd="16dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -582,7 +585,8 @@
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:layout_gravity="center_vertical"
-                            android:layout_marginStart="64dp">
+                            android:layout_marginStart="64dp"
+                            android:layout_marginEnd="16dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
