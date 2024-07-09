@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.ViewCompat
 import androidx.core.widget.NestedScrollView
 import androidx.fluidrecyclerview.widget.LinearLayoutManager
 import androidx.fluidrecyclerview.widget.RecyclerView
@@ -70,6 +71,9 @@ class HomepageFragment : BaseFragment(null), Observer<RecommendationFactory.Reco
 
         ItemSnapHelper().attachToRecyclerView(recyclerView)
         ItemSnapHelper().attachToRecyclerView(recommendRecyclerView)
+
+        ViewCompat.setNestedScrollingEnabled(recyclerView, false)
+        ViewCompat.setNestedScrollingEnabled(recommendRecyclerView, false)
 
         topAppBar.applyGeneralMenuItem(this, libraryViewModel)
 

@@ -5,7 +5,7 @@
     android:id="@+id/full_player"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:background="@color/contrast_colorOnSurface"
+    tools:background="@color/contrast_colorBackground"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -805,31 +805,57 @@
         app:layout_constraintEnd_toEndOf="@id/controls"
         app:layout_constraintStart_toStartOf="@id/controls">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/lyric_btn"
+        <FrameLayout
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_weight="1"
-            android:background="@drawable/rp_buttons"
-            android:checkable="true"
-            android:gravity="center"
-            android:insetLeft="0dp"
-            android:insetTop="0dp"
-            android:insetRight="0dp"
-            android:insetBottom="0dp"
-            android:saveEnabled="false"
-            app:icon="@drawable/ic_quote_bubble_24dp"
-            app:iconGravity="textStart"
-            app:iconPadding="0dp"
-            app:iconSize="28dp"
-            app:iconTint="@color/sl_check_button" />
+            android:layout_weight="1">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/lyric_btn_under"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@android:color/transparent"
+                android:checkable="true"
+                android:gravity="center"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                android:saveEnabled="false"
+                android:layout_gravity="center"
+                app:icon="@drawable/ic_lyrics_btn"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="32dp"
+                app:iconTint="@color/contrast_primaryOverlayColor" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/lyric_btn"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@android:color/transparent"
+                android:checkable="true"
+                android:gravity="center"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                android:saveEnabled="false"
+                android:layout_gravity="center"
+                app:icon="@drawable/ic_lyrics_btn"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="32dp"
+                app:iconTint="@color/contrast_primaryOverlayShadeColor" />
+
+        </FrameLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/timer"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_weight="1"
-            android:background="@drawable/rp_buttons"
+            android:background="@android:color/transparent"
             android:checkable="true"
             android:gravity="center"
             android:insetLeft="0dp"
@@ -837,30 +863,58 @@
             android:insetRight="0dp"
             android:insetBottom="0dp"
             android:saveEnabled="false"
+            android:visibility="gone"
             app:icon="@drawable/ic_timer_24dp"
             app:iconGravity="textStart"
             app:iconPadding="0dp"
-            app:iconSize="28dp"
+            app:iconSize="32dp"
             app:iconTint="@color/sl_check_button" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/playlist"
+        <FrameLayout
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_weight="1"
-            android:background="@drawable/rp_buttons"
-            android:checkable="true"
-            android:gravity="center"
-            android:insetLeft="0dp"
-            android:insetTop="0dp"
-            android:insetRight="0dp"
-            android:insetBottom="0dp"
-            app:icon="@drawable/ic_bullet_list_24dp"
-            app:iconGravity="textStart"
-            app:iconPadding="0dp"
-            app:iconSize="28dp"
-            app:iconTint="@color/sl_check_button"
-            app:rippleColor="@android:color/transparent" />
+            android:layout_weight="1">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/playlist_under"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@android:color/transparent"
+                android:checkable="true"
+                android:gravity="center"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                android:layout_gravity="center"
+                app:icon="@drawable/ic_queue_btn"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="32dp"
+                app:iconTint="@color/contrast_primaryOverlayColor"
+                app:rippleColor="@android:color/transparent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/playlist"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@android:color/transparent"
+                android:checkable="true"
+                android:gravity="center"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                android:layout_gravity="center"
+                app:icon="@drawable/ic_queue_btn"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="32dp"
+                app:iconTint="@color/contrast_primaryOverlayShadeColor"
+                app:rippleColor="@android:color/transparent" />
+
+        </FrameLayout>
+
     </LinearLayout>
 
 </merge>

@@ -31,5 +31,6 @@
     <dimen name="bottom_sheet_height">56dp</dimen>
     <dimen name="top_app_bar_height">132dp</dimen>
     <dimen name="preview_album_cover_start">24dp</dimen>
+    <dimen name="full_cover_elevation">8dp</dimen>
     <item name="top_divider_visibility" format="float" type="dimen">1.0</item>
 </resources>

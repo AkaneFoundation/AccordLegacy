@@ -24,12 +24,10 @@
         android:letterSpacing="0.02"
         android:paddingTop="18dp"
         android:paddingBottom="18dp"
-        android:shadowColor="#FFFFFF"
         android:textColor="#FFFFFF"
-        android:textStyle="bold"
+        android:fontFamily="sans-serif"
+        android:textFontWeight="600"
         tools:layout_marginHorizontal="12.5dp"
-        tools:targetApi="p"
-        tools:text="轢き潰してきた その全てに 对着那被碾碎的 曾经的所有"
         tools:textSize="33sp" />
 
 </com.google.android.material.card.MaterialCardView>

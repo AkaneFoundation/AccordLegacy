@@ -97,6 +97,11 @@ class RecommendationFactory(
                 RecommendationType.GENRE -> {
                     GenreTitleFetcher(this, libraryViewModel)
                 }
+                RecommendationType.NONE -> {
+                    object : TitleFetcher {
+                        override fun getTitle(): String = ""
+                    }
+                }
                 else -> {
                     throw IllegalArgumentException("Invalid recommendation type")
                 }

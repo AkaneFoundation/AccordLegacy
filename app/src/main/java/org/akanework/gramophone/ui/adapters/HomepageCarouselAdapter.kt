@@ -19,8 +19,8 @@ class HomepageCarouselAdapter(
     val carouselList = mutableListOf(
         MediaStoreUtils.HomepageCarouselHolder(
             MediaStoreUtils.CarouselType.CUSTOM,
-            cover = context.resourceUri(R.drawable.accord_mix_1),
-            banner = context.resourceUri(R.drawable.accord_mix_1_banner),
+            cover = context.resourceUri(R.drawable.accord_mix_3),
+            banner = context.resourceUri(R.drawable.accord_mix_3_banner),
             songList = mutableListOf(),
             hint = ContextCompat.getString(context, R.string.daily_shuffle)
         ),
@@ -33,8 +33,8 @@ class HomepageCarouselAdapter(
         ),
         MediaStoreUtils.HomepageCarouselHolder(
             MediaStoreUtils.CarouselType.CUSTOM,
-            cover = context.resourceUri(R.drawable.accord_mix_3),
-            banner = context.resourceUri(R.drawable.accord_mix_3_banner),
+            cover = context.resourceUri(R.drawable.accord_mix_1),
+            banner = context.resourceUri(R.drawable.accord_mix_1_banner),
             songList = mutableListOf(),
             hint = ContextCompat.getString(context, R.string.daily_shuffle)
         ),

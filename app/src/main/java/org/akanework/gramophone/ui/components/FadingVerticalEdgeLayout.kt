@@ -3,6 +3,8 @@ package org.akanework.gramophone.ui.components
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.PorterDuff
@@ -27,6 +29,17 @@ class FadingVerticalEdgeLayout : FrameLayout {
     private var gradientRectBottom: Rect? = null
     private var gradientDirtyFlags = 0
 
+    private val colorMatrix = ColorMatrix(
+        floatArrayOf(
+            1f, 0f, 0f, 0f, 0f,
+            0f, 1f, 0f, 0f, 0f,
+            0f, 0f, 1f, 0f, 0f,
+            0f, 0f, 0f, 1.6f, 0f
+        )
+    )
+
+    private val overlayColorFilter = ColorMatrixColorFilter(colorMatrix)
+
     constructor(context: Context?) : super(context!!) {
         init(null)
     }
@@ -45,6 +58,7 @@ class FadingVerticalEdgeLayout : FrameLayout {
 
     private val overlayPaint = Paint().apply {
         xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
+        colorFilter = overlayColorFilter
     }
 
     private fun init(attrs: AttributeSet?) {

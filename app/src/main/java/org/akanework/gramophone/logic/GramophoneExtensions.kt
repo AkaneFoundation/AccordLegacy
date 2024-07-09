@@ -130,6 +130,7 @@ fun Drawable.startAnimation() {
 
 fun TextView.setTextAnimation(
     text: CharSequence?,
+    interpolator: TimeInterpolator,
     duration: Long = 300,
     completion: (() -> Unit)? = null,
     skipAnimation: Boolean = false
@@ -138,9 +139,9 @@ fun TextView.setTextAnimation(
         this.text = text
         completion?.let { it() }
     } else if (this.text != text) {
-        fadOutAnimation(duration) {
+        fadOutAnimation(interpolator, duration) {
             this.text = text
-            fadInAnimation(duration) {
+            fadInAnimation(interpolator, duration) {
                 completion?.let {
                     it()
                 }
@@ -154,6 +155,7 @@ fun TextView.setTextAnimation(
 // ViewExtensions
 
 fun View.fadOutAnimation(
+    interpolator: TimeInterpolator,
     duration: Long = 300,
     visibility: Int = View.INVISIBLE,
     completion: (() -> Unit)? = null
@@ -161,6 +163,7 @@ fun View.fadOutAnimation(
     animate()
         .alpha(0f)
         .setDuration(duration)
+        .setInterpolator(interpolator)
         .withEndAction {
             this.visibility = visibility
             completion?.let {
@@ -169,12 +172,17 @@ fun View.fadOutAnimation(
         }
 }
 
-fun View.fadInAnimation(duration: Long = 300, completion: (() -> Unit)? = null) {
+fun View.fadInAnimation(
+    interpolator: TimeInterpolator,
+    duration: Long = 300,
+    completion: (() -> Unit)? = null
+) {
     alpha = 0f
     visibility = View.VISIBLE
     animate()
         .alpha(1f)
         .setDuration(duration)
+        .setInterpolator(interpolator)
         .withEndAction {
             this.visibility = View.VISIBLE
             completion?.let {
