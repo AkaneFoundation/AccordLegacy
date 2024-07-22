@@ -136,7 +136,7 @@ object MediaStoreUtils {
 
     @Parcelize
     data class Lyric(
-        val timeStamp: Long = 0,
+        val timeStamp: Long? = null,
         val content: String = "",
         var isTranslation: Boolean = false
     ) : Parcelable

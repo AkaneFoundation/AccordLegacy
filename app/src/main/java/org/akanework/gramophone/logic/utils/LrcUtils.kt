@@ -117,14 +117,27 @@ object LrcUtils {
         var previousTs = -1L
         list.forEach {
             it.isTranslation = (it.timeStamp == previousTs)
-            previousTs = it.timeStamp
+            previousTs = it.timeStamp!!
+        }
+        if (list.isNotEmpty()) {
+            var count = 0
+            while (true) {
+                if (count < list.size
+                    && list[count].content.isEmpty()) {
+                    list.removeAt(count)
+                    count --
+                } else {
+                    break
+                }
+                count++
+            }
         }
         //}
         if (list.isEmpty() && lrcContent.isNotEmpty()) {
-            list.add(MediaStoreUtils.Lyric(1, lrcContent, false))
+            list.add(MediaStoreUtils.Lyric(null, lrcContent, false))
         } else if (!foundNonNull) {
             list.clear()
-            list.add(MediaStoreUtils.Lyric(1, lyricsText!!.toString(), false))
+            list.add(MediaStoreUtils.Lyric(null, lyricsText!!.toString(), false))
         }
         return list
     }

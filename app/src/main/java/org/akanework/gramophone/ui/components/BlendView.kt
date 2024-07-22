@@ -49,7 +49,7 @@ class BlendView @JvmOverloads constructor(
         const val SHALLOW_BLUR_RADIUS: Float = 60F
         const val UPDATE_RUNNABLE_INTERVAL: Long = 34
         const val CYCLE: Int = 360
-        const val SATURATION_FACTOR: Float = 2F
+        const val SATURATION_FACTOR: Float = 2.5F
         const val PICTURE_SIZE: Int = 60
     }
 

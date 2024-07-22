@@ -34,7 +34,7 @@ class FadingVerticalEdgeLayout : FrameLayout {
             1f, 0f, 0f, 0f, 0f,
             0f, 1f, 0f, 0f, 0f,
             0f, 0f, 1f, 0f, 0f,
-            0f, 0f, 0f, 1.6f, 0f
+            0f, 0f, 0f, 1.7f, 0f
         )
     )
 

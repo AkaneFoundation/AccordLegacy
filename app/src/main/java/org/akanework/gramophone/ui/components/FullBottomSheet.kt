@@ -18,7 +18,6 @@ import android.graphics.PorterDuffXfermode
 import android.media.AudioManager
 import android.os.Bundle
 import android.util.AttributeSet
-import android.util.Log
 import android.util.Size
 import android.util.TypedValue
 import android.view.Gravity
@@ -218,7 +217,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
     private val volumeChangeListener = OverlaySlider.OnChangeListener { _, value, fromUser ->
         if (fromUser) {
             if ((currentVolume - value.toInt()).absoluteValue >= 1) {
-                Log.d("TAG", "KNOCK KNOCK, CURRENT: ${currentVolume}, $value")
                 CoroutineScope(Dispatchers.Default).launch {
                     audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, value.toInt(), 0)
                     currentVolume = value.toInt()
@@ -315,6 +313,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
     var fullCoverFrameScale: Float = 0f
     var playlistCoverScale: Float = 0f
     var isPlaylistEnabled: Boolean = false
+    var hasPendingLyricAnimation: Boolean = false
 
     private val overlayPaint = Paint().apply {
         blendMode = BlendMode.OVERLAY
@@ -746,7 +745,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
                             animator.doOnEnd {
                                 animationBroadcastLock = false
                             }
-                            animator.duration = 200L
+                            animator.duration = BOTTOM_TRANSIT_DURATION
                             animator.start()
                             hideControllerJob()
                             return true
@@ -1316,9 +1315,16 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
         private var highlightTextColor =
             ResourcesCompat.getColor(resources, R.color.contrast_lyric_highlightColor, null)
 
+        private var disabledTextColor =
+            ResourcesCompat.getColor(resources, R.color.contrast_lyric_disabledColor, null)
+
         private val sizeFactor = 1f
 
         private val defaultTypeface = TypefaceCompat.create(context, null, 700, false)
+
+        private val disabledTextTypeface = TypefaceCompat.create(context, null, 500, false)
+
+        private val extraLineHeight = resources.getDimensionPixelSize(R.dimen.lyric_extra_line_height)
 
         var currentFocusPos = -1
         private var currentTranslationPos = -1
@@ -1348,12 +1354,21 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
                 payloads.isNotEmpty() && (payloads[0] == LYRIC_SET_HIGHLIGHT || payloads[0] == LYRIC_REMOVE_HIGHLIGHT)
 
             with(holder.lyricCard) {
-                setOnClickListener {
-                    performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                    activity.getPlayer()?.apply {
-                        animationLock = true
-                        seekTo(lyric.timeStamp)
-                        if (!isPlaying) play()
+                if (lyric.timeStamp != null) {
+                    isFocusable = true
+                    isClickable = true
+                } else {
+                    isFocusable = false
+                    isClickable = false
+                }
+                lyric.timeStamp?.let { it1 ->
+                    setOnClickListener {
+                        performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                        activity.getPlayer()?.apply {
+                            animationLock = true
+                            seekTo(it1)
+                            if (!isPlaying) play()
+                        }
                     }
                 }
             }
@@ -1364,13 +1379,17 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
                 gravity = if (isLyricCentered) Gravity.CENTER else Gravity.START
                 translationY = 0f
 
-                val textSize = if (lyric.isTranslation) 20f else 34f
-                val paddingTop = if (lyric.isTranslation) 2 else 18
+                val textSize = if (lyric.isTranslation) 20f else if (lyric.timeStamp != null) 34f else 18f
+                val paddingTop = if (lyric.isTranslation) 2 else if (lyric.timeStamp != null) 18 else 0
                 val paddingBottom =
-                    if (position + 1 < lyricList.size && lyricList[position + 1].isTranslation) 2 else 18
+                    if (position + 1 < lyricList.size && lyricList[position + 1].isTranslation) 2 else if (lyric.timeStamp != null) 18 else 0
 
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
-                typeface = defaultTypeface
+                typeface = if (lyric.timeStamp != null) defaultTypeface else disabledTextTypeface
+                setLineSpacing(
+                    if (lyric.timeStamp != null) 0f else extraLineHeight.toFloat(),
+                    1f
+                )
                 setPadding(
                     (12.5f).dpToPx(context).toInt(),
                     paddingTop.dpToPx(context),
@@ -1379,6 +1398,12 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
                 )
                 pivotX = 0f
                 pivotY = height.toFloat() / 2
+
+                if (lyric.timeStamp == null) {
+                    scaleText(sizeFactor)
+                    setTextColor(disabledTextColor)
+                    return@with
+                }
 
                 when {
                     isHighlightPayload -> {
@@ -1563,12 +1588,12 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
     private fun updateNewIndex(): Int {
         val filteredList = bottomSheetFullLyricList.filterIndexed { _, lyric ->
-            lyric.timeStamp <= (instance?.currentPosition ?: 0)
+            (lyric.timeStamp ?: 0) <= (instance?.currentPosition ?: 0)
         }
 
         return if (filteredList.isNotEmpty()) {
             filteredList.indices.maxBy {
-                filteredList[it].timeStamp
+                (filteredList[it].timeStamp ?: 0)
             }
         } else {
             -1
@@ -1616,7 +1641,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
                 newIndex != bottomSheetFullLyricAdapter.currentFocusPos
             ) {
                 if (bottomSheetFullLyricList[newIndex].content.isNotEmpty()) {
-                    val smoothScroller = createSmoothScroller(animationLock)
+                    val smoothScroller = createSmoothScroller(animationLock || newIndex == 0)
                     smoothScroller.targetPosition = newIndex
                     bottomSheetFullLyricLinearLayoutManager.startSmoothScroll(
                         smoothScroller
@@ -1750,12 +1775,14 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
     }
 
     private fun resetToDefaultLyricPosition() {
-        val smoothScroller = createSmoothScroller()
+        val smoothScroller = createSmoothScroller(true)
         smoothScroller.targetPosition = 0
         bottomSheetFullLyricLinearLayoutManager.startSmoothScroll(
             smoothScroller
         )
         bottomSheetFullLyricAdapter.updateHighlight(0)
+        bottomSheetFullLyricAdapter.notifyItemChanged(0)
+        bottomSheetFullLyricAdapter.notifyItemChanged(1)
     }
 
     inner class VolumeChangeReceiver : BroadcastReceiver() {
