@@ -68,30 +68,30 @@ class BugHandlerActivity : AppCompatActivity() {
         val formattedDateTime = formatter.format(currentDateTime)
         val gramophoneVersion = BuildConfig.MY_VERSION_NAME
 
-        val combinedTextBuilder = StringBuilder()
-        combinedTextBuilder
-            .append(getString(R.string.crash_gramophone_version)).append(':').append(' ')
-            .append(gramophoneVersion).append('\n').append('\n')
-            .append(getString(R.string.crash_phone_brand)).append(':').append("     ")
-            .append(deviceBrand).append('\n')
-            .append(getString(R.string.crash_phone_model)).append(':').append("     ")
-            .append(deviceModel).append('\n')
-            .append(getString(R.string.crash_sdk_level)).append(':').append(' ').append(sdkLevel)
-            .append('\n')
-            .append(getString(R.string.crash_thread)).append(':').append("    ").append(threadName)
-            .append('\n').append('\n').append('\n')
-            .append(getString(R.string.crash_time)).append(':').append(' ')
-            .append(formattedDateTime).append('\n')
-            .append("--------- beginning of crash").append('\n')
-            .append(exceptionMessage)
+        val logString = buildString {
+            append(getString(R.string.crash_accord_version)).append(':').append(' ')
+            append(gramophoneVersion).append('\n').append('\n')
+            append(getString(R.string.crash_phone_brand)).append(':').append("     ")
+            append(deviceBrand).append('\n')
+            append(getString(R.string.crash_phone_model)).append(':').append("     ")
+            append(deviceModel).append('\n')
+            append(getString(R.string.crash_sdk_level)).append(':').append(' ').append(sdkLevel)
+            append('\n')
+            append(getString(R.string.crash_thread)).append(':').append("    ").append(threadName)
+            append('\n').append('\n').append('\n')
+            append(getString(R.string.crash_time)).append(':').append(' ')
+            append(formattedDateTime).append('\n')
+            append("--------- beginning of crash").append('\n')
+            append(exceptionMessage)
+        }
 
         bugText.typeface = Typeface.MONOSPACE
-        bugText.text = combinedTextBuilder.toString()
+        bugText.text = logString
         bugText.enableEdgeToEdgePaddingListener()
 
         // Make our life easier by copying the log to clipboard
         val clipboard: ClipboardManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("error msg", combinedTextBuilder.toString())
+        val clip = ClipData.newPlainText("error msg", logString)
         clipboard.setPrimaryClip(clip)
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
             Toast.makeText(this, R.string.crash_clipboard, Toast.LENGTH_LONG).show()

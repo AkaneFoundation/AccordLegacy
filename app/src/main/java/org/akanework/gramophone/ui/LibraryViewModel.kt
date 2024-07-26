@@ -20,7 +20,6 @@ package org.akanework.gramophone.ui
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.media3.common.MediaItem
-import org.akanework.gramophone.logic.data.db.entity.Playlist
 import org.akanework.gramophone.logic.data.db.entity.PlaylistWithMediaItem
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
 import org.akanework.gramophone.logic.utils.RecommendationFactory

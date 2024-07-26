@@ -18,7 +18,8 @@ android {
     }
 
     namespace = "org.akanework.gramophone"
-    compileSdk = 34
+    compileSdk = 35
+    buildToolsVersion = "35.0.0"
 
     androidResources {
         generateLocaleConfig = true
@@ -30,7 +31,10 @@ android {
 
     packaging {
         jniLibs {
-            useLegacyPackaging = true
+            useLegacyPackaging = false
+        }
+        dex {
+            useLegacyPackaging = false
         }
         resources {
             excludes += "META-INF/*.version"
@@ -106,7 +110,7 @@ android {
                 isShrinkResources = true
                 proguardFiles(
                     getDefaultProguardFile("proguard-android-optimize.txt"),
-                    "proguard-rules.pro",
+                    "proguard-rules.pro"
                 )
             } else {
                 isMinifyEnabled = false
@@ -124,18 +128,21 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-        freeCompilerArgs += listOf(
-            "-Xno-param-assertions",
-            "-Xno-call-assertions",
-            "-Xno-receiver-assertions",
-        )
+    kotlin {
+        jvmToolchain(17)
+        compilerOptions {
+            freeCompilerArgs = listOf(
+                "-Xno-param-assertions",
+                "-Xno-call-assertions",
+                "-Xno-receiver-assertions"
+            )
+        }
     }
 
     // https://gitlab.com/IzzyOnDroid/repo/-/issues/491
@@ -151,32 +158,32 @@ android {
 }
 
 dependencies {
-    val media3Version = "1.3.1"
+    val media3Version = "1.4.0"
     val roomVersion = "2.6.1"
 
     ksp("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.activity:activity-ktx:1.9.0")
-    implementation("androidx.concurrent:concurrent-futures-ktx:1.1.0")
-    implementation("androidx.transition:transition-ktx:1.5.0") // <-- for predictive back
-    implementation("androidx.fragment:fragment-ktx:1.7.1")
+    implementation("androidx.activity:activity-ktx:1.9.1")
+    implementation("androidx.concurrent:concurrent-futures-ktx:1.2.0")
+    implementation("androidx.transition:transition-ktx:1.5.1") // <-- for predictive back
+    implementation("androidx.fragment:fragment-ktx:1.8.2")
     implementation("androidx.core:core-splashscreen:1.0.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0")
-    implementation("androidx.appcompat:appcompat:1.7.0-rc01")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
+    implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.0-alpha13")
     implementation("androidx.media3:media3-exoplayer:$media3Version")
     implementation("androidx.media3:media3-exoplayer-midi:$media3Version")
     implementation("androidx.media3:media3-session:$media3Version")
     implementation("androidx.preference:preference-ktx:1.2.1")
-    implementation("com.google.android.material:material:1.13.0-alpha02")
-    implementation("io.coil-kt.coil3:coil:3.0.0-alpha06")
+    implementation("com.google.android.material:material:1.13.0-alpha04")
+    implementation("io.coil-kt.coil3:coil:3.0.0-alpha09")
     implementation(files("../libs/lib-decoder-ffmpeg-release.aar"))
     implementation(project(":fluidrecyclerview"))
     implementation(project(":fastscroll"))
     // --- below does not apply to release builds ---
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.13")
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
     // Note: JAudioTagger is not compatible with Android 5, we can't ship it in app
     debugImplementation("net.jthink:jaudiotagger:3.0.1") // <-- for "SD Exploder"
     testImplementation("junit:junit:4.13.2")

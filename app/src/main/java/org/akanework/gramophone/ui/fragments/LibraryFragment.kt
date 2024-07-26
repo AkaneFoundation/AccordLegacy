@@ -1,48 +1,34 @@
 package org.akanework.gramophone.ui.fragments
 
 import android.annotation.SuppressLint
-import android.content.ActivityNotFoundException
-import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fluidrecyclerview.widget.ConcatAdapter
 import androidx.fluidrecyclerview.widget.GridLayoutManager
-import androidx.fluidrecyclerview.widget.LinearLayoutManager
 import androidx.fluidrecyclerview.widget.RecyclerView
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.color.MaterialColors
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.applyGeneralMenuItem
-import org.akanework.gramophone.logic.data.db.entity.MediaItem
 import org.akanework.gramophone.logic.data.db.entity.PlaylistWithMediaItem
 import org.akanework.gramophone.logic.enableEdgeToEdgePaddingListener
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
 import org.akanework.gramophone.ui.LibraryViewModel
-import org.akanework.gramophone.ui.MainActivity
-import org.akanework.gramophone.ui.adapters.AlbumAdapter
-import org.akanework.gramophone.ui.adapters.BaseAdapter
 import org.akanework.gramophone.ui.adapters.HeaderAdapter
 import org.akanework.gramophone.ui.adapters.LibraryCategoryAdapter
 import org.akanework.gramophone.ui.adapters.LibraryHomeAdapter
 import org.akanework.gramophone.ui.components.GridPaddingDecorationLibrary
-import org.akanework.gramophone.ui.fragments.settings.MainSettingsFragment
-import kotlin.system.measureTimeMillis
 
 class LibraryFragment : BaseFragment(null), Observer<List<PlaylistWithMediaItem>> {
     private val libraryViewModel: LibraryViewModel by activityViewModels()

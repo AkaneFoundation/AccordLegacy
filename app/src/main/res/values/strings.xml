@@ -52,7 +52,7 @@
     <string name="repeat_mode">Repeat mode</string>
     <string name="unknown_playlist">Unknown playlist</string>
     <string name="gramophone_crashed" translatable="false">Crash log</string>
-    <string name="crash_gramophone_version" translatable="false">Gramophone version</string>
+    <string name="crash_accord_version" translatable="false">Accord version</string>
     <string name="crash_phone_model" translatable="false">Model</string>
     <string name="crash_phone_brand" translatable="false">Brand</string>
     <string name="crash_sdk_level" translatable="false">SDK Level</string>

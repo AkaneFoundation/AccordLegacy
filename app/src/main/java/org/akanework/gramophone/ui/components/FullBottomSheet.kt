@@ -20,7 +20,6 @@ import android.graphics.Shader
 import android.media.AudioManager
 import android.os.Bundle
 import android.util.AttributeSet
-import android.util.Log
 import android.util.Size
 import android.util.TypedValue
 import android.view.Gravity
@@ -49,9 +48,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
+import androidx.fluidrecyclerview.widget.ItemTouchHelper
 import androidx.fluidrecyclerview.widget.LinearLayoutManager
 import androidx.fluidrecyclerview.widget.RecyclerView
-import androidx.fluidrecyclerview.widget.ItemTouchHelper
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -62,6 +61,7 @@ import androidx.media3.session.SessionResult
 import androidx.preference.PreferenceManager
 import androidx.transition.TransitionManager
 import coil3.annotation.ExperimentalCoilApi
+import coil3.asDrawable
 import coil3.dispose
 import coil3.imageLoader
 import coil3.load
@@ -119,14 +119,12 @@ import kotlin.math.min
 import kotlin.math.pow
 
 @SuppressLint("SetTextI18n")
-class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
-    ConstraintLayout(context, attrs, defStyleAttr, defStyleRes), Player.Listener, SharedPreferences.OnSharedPreferenceChangeListener {
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
-            this(context, attrs, defStyleAttr, 0)
-
-    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
-
-    constructor(context: Context) : this(context, null)
+class FullBottomSheet @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
+    defStyleRes: Int = 0
+) : ConstraintLayout(context, attrs, defStyleAttr, defStyleRes), Player.Listener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val activity
         get() = context as MainActivity

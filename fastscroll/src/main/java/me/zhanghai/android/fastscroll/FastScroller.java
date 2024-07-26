@@ -29,13 +29,13 @@ import android.view.ViewGroupOverlay;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import java.util.Objects;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.core.math.MathUtils;
 import androidx.core.util.Consumer;
+
+import java.util.Objects;
 
 public class FastScroller {
 

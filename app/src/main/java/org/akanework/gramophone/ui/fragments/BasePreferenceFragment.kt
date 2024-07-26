@@ -50,7 +50,7 @@ abstract class BasePreferenceFragment : PreferenceFragmentCompat(),
             )
         )
         view.findViewById<RecyclerView>(androidx.preference.R.id.recycler_view).apply {
-            setPadding(paddingLeft, paddingTop + 12.dpToPx(context), paddingRight, paddingBottom)
+            setPadding(paddingLeft, paddingTop + 4.dpToPx(context), paddingRight, paddingBottom)
             enableEdgeToEdgePaddingListener()
         }
     }
