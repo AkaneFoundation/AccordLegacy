@@ -2,8 +2,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbarlayout"
@@ -17,9 +16,7 @@
             style="?attr/collapsingToolbarLayoutMediumStyle"
             android:layout_width="match_parent"
             android:layout_height="@dimen/top_app_bar_height"
-            android:layout_marginStart="0dp"
             android:background="@color/contrast_listBackground"
-            android:paddingStart="0dp"
             app:collapsedTitleTextAppearance="@style/TextAppearance.App.TitleLarge"
             app:collapsedTitleTextColor="@color/contrast_colorOnSurface"
             app:contentScrim="@android:color/transparent"
@@ -27,8 +24,7 @@
             app:expandedTitleTextAppearance="@style/TextAppearance.App.HeadlineLarge"
             app:expandedTitleTextColor="@color/contrast_colorOnSurface"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
-            app:title="@string/settings_contributors"
-            >
+            app:title="@string/settings_contributors">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/topAppBar"
@@ -50,10 +46,10 @@
         android:id="@+id/nested"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
+        android:background="@color/contrast_listBackground"
         android:clipChildren="false"
         android:clipToOutline="false"
-        android:background="@color/contrast_listBackground"
+        android:clipToPadding="false"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -65,27 +61,26 @@
                 android:id="@+id/contributors"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/acknowledgements"
                 android:layout_marginStart="40dp"
-                android:textColor="@color/contrast_colorOnSurfaceSecondary"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 android:layout_marginTop="16dp"
+                android:text="@string/acknowledgements"
+                android:textColor="@color/contrast_colorOnSurfaceSecondary"
                 android:textSize="13sp"
-                />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/contributor_frame"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/contributors"
                 android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="24dp"
-                app:cardCornerRadius="12dp"
                 app:cardBackgroundColor="@color/contrast_cardBackground"
+                app:cardCornerRadius="12dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/contributors"
                 app:strokeWidth="0dp">
 
                 <LinearLayout
@@ -96,130 +91,122 @@
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="58dp"
+                        android:background="?selectableItemBackground"
                         android:clickable="true"
-                        android:focusable="true"
-                        android:background="?selectableItemBackground">
+                        android:focusable="true">
 
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
                             android:layout_gravity="center_vertical"
                             android:layout_marginStart="16dp"
-                            android:layout_marginEnd="16dp">
+                            android:layout_marginEnd="16dp"
+                            android:orientation="vertical">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="sans-serif"
-                                android:textFontWeight="500"
-                                android:textColor="@color/contrast_colorOnSurface"
                                 android:text="@string/ack1"
-                                />
+                                android:textColor="@color/contrast_colorOnSurface"
+                                android:textFontWeight="500" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="monospace"
-                                android:textFontWeight="400"
-                                android:textSize="13sp"
-                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
                                 android:text="@string/ack1_desc"
-                                />
+                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
+                                android:textFontWeight="400"
+                                android:textSize="13sp" />
 
                         </LinearLayout>
 
                         <com.google.android.material.divider.MaterialDivider
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:dividerThickness="0.5dp"
-                            app:dividerColor="@color/contrast_colorOutline"
                             android:layout_gravity="bottom"
                             android:layout_marginStart="16dp"
-                            />
+                            app:dividerColor="@color/contrast_colorOutline"
+                            app:dividerThickness="0.5dp" />
 
                     </FrameLayout>
 
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="58dp"
+                        android:background="?selectableItemBackground"
                         android:clickable="true"
-                        android:focusable="true"
-                        android:background="?selectableItemBackground">
+                        android:focusable="true">
 
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
                             android:layout_gravity="center_vertical"
                             android:layout_marginStart="16dp"
-                            android:layout_marginEnd="16dp">
+                            android:layout_marginEnd="16dp"
+                            android:orientation="vertical">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="sans-serif"
-                                android:textFontWeight="500"
-                                android:textColor="@color/contrast_colorOnSurface"
                                 android:text="@string/ack2"
-                                />
+                                android:textColor="@color/contrast_colorOnSurface"
+                                android:textFontWeight="500" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="monospace"
-                                android:textFontWeight="400"
-                                android:textSize="13sp"
-                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
                                 android:text="@string/ack2_desc"
-                                />
+                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
+                                android:textFontWeight="400"
+                                android:textSize="13sp" />
 
                         </LinearLayout>
 
                         <com.google.android.material.divider.MaterialDivider
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:dividerThickness="0.5dp"
-                            app:dividerColor="@color/contrast_colorOutline"
                             android:layout_gravity="bottom"
                             android:layout_marginStart="16dp"
-                            />
+                            app:dividerColor="@color/contrast_colorOutline"
+                            app:dividerThickness="0.5dp" />
 
                     </FrameLayout>
 
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="58dp"
+                        android:background="?selectableItemBackground"
                         android:clickable="true"
-                        android:focusable="true"
-                        android:background="?selectableItemBackground">
+                        android:focusable="true">
 
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
                             android:layout_gravity="center_vertical"
                             android:layout_marginStart="16dp"
-                            android:layout_marginEnd="16dp">
+                            android:layout_marginEnd="16dp"
+                            android:orientation="vertical">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="sans-serif"
-                                android:textFontWeight="500"
-                                android:textColor="@color/contrast_colorOnSurface"
                                 android:text="@string/ack3"
-                                />
+                                android:textColor="@color/contrast_colorOnSurface"
+                                android:textFontWeight="500" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="monospace"
-                                android:textFontWeight="400"
-                                android:textSize="13sp"
-                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
                                 android:text="@string/ack3_desc"
-                                />
+                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
+                                android:textFontWeight="400"
+                                android:textSize="13sp" />
 
                         </LinearLayout>
 
@@ -233,29 +220,28 @@
                 android:id="@+id/source"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/app_libraries"
                 android:layout_marginStart="40dp"
-                android:textColor="@color/contrast_colorOnSurfaceSecondary"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/contributor_frame"
                 android:layout_marginTop="20dp"
+                android:text="@string/app_libraries"
+                android:textColor="@color/contrast_colorOnSurfaceSecondary"
                 android:textSize="13sp"
-                />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/contributor_frame" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/source_frame"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/source"
-                app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="24dp"
-                app:cardCornerRadius="12dp"
                 android:layout_marginBottom="128dp"
                 app:cardBackgroundColor="@color/contrast_cardBackground"
+                app:cardCornerRadius="12dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/source"
                 app:strokeWidth="0dp">
 
                 <LinearLayout
@@ -266,9 +252,9 @@
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="58dp"
+                        android:background="?selectableItemBackground"
                         android:clickable="true"
-                        android:focusable="true"
-                        android:background="?selectableItemBackground">
+                        android:focusable="true">
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -291,154 +277,145 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="monospace"
                                 android:maxLines="1"
-                                android:textSize="13sp"
                                 android:text="@string/lib1_desc"
                                 android:textColor="@color/contrast_colorOnSurfaceSecondary"
-                                android:textFontWeight="400" />
+                                android:textFontWeight="400"
+                                android:textSize="13sp" />
 
                         </LinearLayout>
 
                         <com.google.android.material.divider.MaterialDivider
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:dividerThickness="0.5dp"
-                            app:dividerColor="@color/contrast_colorOutline"
                             android:layout_gravity="bottom"
                             android:layout_marginStart="16dp"
-                            />
+                            app:dividerColor="@color/contrast_colorOutline"
+                            app:dividerThickness="0.5dp" />
 
                     </FrameLayout>
 
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="58dp"
+                        android:background="?selectableItemBackground"
                         android:clickable="true"
-                        android:focusable="true"
-                        android:background="?selectableItemBackground">
+                        android:focusable="true">
 
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
                             android:layout_gravity="center_vertical"
                             android:layout_marginStart="16dp"
-                            android:layout_marginEnd="16dp">
+                            android:layout_marginEnd="16dp"
+                            android:orientation="vertical">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="sans-serif"
-                                android:textFontWeight="500"
-                                android:textColor="@color/contrast_colorOnSurface"
                                 android:text="@string/lib2"
-                                />
+                                android:textColor="@color/contrast_colorOnSurface"
+                                android:textFontWeight="500" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="monospace"
-                                android:textFontWeight="400"
-                                android:textSize="13sp"
-                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
+                                android:maxLines="1"
                                 android:text="@string/lib2_desc"
-                                android:maxLines="1"
-                                />
+                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
+                                android:textFontWeight="400"
+                                android:textSize="13sp" />
 
                         </LinearLayout>
 
                         <com.google.android.material.divider.MaterialDivider
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:dividerThickness="0.5dp"
-                            app:dividerColor="@color/contrast_colorOutline"
                             android:layout_gravity="bottom"
                             android:layout_marginStart="16dp"
-                            />
+                            app:dividerColor="@color/contrast_colorOutline"
+                            app:dividerThickness="0.5dp" />
 
                     </FrameLayout>
 
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="58dp"
+                        android:background="?selectableItemBackground"
                         android:clickable="true"
-                        android:focusable="true"
-                        android:background="?selectableItemBackground">
+                        android:focusable="true">
 
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
                             android:layout_gravity="center_vertical"
                             android:layout_marginStart="16dp"
-                            android:layout_marginEnd="16dp">
+                            android:layout_marginEnd="16dp"
+                            android:orientation="vertical">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="sans-serif"
-                                android:textFontWeight="500"
-                                android:textColor="@color/contrast_colorOnSurface"
                                 android:text="@string/lib3"
-                                />
+                                android:textColor="@color/contrast_colorOnSurface"
+                                android:textFontWeight="500" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="monospace"
-                                android:textFontWeight="400"
-                                android:textSize="13sp"
-                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
-                                android:text="@string/lib3_desc"
                                 android:maxLines="1"
-                                />
+                                android:text="@string/lib3_desc"
+                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
+                                android:textFontWeight="400"
+                                android:textSize="13sp" />
 
                         </LinearLayout>
 
                         <com.google.android.material.divider.MaterialDivider
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:dividerThickness="0.5dp"
-                            app:dividerColor="@color/contrast_colorOutline"
                             android:layout_gravity="bottom"
                             android:layout_marginStart="16dp"
-                            />
+                            app:dividerColor="@color/contrast_colorOutline"
+                            app:dividerThickness="0.5dp" />
 
                     </FrameLayout>
 
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="58dp"
+                        android:background="?selectableItemBackground"
                         android:clickable="true"
-                        android:focusable="true"
-                        android:background="?selectableItemBackground">
+                        android:focusable="true">
 
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
                             android:layout_gravity="center_vertical"
                             android:layout_marginStart="16dp"
-                            android:layout_marginEnd="16dp">
+                            android:layout_marginEnd="16dp"
+                            android:orientation="vertical">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="sans-serif"
-                                android:textFontWeight="500"
-                                android:textColor="@color/contrast_colorOnSurface"
                                 android:text="@string/lib4"
-                                />
+                                android:textColor="@color/contrast_colorOnSurface"
+                                android:textFontWeight="500" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="monospace"
-                                android:textFontWeight="400"
-                                android:textSize="13sp"
-                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
-                                android:text="@string/lib4_desc"
                                 android:maxLines="1"
-                                />
+                                android:text="@string/lib4_desc"
+                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
+                                android:textFontWeight="400"
+                                android:textSize="13sp" />
 
                         </LinearLayout>
 

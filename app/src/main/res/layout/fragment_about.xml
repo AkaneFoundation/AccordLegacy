@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbarlayout"
@@ -17,9 +17,7 @@
             style="?attr/collapsingToolbarLayoutMediumStyle"
             android:layout_width="match_parent"
             android:layout_height="@dimen/top_app_bar_height"
-            android:layout_marginStart="0dp"
             android:background="@color/contrast_listBackground"
-            android:paddingStart="0dp"
             app:collapsedTitleTextAppearance="@style/TextAppearance.App.TitleLarge"
             app:collapsedTitleTextColor="@color/contrast_colorOnSurface"
             app:contentScrim="@android:color/transparent"
@@ -27,8 +25,7 @@
             app:expandedTitleTextAppearance="@style/TextAppearance.App.HeadlineLarge"
             app:expandedTitleTextColor="@color/contrast_colorOnSurface"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
-            app:title="@string/settings_about_app"
-            >
+            app:title="@string/settings_about_app">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/topAppBar"
@@ -50,10 +47,10 @@
         android:id="@+id/nested"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
+        android:background="@color/contrast_listBackground"
         android:clipChildren="false"
         android:clipToOutline="false"
-        android:background="@color/contrast_listBackground"
+        android:clipToPadding="false"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -65,15 +62,15 @@
                 android:id="@+id/info_card"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginStart="24dp"
-                android:layout_marginEnd="24dp"
                 android:layout_marginTop="16dp"
-                app:strokeWidth="0dp"
+                android:layout_marginEnd="24dp"
+                app:cardBackgroundColor="@color/contrast_cardBackground"
                 app:cardCornerRadius="12dp"
-                app:cardBackgroundColor="@color/contrast_cardBackground">
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -85,43 +82,42 @@
                         android:layout_height="28dp"
                         android:layout_marginStart="18dp"
                         android:layout_marginTop="18dp"
-                        android:src="@drawable/ic_accord_logo_alt"
                         android:adjustViewBounds="true"
+                        android:importantForAccessibility="no"
                         android:scaleType="center"
-                        app:tint="@color/contrast_colorOnSurface"/>
+                        android:src="@drawable/ic_accord_logo_alt"
+                        app:tint="@color/contrast_colorOnSurface" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="35dp"
-                        android:layout_marginTop="28dp"
                         android:layout_marginStart="18dp"
-                        android:gravity="center"
-                        android:text="@string/app_name"
+                        android:layout_marginTop="28dp"
+                        android:contentDescription="@string/app_name"
                         android:fontFamily="sans-serif"
-                        android:textFontWeight="600"
-                        android:textColor="@color/contrast_colorOnSurface"
-                        android:textSize="24sp"
+                        android:gravity="center"
                         android:lineHeight="34.75dp"
-                        />
+                        android:text="@string/app_name"
+                        android:textColor="@color/contrast_colorOnSurface"
+                        android:textFontWeight="600"
+                        android:textSize="24sp" />
 
                     <TextView
                         android:id="@+id/version_tag"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/contrast_colorOnSurfaceSecondary"
-                        tools:text="Beta 1 · Dessert"
                         android:layout_marginStart="18dp"
-                        />
+                        android:textColor="@color/contrast_colorOnSurfaceSecondary"
+                        tools:text="Beta 1 · Dessert" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/opensource_info"
-                        android:textColor="@color/contrast_colorOnSurface"
                         android:layout_marginStart="18dp"
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="18dp"
-                        />
+                        android:text="@string/opensource_info"
+                        android:textColor="@color/contrast_colorOnSurface" />
 
                 </LinearLayout>
 
@@ -131,79 +127,75 @@
                 android:id="@+id/main_dev"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/main_developers"
                 android:layout_marginStart="40dp"
-                android:textColor="@color/contrast_colorOnSurfaceSecondary"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/info_card"
                 android:layout_marginTop="20dp"
+                android:text="@string/main_developers"
+                android:textColor="@color/contrast_colorOnSurfaceSecondary"
                 android:textSize="13sp"
-                />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/info_card" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/akane_cv"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:strokeWidth="0dp"
-                app:cardCornerRadius="16dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/main_dev"
-                app:layout_constraintEnd_toStartOf="@id/duo_cv"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="6dp"
-                app:cardBackgroundColor="@color/contrast_cardBackground"
                 android:clickable="true"
-                android:focusable="true">
-                
+                android:focusable="true"
+                app:cardBackgroundColor="@color/contrast_cardBackground"
+                app:cardCornerRadius="16dp"
+                app:layout_constraintEnd_toStartOf="@id/duo_cv"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/main_dev"
+                app:strokeWidth="0dp">
+
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    app:cardCornerRadius="128dp"
-                    android:layout_marginTop="12dp"
                     android:layout_marginStart="12dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="@color/contrast_colorOutline">
+                    android:layout_marginTop="12dp"
+                    app:cardCornerRadius="128dp"
+                    app:strokeColor="@color/contrast_colorOutline"
+                    app:strokeWidth="1dp">
 
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:importantForAccessibility="no"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/akane_avatar"
-                        />
+                        android:src="@drawable/akane_avatar" />
 
                 </com.google.android.material.card.MaterialCardView>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/akane"
                     android:layout_marginStart="12dp"
                     android:layout_marginTop="74dp"
-                    android:textColor="@color/contrast_colorOnSurface"
                     android:fontFamily="sans-serif"
-                    android:textFontWeight="500"
-                    />
+                    android:text="@string/akane"
+                    android:textColor="@color/contrast_colorOnSurface"
+                    android:textFontWeight="500" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:layout_marginTop="94dp"
-                    android:text="@string/akanetan"
                     android:fontFamily="monospace"
-                    android:textColor="@color/contrast_colorOnSurfaceSecondary"
-                    />
+                    android:text="@string/akanetan"
+                    android:textColor="@color/contrast_colorOnSurfaceSecondary" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:layout_marginTop="120dp"
-                    android:text="@string/akane_job"
-                    android:textColor="@color/contrast_colorOnSurface"
                     android:layout_marginBottom="12dp"
-                    />
+                    android:text="@string/akane_job"
+                    android:textColor="@color/contrast_colorOnSurface" />
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -211,65 +203,62 @@
                 android:id="@+id/duo_cv"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:strokeWidth="0dp"
-                app:cardCornerRadius="16dp"
-                android:layout_marginEnd="10dp"
                 android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="@color/contrast_cardBackground"
+                app:cardCornerRadius="16dp"
+                app:layout_constraintEnd_toStartOf="@id/nick_cv"
                 app:layout_constraintStart_toEndOf="@id/akane_cv"
                 app:layout_constraintTop_toTopOf="@id/akane_cv"
-                app:layout_constraintEnd_toStartOf="@id/nick_cv"
-                app:cardBackgroundColor="@color/contrast_cardBackground"
-                android:clickable="true"
-                android:focusable="true">
+                app:strokeWidth="0dp">
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    app:cardCornerRadius="128dp"
-                    android:layout_marginTop="12dp"
                     android:layout_marginStart="12dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="@color/contrast_colorOutline">
+                    android:layout_marginTop="12dp"
+                    app:cardCornerRadius="128dp"
+                    app:strokeColor="@color/contrast_colorOutline"
+                    app:strokeWidth="1dp">
 
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:importantForAccessibility="no"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/duo3"
-                        />
+                        android:src="@drawable/duo3" />
 
                 </com.google.android.material.card.MaterialCardView>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/duo3"
                     android:layout_marginStart="12dp"
                     android:layout_marginTop="74dp"
-                    android:textColor="@color/contrast_colorOnSurface"
                     android:fontFamily="sans-serif"
-                    android:textFontWeight="500"
-                    />
+                    android:text="@string/duo3"
+                    android:textColor="@color/contrast_colorOnSurface"
+                    android:textFontWeight="500" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:layout_marginTop="94dp"
-                    android:text="@string/duo3_tag"
                     android:fontFamily="monospace"
-                    android:textColor="@color/contrast_colorOnSurfaceSecondary"
-                    />
+                    android:text="@string/duo3_tag"
+                    android:textColor="@color/contrast_colorOnSurfaceSecondary" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:layout_marginTop="120dp"
-                    android:text="@string/duo3_job"
-                    android:textColor="@color/contrast_colorOnSurface"
                     android:layout_marginBottom="12dp"
-                    />
+                    android:text="@string/duo3_job"
+                    android:textColor="@color/contrast_colorOnSurface" />
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -277,65 +266,62 @@
                 android:id="@+id/nick_cv"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:strokeWidth="0dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="24dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="@color/contrast_cardBackground"
                 app:cardCornerRadius="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/duo_cv"
                 app:layout_constraintTop_toTopOf="@id/akane_cv"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginEnd="24dp"
-                android:layout_marginStart="6dp"
-                app:cardBackgroundColor="@color/contrast_cardBackground"
-                android:clickable="true"
-                android:focusable="true">
+                app:strokeWidth="0dp">
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    app:cardCornerRadius="128dp"
-                    android:layout_marginTop="12dp"
                     android:layout_marginStart="12dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="@color/contrast_colorOutline">
+                    android:layout_marginTop="12dp"
+                    app:cardCornerRadius="128dp"
+                    app:strokeColor="@color/contrast_colorOutline"
+                    app:strokeWidth="1dp">
 
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:importantForAccessibility="no"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/nick"
-                        />
+                        android:src="@drawable/nick" />
 
                 </com.google.android.material.card.MaterialCardView>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/nick"
                     android:layout_marginStart="12dp"
                     android:layout_marginTop="74dp"
-                    android:textColor="@color/contrast_colorOnSurface"
                     android:fontFamily="sans-serif"
-                    android:textFontWeight="500"
-                    />
+                    android:text="@string/nick"
+                    android:textColor="@color/contrast_colorOnSurface"
+                    android:textFontWeight="500" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:layout_marginTop="94dp"
-                    android:text="@string/nick_tag"
                     android:fontFamily="monospace"
-                    android:textColor="@color/contrast_colorOnSurfaceSecondary"
-                    />
+                    android:text="@string/nick_tag"
+                    android:textColor="@color/contrast_colorOnSurfaceSecondary" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:layout_marginTop="120dp"
-                    android:text="@string/nick_job"
-                    android:textColor="@color/contrast_colorOnSurface"
                     android:layout_marginBottom="12dp"
-                    />
+                    android:text="@string/nick_job"
+                    android:textColor="@color/contrast_colorOnSurface" />
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -343,27 +329,26 @@
                 android:id="@+id/side_dev"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/side_developers"
                 android:layout_marginStart="40dp"
-                android:textColor="@color/contrast_colorOnSurfaceSecondary"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/akane_cv"
                 android:layout_marginTop="20dp"
+                android:text="@string/side_developers"
+                android:textColor="@color/contrast_colorOnSurfaceSecondary"
                 android:textSize="13sp"
-                />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/akane_cv" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/side_dev_frame"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/side_dev"
                 android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="24dp"
-                app:cardCornerRadius="12dp"
                 app:cardBackgroundColor="@color/contrast_cardBackground"
+                app:cardCornerRadius="12dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/side_dev"
                 app:strokeWidth="0dp">
 
                 <LinearLayout
@@ -374,22 +359,23 @@
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="58dp"
+                        android:background="?selectableItemBackground"
                         android:clickable="true"
-                        android:focusable="true"
-                        android:background="?selectableItemBackground">
+                        android:focusable="true">
 
                         <com.google.android.material.card.MaterialCardView
                             android:layout_width="32dp"
                             android:layout_height="32dp"
-                            app:strokeWidth="0.5dp"
-                            app:cardCornerRadius="128dp"
-                            android:layout_marginStart="16dp"
                             android:layout_gravity="center_vertical"
-                            app:strokeColor="@color/contrast_colorOutline">
+                            android:layout_marginStart="16dp"
+                            app:cardCornerRadius="128dp"
+                            app:strokeColor="@color/contrast_colorOutline"
+                            app:strokeWidth="0.5dp">
 
                             <ImageView
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
+                                android:importantForAccessibility="no"
                                 android:src="@drawable/lazar" />
 
                         </com.google.android.material.card.MaterialCardView>
@@ -397,61 +383,59 @@
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
                             android:layout_gravity="center_vertical"
                             android:layout_marginStart="64dp"
-                            android:layout_marginEnd="16dp">
+                            android:layout_marginEnd="16dp"
+                            android:orientation="vertical">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="16sp"
-                                android:textColor="@color/contrast_colorOnSurface"
                                 android:text="@string/lazar"
-                                />
+                                android:textColor="@color/contrast_colorOnSurface"
+                                android:textSize="16sp" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="monospace"
-                                android:textFontWeight="400"
-                                android:textSize="13sp"
-                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
                                 android:text="@string/lazar_tag"
-                                />
+                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
+                                android:textFontWeight="400"
+                                android:textSize="13sp" />
 
                         </LinearLayout>
 
                         <com.google.android.material.divider.MaterialDivider
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:dividerThickness="0.5dp"
-                            app:dividerColor="@color/contrast_colorOutline"
                             android:layout_gravity="bottom"
                             android:layout_marginStart="64dp"
-                            />
+                            app:dividerColor="@color/contrast_colorOutline"
+                            app:dividerThickness="0.5dp" />
 
                     </FrameLayout>
 
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="58dp"
+                        android:background="?selectableItemBackground"
                         android:clickable="true"
-                        android:focusable="true"
-                        android:background="?selectableItemBackground">
+                        android:focusable="true">
 
                         <com.google.android.material.card.MaterialCardView
                             android:layout_width="32dp"
                             android:layout_height="32dp"
-                            app:strokeWidth="0.5dp"
-                            app:cardCornerRadius="128dp"
-                            android:layout_marginStart="16dp"
                             android:layout_gravity="center_vertical"
-                            app:strokeColor="@color/contrast_colorOutline">
+                            android:layout_marginStart="16dp"
+                            app:cardCornerRadius="128dp"
+                            app:strokeColor="@color/contrast_colorOutline"
+                            app:strokeWidth="0.5dp">
 
                             <ImageView
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
+                                android:importantForAccessibility="no"
                                 android:src="@drawable/awainatsu" />
 
                         </com.google.android.material.card.MaterialCardView>
@@ -459,61 +443,59 @@
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
                             android:layout_gravity="center_vertical"
                             android:layout_marginStart="64dp"
-                            android:layout_marginEnd="16dp">
+                            android:layout_marginEnd="16dp"
+                            android:orientation="vertical">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="16sp"
-                                android:textColor="@color/contrast_colorOnSurface"
                                 android:text="@string/awainatsu"
-                                />
+                                android:textColor="@color/contrast_colorOnSurface"
+                                android:textSize="16sp" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="monospace"
-                                android:textFontWeight="400"
-                                android:textSize="13sp"
-                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
                                 android:text="@string/awainatsu_tag"
-                                />
+                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
+                                android:textFontWeight="400"
+                                android:textSize="13sp" />
 
                         </LinearLayout>
 
                         <com.google.android.material.divider.MaterialDivider
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:dividerThickness="0.5dp"
-                            app:dividerColor="@color/contrast_colorOutline"
                             android:layout_gravity="bottom"
                             android:layout_marginStart="64dp"
-                            />
+                            app:dividerColor="@color/contrast_colorOutline"
+                            app:dividerThickness="0.5dp" />
 
                     </FrameLayout>
 
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="58dp"
+                        android:background="?selectableItemBackground"
                         android:clickable="true"
-                        android:focusable="true"
-                        android:background="?selectableItemBackground">
+                        android:focusable="true">
 
                         <com.google.android.material.card.MaterialCardView
                             android:layout_width="32dp"
                             android:layout_height="32dp"
-                            app:strokeWidth="0.5dp"
-                            app:cardCornerRadius="128dp"
-                            android:layout_marginStart="16dp"
                             android:layout_gravity="center_vertical"
-                            app:strokeColor="@color/contrast_colorOutline">
+                            android:layout_marginStart="16dp"
+                            app:cardCornerRadius="128dp"
+                            app:strokeColor="@color/contrast_colorOutline"
+                            app:strokeWidth="0.5dp">
 
                             <ImageView
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
+                                android:importantForAccessibility="no"
                                 android:src="@drawable/skyd" />
 
                         </com.google.android.material.card.MaterialCardView>
@@ -521,61 +503,59 @@
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
                             android:layout_gravity="center_vertical"
                             android:layout_marginStart="64dp"
-                            android:layout_marginEnd="16dp">
+                            android:layout_marginEnd="16dp"
+                            android:orientation="vertical">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="16sp"
-                                android:textColor="@color/contrast_colorOnSurface"
                                 android:text="@string/skyd"
-                                />
+                                android:textColor="@color/contrast_colorOnSurface"
+                                android:textSize="16sp" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="monospace"
-                                android:textFontWeight="400"
-                                android:textSize="13sp"
-                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
                                 android:text="@string/skyd_tag"
-                                />
+                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
+                                android:textFontWeight="400"
+                                android:textSize="13sp" />
 
                         </LinearLayout>
 
                         <com.google.android.material.divider.MaterialDivider
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:dividerThickness="0.5dp"
-                            app:dividerColor="@color/contrast_colorOutline"
                             android:layout_gravity="bottom"
                             android:layout_marginStart="64dp"
-                            />
+                            app:dividerColor="@color/contrast_colorOutline"
+                            app:dividerThickness="0.5dp" />
 
                     </FrameLayout>
 
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="58dp"
+                        android:background="?selectableItemBackground"
                         android:clickable="true"
-                        android:focusable="true"
-                        android:background="?selectableItemBackground">
+                        android:focusable="true">
 
                         <com.google.android.material.card.MaterialCardView
                             android:layout_width="32dp"
                             android:layout_height="32dp"
-                            app:strokeWidth="0.5dp"
-                            app:cardCornerRadius="128dp"
-                            android:layout_marginStart="16dp"
                             android:layout_gravity="center_vertical"
-                            app:strokeColor="@color/contrast_colorOutline">
+                            android:layout_marginStart="16dp"
+                            app:cardCornerRadius="128dp"
+                            app:strokeColor="@color/contrast_colorOutline"
+                            app:strokeWidth="0.5dp">
 
                             <ImageView
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
+                                android:importantForAccessibility="no"
                                 android:src="@drawable/luka" />
 
                         </com.google.android.material.card.MaterialCardView>
@@ -583,28 +563,26 @@
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
                             android:layout_gravity="center_vertical"
                             android:layout_marginStart="64dp"
-                            android:layout_marginEnd="16dp">
+                            android:layout_marginEnd="16dp"
+                            android:orientation="vertical">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="16sp"
-                                android:textColor="@color/contrast_colorOnSurface"
                                 android:text="@string/luka"
-                                />
+                                android:textColor="@color/contrast_colorOnSurface"
+                                android:textSize="16sp" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="monospace"
-                                android:textFontWeight="400"
-                                android:textSize="13sp"
-                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
                                 android:text="@string/luka_tag"
-                                />
+                                android:textColor="@color/contrast_colorOnSurfaceSecondary"
+                                android:textFontWeight="400"
+                                android:textSize="13sp" />
 
                         </LinearLayout>
 
@@ -619,65 +597,66 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
-                android:layout_marginEnd="24dp"
                 android:layout_marginTop="36dp"
-                app:layout_constraintTop_toBottomOf="@id/side_dev_frame"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:cardBackgroundColor="@color/contrast_cardBackground"
-                app:strokeWidth="0dp"
-                app:cardCornerRadius="10dp"
+                android:layout_marginEnd="24dp"
+                android:layout_marginBottom="36dp"
                 android:clickable="true"
                 android:focusable="true"
+                app:cardBackgroundColor="@color/contrast_cardBackground"
+                app:cardCornerRadius="10dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginBottom="36dp">
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/side_dev_frame"
+                app:strokeWidth="0dp">
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="28dp"
                     android:layout_height="28dp"
-                    app:strokeWidth="0.75dp"
-                    app:cardCornerRadius="6dp"
+                    android:layout_gravity="center_vertical"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
-                    android:layout_gravity="center_vertical"
+                    app:cardBackgroundColor="@color/contrast_colorBackgroundFixed"
+                    app:cardCornerRadius="6dp"
                     app:strokeColor="@color/contrast_colorOutline"
-                    app:cardBackgroundColor="@color/contrast_colorBackgroundFixed">
+                    app:strokeWidth="0.75dp">
 
                     <ImageView
-                        android:padding="3dp"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:importantForAccessibility="no"
+                        android:padding="3dp"
                         android:src="@drawable/ic_contributors"
-                        app:tint="@color/contrast_themeColorFixed"/>
+                        app:tint="@color/contrast_themeColorFixed" />
 
                 </com.google.android.material.card.MaterialCardView>
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginStart="64dp">
+                    android:layout_marginStart="64dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="16sp"
-                        android:textColor="@color/contrast_colorOnSurface"
                         android:text="@string/settings_contributors"
-                        />
+                        android:textColor="@color/contrast_colorOnSurface"
+                        android:textSize="16sp" />
 
                 </LinearLayout>
 
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/ic_chevron_right"
-                    android:layout_marginEnd="12dp"
-                    android:padding="4dp"
                     android:layout_gravity="end|center_vertical"
-                    app:tint="@color/contrast_listButtonTint"/>
+                    android:layout_marginEnd="12dp"
+                    android:importantForAccessibility="no"
+                    android:padding="4dp"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/contrast_listButtonTint" />
 
             </com.google.android.material.card.MaterialCardView>
 

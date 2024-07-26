@@ -23,18 +23,22 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbarlayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/contrast_colorBackground"
+        app:liftOnScroll="false">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsingtoolbar"
-            style="?attr/collapsingToolbarLayoutLargeStyle"
+            style="?attr/collapsingToolbarLayoutMediumStyle"
             android:layout_width="match_parent"
-            android:layout_height="?attr/collapsingToolbarLayoutLargeSize"
-            app:collapsedTitleTextAppearance="?textAppearanceTitleLarge"
-            app:collapsedTitleTextColor="?attr/colorOnSurface"
+            android:layout_height="@dimen/top_app_bar_height"
+            android:background="@color/contrast_colorBackground"
+            app:collapsedTitleTextAppearance="@style/TextAppearance.App.TitleLarge"
+            app:collapsedTitleTextColor="@color/contrast_colorOnSurface"
+            app:contentScrim="@android:color/transparent"
             app:expandedTitleMarginStart="24dp"
-            app:expandedTitleTextAppearance="?textAppearanceHeadlineLarge"
-            app:expandedTitleTextColor="?attr/colorOnSurface"
+            app:expandedTitleTextAppearance="@style/TextAppearance.App.HeadlineLarge"
+            app:expandedTitleTextColor="@color/contrast_colorOnSurface"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:title="@string/settings_blacklist">
 
@@ -42,14 +46,23 @@
                 android:id="@+id/topAppBar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                android:background="@color/contrast_colorBackground"
                 android:elevation="0dp"
                 android:paddingStart="6dp"
                 android:paddingEnd="8dp"
                 app:layout_collapseMode="pin"
                 app:navigationIcon="@drawable/ic_arrow_back"
-                app:navigationIconTint="?colorOnSurface" />
+                app:navigationIconTint="@color/contrast_themeColor" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            app:dividerColor="@color/contrast_colorBackgroundContainer"
+            app:dividerThickness="0.5dp" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
