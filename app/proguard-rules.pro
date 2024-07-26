@@ -20,7 +20,8 @@
 # hide the original source file name.
 # -renamesourcefileattribute SourceFile
 
--dontobfuscate
+# Enable more agressive optimizations changing access of classes and methods
+-allowaccessmodification
 
 -dontwarn org.jaudiotagger.**
 -keep class org.jaudiotagger.** { *; }
