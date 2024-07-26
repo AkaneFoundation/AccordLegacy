@@ -1591,12 +1591,12 @@ class FullBottomSheet @JvmOverloads constructor(
             else if (currentFocusPos == 0)
                 min(
                     (lyricList[position].absolutePosition!! - 0)
-                        .absoluteValue.toFloat().pow(1.7F), 32F
+                        .absoluteValue.toFloat().pow(2F), 36F
                 )
             else
                 min(
                     (lyricList[position].absolutePosition!! - lyricList[currentFocusPos].absolutePosition!!)
-                        .absoluteValue.toFloat().pow(1.7F), 32F
+                        .absoluteValue.toFloat().pow(2F), 36F
                 )
     }
 
@@ -1804,10 +1804,6 @@ class FullBottomSheet @JvmOverloads constructor(
                 return LYRIC_SCROLL_DURATION.toInt()
             }
 
-            override fun onStop() {
-                super.onStop()
-            }
-
             override fun afterTargetFound() {
                 if (targetPosition > 1 && alpha > 0f) {
                     val firstVisibleItemPosition: Int =
@@ -1815,16 +1811,18 @@ class FullBottomSheet @JvmOverloads constructor(
                     val lastVisibleItemPosition: Int =
                         bottomSheetFullLyricLinearLayoutManager.findLastVisibleItemPosition() + 3
                     for (i in firstVisibleItemPosition..lastVisibleItemPosition) {
-                        if (i >= targetPosition + 1) {
+                        if (i > targetPosition) {
                             val view: View? =
                                 bottomSheetFullLyricLinearLayoutManager.findViewByPosition(i)
+                            if (i == targetPosition + 1 && bottomSheetFullLyricList[i].isTranslation) {
+                                continue
+                            }
                             if (view != null) {
-                                if (i == targetPosition + 1 && bottomSheetFullLyricList[i].isTranslation) {
-                                    continue
-                                }
-                                if (!noAnimation) {
-                                    val ii = i - firstVisibleItemPosition -
-                                            if (bottomSheetFullLyricList[i].isTranslation) 1 else 0
+                                if (!noAnimation &&
+                                    bottomSheetFullLyricList[targetPosition].absolutePosition != null &&
+                                    bottomSheetFullLyricList[i].absolutePosition != null) {
+                                    val ii = (bottomSheetFullLyricList[i].absolutePosition!! -
+                                            bottomSheetFullLyricList[targetPosition].absolutePosition!!).absoluteValue
                                     applyAnimation(view, ii)
                                 }
                             }
@@ -1836,7 +1834,7 @@ class FullBottomSheet @JvmOverloads constructor(
         }
     }
 
-    fun suddenUpdate() {
+    private fun suddenUpdate() {
         val firstVisibleItemPosition: Int =
             bottomSheetFullLyricLinearLayoutManager.findFirstVisibleItemPosition() - 3
         val lastVisibleItemPosition: Int =
@@ -1860,6 +1858,7 @@ class FullBottomSheet @JvmOverloads constructor(
     private val liftInterpolator = PathInterpolator(0.17f, 0f, -0.15f, 1f)
 
     private fun applyAnimation(view: View, ii: Int) {
+        Log.d("TAG", "II: $ii")
         val depth = 15.dpToPx(context).toFloat()
         val duration = (LYRIC_SCROLL_DURATION * 0.278).toLong()
         val durationReturn = (LYRIC_SCROLL_DURATION * 0.722).toLong()
