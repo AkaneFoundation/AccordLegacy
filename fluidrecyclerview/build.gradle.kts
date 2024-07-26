@@ -21,10 +21,10 @@ plugins {
 
 android {
     namespace = "androidx.fluidrecyclerview"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
-        minSdk = 14
+        minSdk = 19
         multiDexEnabled = true
     }
 
@@ -39,13 +39,14 @@ android {
         res.srcDirs("res-public")
     }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
     }
 
-    kotlinOptions {
-        jvmTarget = "1.8"
+    kotlin {
+        jvmToolchain(17)
     }
 
     publishing {
@@ -56,11 +57,11 @@ android {
 }
 
 dependencies {
-    api("androidx.annotation:annotation:1.7.1")
+    api("androidx.annotation:annotation:1.8.0")
     //noinspection KtxExtensionAvailable
-    api("androidx.core:core:1.12.0")
+    api("androidx.core:core:1.13.1")
     //noinspection KtxExtensionAvailable,GradleDependency
-    implementation("androidx.collection:collection:1.0.0")
+    implementation("androidx.collection:collection:1.4.0")
     api("androidx.customview:customview:1.1.0")
     implementation("androidx.customview:customview-poolingcontainer:1.0.0")
 

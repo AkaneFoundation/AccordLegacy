@@ -14,7 +14,8 @@ import androidx.annotation.RequiresApi
 import androidx.core.graphics.withSave
 import androidx.vectordrawable.graphics.drawable.Animatable2Compat
 import coil3.annotation.ExperimentalCoilApi
-import coil3.asCoilImage
+import coil3.asDrawable
+import coil3.asImage
 import coil3.decode.DataSource
 import coil3.decode.DecodeUtils
 import coil3.request.ErrorResult
@@ -67,7 +68,7 @@ private class CoolCrossfadeTransition(
             result.request.scale,
             this.durationMillis, result !is SuccessResult || !result.isPlaceholderCached,
             this.preferExactIntrinsicSize
-        ).asCoilImage()
+        ).asImage()
         if (result is SuccessResult) {
             target.onSuccess(drawable)
         } else if (result is ErrorResult) {

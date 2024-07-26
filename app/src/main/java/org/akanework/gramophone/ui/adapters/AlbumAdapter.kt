@@ -26,7 +26,6 @@ import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.findBaseWrapperFragment
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
 import org.akanework.gramophone.ui.LibraryViewModel
-import org.akanework.gramophone.ui.fragments.BaseWrapperFragment
 import org.akanework.gramophone.ui.fragments.GeneralSubFragment
 
 class AlbumAdapter(

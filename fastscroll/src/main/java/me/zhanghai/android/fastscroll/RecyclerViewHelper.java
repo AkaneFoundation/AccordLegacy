@@ -145,8 +145,7 @@ class RecyclerViewHelper implements FastScroller.ViewHelper {
         if (itemCount == 0) {
             return 0;
         }
-        if (linearLayoutManager instanceof GridLayoutManager) {
-            GridLayoutManager gridLayoutManager = (GridLayoutManager) linearLayoutManager;
+        if (linearLayoutManager instanceof GridLayoutManager gridLayoutManager) {
             itemCount = (itemCount - 1) / gridLayoutManager.getSpanCount() + 1;
         }
         return itemCount;
@@ -167,8 +166,7 @@ class RecyclerViewHelper implements FastScroller.ViewHelper {
         if (linearLayoutManager == null) {
             return RecyclerView.NO_POSITION;
         }
-        if (linearLayoutManager instanceof GridLayoutManager) {
-            GridLayoutManager gridLayoutManager = (GridLayoutManager) linearLayoutManager;
+        if (linearLayoutManager instanceof GridLayoutManager gridLayoutManager) {
             position /= gridLayoutManager.getSpanCount();
         }
         return position;
@@ -200,8 +198,7 @@ class RecyclerViewHelper implements FastScroller.ViewHelper {
         if (linearLayoutManager == null) {
             return;
         }
-        if (linearLayoutManager instanceof GridLayoutManager) {
-            GridLayoutManager gridLayoutManager = (GridLayoutManager) linearLayoutManager;
+        if (linearLayoutManager instanceof GridLayoutManager gridLayoutManager) {
             position *= gridLayoutManager.getSpanCount();
         }
         // LinearLayoutManager actually takes offset from paddingTop instead of top of RecyclerView.
@@ -212,10 +209,9 @@ class RecyclerViewHelper implements FastScroller.ViewHelper {
     @Nullable
     private LinearLayoutManager getVerticalLinearLayoutManager() {
         RecyclerView.LayoutManager layoutManager = mView.getLayoutManager();
-        if (!(layoutManager instanceof LinearLayoutManager)) {
+        if (!(layoutManager instanceof LinearLayoutManager linearLayoutManager)) {
             return null;
         }
-        LinearLayoutManager linearLayoutManager = (LinearLayoutManager) layoutManager;
         if (linearLayoutManager.getOrientation() != RecyclerView.VERTICAL) {
             return null;
         }

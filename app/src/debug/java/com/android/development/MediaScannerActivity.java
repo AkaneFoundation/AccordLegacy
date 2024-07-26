@@ -17,12 +17,12 @@ package com.android.development;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.BroadcastReceiver;
 import android.database.sqlite.SQLiteConstraintException;
 import android.net.Uri;
 import android.os.Build;
@@ -41,7 +41,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import org.akanework.gramophone.R;
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.CannotWriteException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.FieldKey;
+import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.TagException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -49,19 +59,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Random;
-
-import org.akanework.gramophone.R;
-import org.akanework.gramophone.SdScanner;
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.CannotWriteException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.FieldDataInvalidException;
-import org.jaudiotagger.tag.FieldKey;
-import org.jaudiotagger.tag.Tag;
-import org.jaudiotagger.tag.TagException;
 
 public class MediaScannerActivity extends Activity {
     // buffer size used for reading and writing
@@ -251,19 +248,8 @@ public class MediaScannerActivity extends Activity {
             mArtists += 11;
         } catch (SQLiteConstraintException ex) {
             Log.d("@@@@", "insert failed", ex);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (CannotWriteException e) {
-            throw new RuntimeException(e);
-        } catch (CannotReadException e) {
-            throw new RuntimeException(e);
-        } catch (FieldDataInvalidException e) {
-            throw new RuntimeException(e);
-        } catch (TagException e) {
-            throw new RuntimeException(e);
-        } catch (InvalidAudioFrameException e) {
-            throw new RuntimeException(e);
-        } catch (ReadOnlyFileException e) {
+        } catch (IOException | CannotReadException | TagException | InvalidAudioFrameException |
+                 ReadOnlyFileException | CannotWriteException e) {
             throw new RuntimeException(e);
         }
     }

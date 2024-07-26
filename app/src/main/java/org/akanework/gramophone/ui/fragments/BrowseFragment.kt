@@ -18,30 +18,23 @@
 package org.akanework.gramophone.ui.fragments
 
 import android.annotation.SuppressLint
-import android.content.ActivityNotFoundException
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fluidviewpager2.widget.ViewPager2
 import androidx.fragment.app.activityViewModels
 import androidx.media3.common.util.UnstableApi
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.color.MaterialColors
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.FluidTabLayoutMediator
 import com.google.android.material.tabs.TabLayout
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.applyGeneralMenuItem
 import org.akanework.gramophone.logic.enableEdgeToEdgePaddingListener
 import org.akanework.gramophone.ui.LibraryViewModel
-import org.akanework.gramophone.ui.MainActivity
 import org.akanework.gramophone.ui.adapters.ViewPager2Adapter
-import org.akanework.gramophone.ui.fragments.settings.MainSettingsFragment
 
 /**
  * ViewPagerFragment:

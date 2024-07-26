@@ -1,9 +1,6 @@
 package org.akanework.gramophone.ui.adapters
 
 import android.content.Context
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.Looper
 import android.text.Spannable
 import android.text.SpannableString
 import android.util.Log
@@ -24,7 +21,6 @@ import org.akanework.gramophone.logic.findBaseWrapperFragment
 import org.akanework.gramophone.logic.ui.CenteredImageSpan
 import org.akanework.gramophone.logic.ui.coolCrossfade
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
-import org.akanework.gramophone.ui.LibraryViewModel
 import org.akanework.gramophone.ui.fragments.BaseFragment
 import org.akanework.gramophone.ui.fragments.GeneralSubFragment
 import org.akanework.gramophone.ui.fragments.LibraryFragment

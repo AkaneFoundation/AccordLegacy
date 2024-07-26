@@ -25,7 +25,6 @@ import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Binder
-import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.provider.MediaStore
@@ -43,7 +42,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import org.akanework.gramophone.R
-import org.akanework.gramophone.logic.data.db.entity.Playlist
 import org.akanework.gramophone.logic.getColumnIndexOrNull
 import org.akanework.gramophone.logic.hasAlbumArtistIdInMediaStore
 import org.akanework.gramophone.logic.hasImagePermission
