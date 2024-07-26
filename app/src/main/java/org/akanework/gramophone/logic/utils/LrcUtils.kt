@@ -132,6 +132,15 @@ object LrcUtils {
                 count++
             }
         }
+        var absolutePosition = 0
+        list.forEachIndexed { index, it ->
+            if (!it.isTranslation && it.content.isNotEmpty()) {
+                it.absolutePosition = absolutePosition
+                absolutePosition ++
+            } else {
+                it.absolutePosition = list[index - 1].absolutePosition
+            }
+        }
         //}
         if (list.isEmpty() && lrcContent.isNotEmpty()) {
             list.add(MediaStoreUtils.Lyric(null, lrcContent, false))
