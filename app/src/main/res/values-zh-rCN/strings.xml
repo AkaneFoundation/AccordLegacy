@@ -24,7 +24,7 @@
     <string name="dismiss">关闭</string>
     <string name="unknown_genre">未知主题</string>
     <string name="unknown_year">未知年份</string>
-    <string name="refreshed_songs">刷新了 %1$s 首歌曲。</string>
+    <string name="refreshed_songs">刷新了 %1$s 首歌曲</string>
     <string name="search">搜索</string>
     <string name="settings_app_name">应用名称</string>
     <string name="settings_contributors">贡献者</string>
@@ -42,7 +42,7 @@
     <string name="dialog_title">标题</string>
     <string name="dialog_artist">艺术家</string>
     <string name="settings_category_behavior">行为</string>
-    <string name="settings_mediastore_filter">隐藏时长小于 … 秒的歌曲</string>
+    <string name="settings_mediastore_filter">歌曲最小长度（秒）</string>
     <string name="settings_repository">仓库地址</string>
     <string name="dialog_album">专辑</string>
     <string name="dialog_genre">流派</string>
@@ -167,6 +167,9 @@
     <string name="add_notes_desc">为收藏的曲目添加备注，记录您的心情、想法或者属于您的的特殊回忆。</string>
     <string name="rearrange">重新排序</string>
     <string name="rearrange_desc">您可以随时回到列表中调整歌曲的顺序，个性化您的音乐体验。</string>
+    <string name="fgs_failed_channel">播放无法恢复</string>
+    <string name="fgs_failed_text">单击此处以打开应用并继续播放</string>
+    <string name="fgs_failed_title">无法恢复音乐播放</string>
     <string name="lossless">无损</string>
     <string name="home">主页</string>
     <string name="browse">浏览</string>
@@ -183,4 +186,6 @@
     <string name="side_developers">其他开发者</string>
     <string name="acknowledgements">致谢名单</string>
     <string name="app_libraries">代码库</string>
+    <string name="blur_lyrics">模糊歌词</string>
+    <string name="blur_lyrics_summary">为歌词添加模糊（也许会增加性能消耗）</string>
 </resources>
