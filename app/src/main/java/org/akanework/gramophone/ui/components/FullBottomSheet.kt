@@ -143,7 +143,7 @@ class FullBottomSheet @JvmOverloads constructor(
     val interpolator = PathInterpolator(0.4f, 0.2f, 0f, 1f)
 
     companion object {
-        const val SLIDER_UPDATE_INTERVAL = 100L
+        const val SLIDER_UPDATE_INTERVAL = 1000L
         const val VIEW_TRANSIT_DURATION = 350L
         const val LYRIC_REMOVE_HIGHLIGHT = 0
         const val LYRIC_SET_HIGHLIGHT = 1
@@ -1155,6 +1155,7 @@ class FullBottomSheet @JvmOverloads constructor(
                 }
             }
             suddenUpdate()
+            isFingerOnScreen = false
         } else {
             lastDisposable?.dispose()
             lastDisposable = null
@@ -1814,7 +1815,9 @@ class FullBottomSheet @JvmOverloads constructor(
                         if (i > targetPosition) {
                             val view: View? =
                                 bottomSheetFullLyricLinearLayoutManager.findViewByPosition(i)
-                            if (i == targetPosition + 1 && bottomSheetFullLyricList[i].isTranslation) {
+                            if (i == targetPosition + 1 &&
+                                i < bottomSheetFullLyricList.size &&
+                                bottomSheetFullLyricList[i].isTranslation) {
                                 continue
                             }
                             if (view != null) {
@@ -1858,7 +1861,6 @@ class FullBottomSheet @JvmOverloads constructor(
     private val liftInterpolator = PathInterpolator(0.17f, 0f, -0.15f, 1f)
 
     private fun applyAnimation(view: View, ii: Int) {
-        Log.d("TAG", "II: $ii")
         val depth = 15.dpToPx(context).toFloat()
         val duration = (LYRIC_SCROLL_DURATION * 0.278).toLong()
         val durationReturn = (LYRIC_SCROLL_DURATION * 0.722).toLong()

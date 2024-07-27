@@ -179,9 +179,9 @@ class BlendView @JvmOverloads constructor(
 
     private val rotationRunnable = object : Runnable {
         override fun run() {
-            imageViewTS.rotation = (imageViewTS.rotation + .6f) % CYCLE
-            imageViewBE.rotation = (imageViewBE.rotation + .4f) % CYCLE
-            rotateFrame.rotation = (rotateFrame.rotation - .2f) % CYCLE
+            // imageViewTS.rotation = (imageViewTS.rotation + 1.2f) % CYCLE
+            // imageViewBE.rotation = (imageViewBE.rotation + .67f) % CYCLE
+            // rotateFrame.rotation = (rotateFrame.rotation - .6f) % CYCLE
             if (isAnimationOngoing) {
                 handler.postDelayed(this, UPDATE_RUNNABLE_INTERVAL)
             }
