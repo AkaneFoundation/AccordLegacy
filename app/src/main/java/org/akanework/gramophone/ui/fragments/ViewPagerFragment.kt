@@ -26,7 +26,7 @@ class ViewPagerFragment : BaseFragment(true) {
         val bottomNavigationView = (requireActivity() as MainActivity).bottomNavigationView
 
         // Set up bottomNavigationView
-        bottomNavigationView.setOnItemSelectedListener { it ->
+        bottomNavigationView.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.home -> mViewPager2.setCurrentItem(0, true)
                 R.id.browse -> mViewPager2.setCurrentItem(1, true)

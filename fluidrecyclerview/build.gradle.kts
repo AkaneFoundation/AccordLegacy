@@ -57,11 +57,11 @@ android {
 }
 
 dependencies {
-    api("androidx.annotation:annotation:1.8.0")
+    api("androidx.annotation:annotation:1.8.1")
     //noinspection KtxExtensionAvailable
     api("androidx.core:core:1.13.1")
     //noinspection KtxExtensionAvailable,GradleDependency
-    implementation("androidx.collection:collection:1.4.0")
+    implementation("androidx.collection:collection:1.4.2")
     api("androidx.customview:customview:1.1.0")
     implementation("androidx.customview:customview-poolingcontainer:1.0.0")
 

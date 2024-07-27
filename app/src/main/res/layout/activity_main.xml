@@ -39,6 +39,7 @@
             android:elevation="0dp"
             app:dividerColor="@color/contrast_colorBackgroundContainer"
             app:dividerThickness="0.5dp" />
+
     </com.google.android.material.bottomnavigation.BottomNavigationView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

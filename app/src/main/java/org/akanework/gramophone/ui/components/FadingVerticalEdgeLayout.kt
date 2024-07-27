@@ -172,9 +172,9 @@ class FadingVerticalEdgeLayout : FrameLayout {
         val actualHeight = height - paddingTop - paddingBottom
         val size =
             min(gradientSizeTop.toDouble(), actualHeight.toDouble()).toInt()
-        val l = getPaddingLeft()
+        val l = paddingLeft
         val t = paddingTop
-        val r = width - getPaddingRight()
+        val r = width - paddingRight
         val b = t + size
         gradientRectTop!![l, t, r] = b
         val gradient = LinearGradient(
@@ -193,9 +193,9 @@ class FadingVerticalEdgeLayout : FrameLayout {
         val actualHeight = height - paddingTop - paddingBottom
         val size =
             min(gradientSizeBottom.toDouble(), actualHeight.toDouble()).toInt()
-        val l = getPaddingLeft()
+        val l = paddingLeft
         val t = paddingTop + actualHeight - size
-        val r = width - getPaddingRight()
+        val r = width - paddingRight
         val b = t + size
         gradientRectBottom!![l, t, r] = b
         val gradient = LinearGradient(

@@ -768,7 +768,7 @@ object MediaStoreUtils {
             return Pair(true) {
                 try {
                     /**
-                     * In [Build.VERSION_CODES.Q], it isn't possible to modify
+                     * In [android.os.Build.VERSION_CODES.Q], it isn't possible to modify
                      * or delete items in MediaStore directly, and explicit permission
                      * must usually be obtained to do this.
                      *

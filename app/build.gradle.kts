@@ -49,7 +49,7 @@ android {
         // for it for a while.
         // Bye bye android 12 - cuz blur
         minSdk = 31
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 18
         versionName = "beta1"
         buildConfigField(

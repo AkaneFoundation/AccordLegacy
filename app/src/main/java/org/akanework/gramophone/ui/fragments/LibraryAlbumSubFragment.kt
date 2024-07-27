@@ -87,8 +87,8 @@ class LibraryAlbumSubFragment : BaseFragment(), Observer<List<PlaylistWithMediaI
                     libraryViewModel.mediaItemList.value
                         ?.find { it2 -> it2.mediaId.toLong() == mediaItem.mediaItemId }
                 },
-                false,
-                true
+                now = false,
+                canDiff = true
             )
         }
     }

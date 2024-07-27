@@ -45,7 +45,7 @@ class SdScanner(private val context: Context) {
             val modifiedColumn = cursor.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED)
             val totalSize = cursor.count
             while (cursor.moveToNext()) {
-                val mediaFile = File(cursor.getString(dataColumn)).getCanonicalFile()
+                val mediaFile = File(cursor.getString(dataColumn)).canonicalFile
                 System.currentTimeMillis().apply {
                     if (lastUpdate + progressFrequencyMs/*ms*/ < this) {
                         lastUpdate = this
@@ -128,7 +128,7 @@ class SdScanner(private val context: Context) {
             Log.w("SdScanner", "cannot read $file")
         }
         Log.w("SdScanner", " read $file")
-        if (file.isDirectory()) {
+        if (file.isDirectory) {
             val nomedia = File(file, ".nomedia").exists()
             // Only recurse downward if not blocked by nomedia.
             if (!nomedia) {
@@ -136,7 +136,7 @@ class SdScanner(private val context: Context) {
                 if (files != null) {
                     for (nextFile in files) {
                         recursiveAddFiles(
-                            nextFile.getCanonicalFile()
+                            nextFile.canonicalFile
                         )
                     }
                 }
@@ -148,7 +148,7 @@ class SdScanner(private val context: Context) {
     fun shouldScan(inFile: File?, fromDb: Boolean): Boolean {
         // Empty directory check.
         var file = inFile
-        if (file!!.isDirectory()) {
+        if (file!!.isDirectory) {
             val files = file.listFiles()
             if (files.isNullOrEmpty()) {
                 return false
@@ -161,7 +161,7 @@ class SdScanner(private val context: Context) {
             if (file == root) {
                 return true
             }
-            file = file.getParentFile()
+            file = file.parentFile
         }
         return false
     }

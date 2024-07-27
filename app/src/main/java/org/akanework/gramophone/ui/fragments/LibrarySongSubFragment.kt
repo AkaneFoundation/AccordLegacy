@@ -90,12 +90,12 @@ class LibrarySongSubFragment : BaseFragment(), Observer<List<PlaylistWithMediaIt
                     val updatedList = it1.mediaItems.mapNotNull { mediaItem ->
                         map[mediaItem.mediaItemId]
                     }
-                    songAdapter.updateList(updatedList, false, true)
+                    songAdapter.updateList(updatedList, now = false, canDiff = true)
                 }
             }
 
         }
-        Log.d("TAG", "MEASURETIME: ${measureTime}")
+        Log.d("TAG", "MEASURETIME: $measureTime")
     }
 
     override fun onDestroy() {

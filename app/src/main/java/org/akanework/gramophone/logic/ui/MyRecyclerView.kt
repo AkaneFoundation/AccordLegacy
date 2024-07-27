@@ -118,32 +118,21 @@ class MyRecyclerView(context: Context, attributeSet: AttributeSet?, defStyleAttr
         val popupStyles =
             Consumer { popupView: TextView ->
                 val resources = popupView.resources
-                popupView.setMinimumWidth(resources.getDimensionPixelSize(R.dimen.afs_md2_popup_min_width))
-                popupView.setMinimumHeight(resources.getDimensionPixelSize(R.dimen.afs_md2_popup_min_height))
-                val layoutParams =
-                    popupView.layoutParams as FrameLayout.LayoutParams
+                popupView.minimumWidth = resources.getDimensionPixelSize(R.dimen.afs_md2_popup_min_width)
+                popupView.minimumHeight = resources.getDimensionPixelSize(R.dimen.afs_md2_popup_min_height)
+                val layoutParams = popupView.layoutParams as FrameLayout.LayoutParams
                 layoutParams.gravity = 49
-                layoutParams.setMarginEnd(resources.getDimensionPixelOffset(R.dimen.afs_md2_popup_margin_end))
-                popupView.setLayoutParams(layoutParams)
+                layoutParams.marginEnd = resources.getDimensionPixelOffset(R.dimen.afs_md2_popup_margin_end)
+                popupView.layoutParams = layoutParams
                 val context = popupView.context
-                popupView.background =
-                    AppCompatResources.getDrawable(context, R.drawable.afs_popup_background)
-                popupView.elevation =
-                    resources.getDimensionPixelOffset(R.dimen.afs_md2_popup_elevation).toFloat()
+                popupView.background = AppCompatResources.getDrawable(context, R.drawable.afs_popup_background)
+                popupView.elevation = resources.getDimensionPixelOffset(R.dimen.afs_md2_popup_elevation).toFloat()
                 popupView.ellipsize = TruncateAt.MIDDLE
-                popupView.setGravity(17)
+                popupView.gravity = 17
                 popupView.includeFontPadding = false
-                popupView.setSingleLine(true)
-                popupView.setTextColor(
-                    ContextCompat.getColor(
-                        context,
-                        R.color.contrast_colorBackground
-                    )
-                )
-                popupView.setTextSize(
-                    0,
-                    resources.getDimensionPixelSize(R.dimen.afs_md2_popup_text_size).toFloat()
-                )
+                popupView.isSingleLine = true
+                popupView.setTextColor(ContextCompat.getColor(context, R.color.contrast_colorBackground))
+                popupView.setTextSize(0, resources.getDimensionPixelSize(R.dimen.afs_md2_popup_text_size).toFloat())
             }
         return FastScrollerBuilder(this)
             .setViewHelper(RecyclerViewHelper(this, popupTextProvider, ihh))

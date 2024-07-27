@@ -15,15 +15,15 @@
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsingtoolbar"
-            style="?attr/collapsingToolbarLayoutLargeStyle"
+            style="?attr/collapsingToolbarLayoutMediumStyle"
             android:layout_width="match_parent"
-            android:layout_height="?attr/collapsingToolbarLayoutLargeSize"
+            android:layout_height="@dimen/top_app_bar_height"
             android:background="@color/contrast_colorBackground"
-            app:collapsedTitleTextAppearance="?textAppearanceTitleLarge"
+            app:collapsedTitleTextAppearance="@style/TextAppearance.App.TitleLarge"
             app:collapsedTitleTextColor="@color/contrast_colorOnSurface"
             app:contentScrim="@android:color/transparent"
             app:expandedTitleMarginStart="24dp"
-            app:expandedTitleTextAppearance="?textAppearanceHeadlineLarge"
+            app:expandedTitleTextAppearance="@style/TextAppearance.App.HeadlineLarge"
             app:expandedTitleTextColor="@color/contrast_colorOnSurface"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:title="@string/details">
@@ -38,9 +38,17 @@
                 android:paddingEnd="8dp"
                 app:layout_collapseMode="pin"
                 app:navigationIcon="@drawable/ic_arrow_back"
-                app:navigationIconTint="?colorOnSurface" />
+                app:navigationIconTint="@color/contrast_themeColor" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            app:dividerColor="@color/contrast_colorBackgroundContainer"
+            app:dividerThickness="0.5dp" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -61,7 +69,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="28dp"
                 android:fontFamily="sans-serif"
                 android:text="@string/album_cover"
                 android:textColor="@color/contrast_colorOnSurface"
@@ -75,6 +83,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="16dp"
+                android:layout_marginBottom="10dp"
                 android:adjustViewBounds="true"
                 android:importantForAccessibility="no"
                 android:scaleType="centerCrop"
@@ -84,8 +93,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="4dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="10dp"
                 android:enabled="false"
                 android:text="@string/dialog_edit_metadata"
                 android:visibility="gone"
@@ -95,16 +104,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="18dp"
                 android:layout_marginEnd="24dp"
-                android:layout_marginBottom="24dp"
-                app:dividerColor="@color/contrast_colorBackgroundContainer" />
+                android:layout_marginBottom="18dp"
+                app:dividerColor="@color/contrast_colorBackgroundContainer"
+                app:dividerThickness="0.5dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginEnd="24dp"
                 android:layout_marginBottom="10dp"
                 android:orientation="horizontal">
@@ -402,14 +412,15 @@
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="18dp"
                 android:layout_marginEnd="24dp"
-                android:layout_marginBottom="24dp"
-                app:dividerColor="@color/contrast_colorBackgroundContainer" />
+                android:layout_marginBottom="18dp"
+                app:dividerColor="@color/contrast_colorBackgroundContainer"
+                app:dividerThickness="0.5dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginEnd="24dp"
                 android:layout_marginBottom="10dp"
                 android:orientation="horizontal">

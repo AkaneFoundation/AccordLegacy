@@ -4,14 +4,12 @@
         <!-- fixes some UI issues on MIUI devices -->
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
         <!-- true edge-to-edge, no black bars in display notch -->
-        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">shortEdges
-        </item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">shortEdges</item>
         <!-- Work around b/331383944: PreferenceFragmentCompat permanently mutates activity theme (enables vertical scrollbars) -->
         <item name="android:scrollbars">none</item>
         <item name="bottomSheetDialogTheme">@style/ThemeOverlay.App.BottomSheetDialog</item>
         <item name="textAppearanceLargePopupMenu">@style/TextAppearance.App.BodyLarge</item>
         <item name="textAppearanceSmallPopupMenu">@style/TextAppearance.App.BodyLarge</item>
-        <item name="collapsingToolbarLayoutLargeStyle">@style/CollapsingToolbarLarge</item>
         <item name="popupMenuBackground">@drawable/popup_background</item>
 
         <!-- Fallback -->
@@ -115,11 +113,6 @@
 
     <style name="BottomPlayerCornerShape">
         <item name="cornerSize">0dp</item>
-    </style>
-
-    <style name="CollapsingToolbarLarge" parent="Widget.Material3.CollapsingToolbar.Large">
-        <item name="titleCollapseMode">scale</item>
-        <item name="contentScrim">?attr/colorSurfaceContainer</item>
     </style>
 
     <style name="MediaPlayer.ProgressBar" parent="@style/Widget.AppCompat.ProgressBar.Horizontal">
