@@ -143,7 +143,7 @@ class FullBottomSheet @JvmOverloads constructor(
     val interpolator = PathInterpolator(0.4f, 0.2f, 0f, 1f)
 
     companion object {
-        const val SLIDER_UPDATE_INTERVAL = 1000L
+        const val SLIDER_UPDATE_INTERVAL = 100L
         const val VIEW_TRANSIT_DURATION = 350L
         const val LYRIC_REMOVE_HIGHLIGHT = 0
         const val LYRIC_SET_HIGHLIGHT = 1
