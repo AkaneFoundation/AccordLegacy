@@ -37,7 +37,12 @@ android {
             useLegacyPackaging = false
         }
         resources {
+            // https://stackoverflow.com/a/58956288
             excludes += "META-INF/*.version"
+            // https://github.com/Kotlin/kotlinx.coroutines?tab=readme-ov-file#avoiding-including-the-debug-infrastructure-in-the-resulting-apk
+            excludes += "DebugProbesKt.bin"
+            // https://issueantenna.com/repo/kotlin/kotlinx.coroutines/issues/3158
+            excludes += "kotlin-tooling-metadata.json"
         }
     }
 
