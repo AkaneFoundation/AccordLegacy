@@ -39,8 +39,8 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 import androidx.annotation.XmlRes;
 import androidx.core.content.res.TypedArrayUtils;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.fluidrecyclerview.widget.LinearLayoutManager;
+import androidx.fluidrecyclerview.widget.RecyclerView;
 
 import androidx.preference.R;
 

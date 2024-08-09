@@ -42,8 +42,8 @@ import androidx.annotation.XmlRes;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.fluidrecyclerview.widget.LinearLayoutManager;
+import androidx.fluidrecyclerview.widget.RecyclerView;
 
 import androidx.preference.R;
 

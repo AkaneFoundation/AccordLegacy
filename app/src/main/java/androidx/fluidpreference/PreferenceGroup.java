@@ -36,7 +36,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 import androidx.collection.SimpleArrayMap;
 import androidx.core.content.res.TypedArrayUtils;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.fluidrecyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.Collections;

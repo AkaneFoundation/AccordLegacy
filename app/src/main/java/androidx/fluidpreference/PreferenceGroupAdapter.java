@@ -32,8 +32,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.fluidrecyclerview.widget.DiffUtil;
+import androidx.fluidrecyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;

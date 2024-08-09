@@ -25,8 +25,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
 import androidx.core.view.AccessibilityDelegateCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.RecyclerViewAccessibilityDelegate;
+import androidx.fluidrecyclerview.widget.RecyclerView;
+import androidx.fluidrecyclerview.widget.RecyclerViewAccessibilityDelegate;
 
 /**
  * The accessibility delegate used by the {@link RecyclerView} that displays views for
