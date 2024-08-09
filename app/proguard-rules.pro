@@ -34,3 +34,11 @@
     public static int d(...);
     public static int e(...);
 }
+
+# Preference objects are inflated via reflection
+-keep public class androidx.fluidpreference.Preference {
+    public <init>(android.content.Context, android.util.AttributeSet);
+}
+-keep public class * extends androidx.fluidpreference.Preference {
+    public <init>(android.content.Context, android.util.AttributeSet);
+}

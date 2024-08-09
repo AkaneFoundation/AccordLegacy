@@ -208,8 +208,7 @@ public abstract class PreferenceFragmentCompat extends Fragment implements
                     + "'android.R.id.list_container' that is not a ViewGroup class");
         }
 
-        final RecyclerView listView = onCreateRecyclerView(themedInflater, listContainer,
-                savedInstanceState);
+        final RecyclerView listView = onCreateRecyclerView(themedInflater, listContainer, savedInstanceState);
         if (listView == null) {
             throw new RuntimeException("Could not create RecyclerView");
         }

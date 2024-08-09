@@ -32,7 +32,6 @@ public class AndroidResources {
     public static final int ANDROID_R_ICON_FRAME = android.R.id.icon_frame;
     static final int ANDROID_R_LIST_CONTAINER = android.R.id.list_container;
     static final int ANDROID_R_SWITCH_WIDGET = android.R.id.switch_widget;
-    static final int ANDROID_R_PREFERENCE_FRAGMENT_STYLE = android.R.attr.preferenceFragmentStyle;
 
     private AndroidResources() {}
 }
