@@ -26,7 +26,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.fluidrecyclerview.widget.RecyclerView
 import androidx.media3.common.C
 import androidx.media3.common.Player.REPEAT_MODE_OFF
-import androidx.preference.PreferenceManager
+import androidx.fluidpreference.PreferenceManager
 import com.google.android.material.button.MaterialButton
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.ui.CustomSmoothScroller

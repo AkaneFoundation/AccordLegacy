@@ -47,7 +47,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
-import androidx.preference.PreferenceManager
+import androidx.fluidpreference.PreferenceManager
 import coil3.annotation.ExperimentalCoilApi
 import coil3.asDrawable
 import coil3.imageLoader

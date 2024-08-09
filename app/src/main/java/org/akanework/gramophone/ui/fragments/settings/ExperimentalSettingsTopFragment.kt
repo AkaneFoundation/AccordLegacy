@@ -18,7 +18,7 @@
 package org.akanework.gramophone.ui.fragments.settings
 
 import android.os.Bundle
-import androidx.preference.Preference
+import androidx.fluidpreference.Preference
 import org.akanework.gramophone.R
 import org.akanework.gramophone.ui.fragments.BasePreferenceFragment
 import org.akanework.gramophone.ui.fragments.BaseSettingFragment

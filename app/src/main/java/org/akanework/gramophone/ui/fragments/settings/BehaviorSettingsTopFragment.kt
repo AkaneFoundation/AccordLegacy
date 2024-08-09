@@ -23,8 +23,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
-import androidx.preference.Preference
-import androidx.preference.SwitchPreferenceCompat
+import androidx.fluidpreference.Preference
+import androidx.fluidpreference.SwitchPreferenceCompat
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.hasScopedStorageWithMediaTypes
 import org.akanework.gramophone.ui.fragments.BasePreferenceFragment

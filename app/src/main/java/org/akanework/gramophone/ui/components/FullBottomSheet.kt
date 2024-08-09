@@ -58,7 +58,7 @@ import androidx.media3.common.Timeline
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
-import androidx.preference.PreferenceManager
+import androidx.fluidpreference.PreferenceManager
 import androidx.transition.TransitionManager
 import coil3.annotation.ExperimentalCoilApi
 import coil3.asDrawable

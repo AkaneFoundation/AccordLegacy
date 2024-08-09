@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fluidrecyclerview.widget.LinearLayoutManager
 import androidx.fluidrecyclerview.widget.RecyclerView
 import androidx.fragment.app.activityViewModels
-import androidx.preference.PreferenceManager
+import androidx.fluidpreference.PreferenceManager
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import org.akanework.gramophone.R

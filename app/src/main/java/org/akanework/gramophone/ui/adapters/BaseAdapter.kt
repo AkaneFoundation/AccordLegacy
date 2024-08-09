@@ -40,7 +40,7 @@ import androidx.fluidrecyclerview.widget.RecyclerView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.preference.PreferenceManager
+import androidx.fluidpreference.PreferenceManager
 import coil3.dispose
 import coil3.load
 import coil3.request.error
