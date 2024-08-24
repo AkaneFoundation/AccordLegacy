@@ -137,7 +137,8 @@ object MediaStoreUtils {
         val timeStamp: Long? = null,
         val content: String = "",
         var isTranslation: Boolean = false,
-        var absolutePosition: Int? = null
+        var absolutePosition: Int? = null,
+        val wordTimestamps: List<Pair<Int, Long>> = emptyList()
     ) : Parcelable
 
     class RecentlyAdded(minAddDate: Long, songList: PriorityQueue<Pair<Long, MediaItem>>) :

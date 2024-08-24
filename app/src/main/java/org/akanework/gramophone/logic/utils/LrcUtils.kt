@@ -87,6 +87,7 @@ object LrcUtils {
     @VisibleForTesting
     fun parseLrcString(lrcContent: String, trim: Boolean): MutableList<MediaStoreUtils.Lyric> {
         val timeMarksRegex = "\\[(\\d{2}:\\d{2})([.:]\\d+)?]".toRegex()
+        val wordTimeMarksRegex = "<(\\d{2}:\\d{2})([.:]\\d+)?>".toRegex()
         val list = mutableListOf<MediaStoreUtils.Lyric>()
         var foundNonNull = false
         var lyricsText: StringBuilder? = StringBuilder()
@@ -97,18 +98,42 @@ object LrcUtils {
                 if (sequence.count() == 0) {
                     return@let
                 }
-                val lyricLine = line.substring(sequence.last().range.last + 1)
-                    .let { if (trim) it.trim() else it }
+                val lyricLine = line.substring(sequence.last().range.last + 1).let { if (trim) it.trim() else it }
                 sequence.forEach { match ->
-                    val ts = parseTime(
-                        match.groupValues.subList(1, match.groupValues.size).joinToString("")
-                    )
-                    if (!foundNonNull && ts > 0) {
+                    val timeString = match.groupValues[1] + match.groupValues[2]
+                    val timeStamp = parseTime(timeString)
+
+                    if (!foundNonNull && timeStamp > 0) {
                         foundNonNull = true
                         lyricsText = null
                     }
                     lyricsText?.append(lyricLine + "\n")
-                    list.add(MediaStoreUtils.Lyric(ts, lyricLine))
+
+                    if (wordTimeMarksRegex.containsMatchIn(lyricLine)) {
+                        val wordMatches = wordTimeMarksRegex.findAll(lyricLine)
+                        val words = lyricLine.split(wordTimeMarksRegex)
+                        val wordTimestamps = words.mapIndexedNotNull { index, word ->
+                            wordMatches.elementAtOrNull(index)?.let { match ->
+                                val wordTimestamp =
+                                    parseTime(match.groupValues[1] + match.groupValues[2])
+                                Pair(words.take(index).sumOf { it.length }, wordTimestamp)
+                            }
+                        }
+                        list.add(
+                            MediaStoreUtils.Lyric(
+                                timeStamp,
+                                lyricLine.replace(wordTimeMarksRegex, ""),
+                                wordTimestamps = wordTimestamps
+                            )
+                        )
+                    } else {
+                        list.add(
+                            MediaStoreUtils.Lyric(
+                                timeStamp,
+                                lyricLine
+                            )
+                        )
+                    }
                 }
             }
         }
@@ -119,19 +144,7 @@ object LrcUtils {
             it.isTranslation = (it.timeStamp == previousTs)
             previousTs = it.timeStamp!!
         }
-        if (list.isNotEmpty()) {
-            var count = 0
-            while (true) {
-                if (count < list.size
-                    && list[count].content.isEmpty()) {
-                    list.removeAt(count)
-                    count --
-                } else {
-                    break
-                }
-                count++
-            }
-        }
+        list.takeWhile { it.content.isEmpty() }.forEach { _ -> list.removeAt(0) }
         var absolutePosition = 0
         list.forEachIndexed { index, it ->
             if (!it.isTranslation && it.content.isNotEmpty()) {
@@ -141,7 +154,6 @@ object LrcUtils {
                 it.absolutePosition = list[index - 1].absolutePosition
             }
         }
-        //}
         if (list.isEmpty() && lrcContent.isNotEmpty()) {
             list.add(MediaStoreUtils.Lyric(null, lrcContent, false))
         } else if (!foundNonNull) {
