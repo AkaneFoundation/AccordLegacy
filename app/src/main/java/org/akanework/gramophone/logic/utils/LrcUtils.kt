@@ -88,17 +88,22 @@ object LrcUtils {
     fun parseLrcString(lrcContent: String, trim: Boolean): MutableList<MediaStoreUtils.Lyric> {
         val timeMarksRegex = "\\[(\\d{2}:\\d{2})([.:]\\d+)?]".toRegex()
         val wordTimeMarksRegex = "<(\\d{2}:\\d{2})([.:]\\d+)?>".toRegex()
+        val labelRegex = "(v\\d+|bg):\\s?".toRegex()
         val list = mutableListOf<MediaStoreUtils.Lyric>()
         var foundNonNull = false
         var lyricsText: StringBuilder? = StringBuilder()
+        var currentLabel = ""
         //val measureTime = measureTimeMillis {
         // Add all lines found on LRC (probably will be unordered because of "compression" or translation type)
         lrcContent.lines().forEach { line ->
+            currentLabel = labelRegex.find(line)?.value ?: currentLabel
             timeMarksRegex.findAll(line).let { sequence ->
                 if (sequence.count() == 0) {
                     return@let
                 }
-                val lyricLine = line.substring(sequence.last().range.last + 1).let { if (trim) it.trim() else it }
+                val lyricLine = line.substring(sequence.last().range.last + 1)
+                    .let { if (trim) it.trim() else it }
+                    .replace(labelRegex, "")
                 sequence.forEach { match ->
                     val timeString = match.groupValues[1] + match.groupValues[2]
                     val timeStamp = parseTime(timeString)
@@ -123,14 +128,16 @@ object LrcUtils {
                             MediaStoreUtils.Lyric(
                                 timeStamp,
                                 lyricLine.replace(wordTimeMarksRegex, ""),
-                                wordTimestamps = wordTimestamps
+                                wordTimestamps = wordTimestamps,
+                                label = currentLabel
                             )
                         )
                     } else {
                         list.add(
                             MediaStoreUtils.Lyric(
                                 timeStamp,
-                                lyricLine
+                                lyricLine,
+                                label = currentLabel
                             )
                         )
                     }
