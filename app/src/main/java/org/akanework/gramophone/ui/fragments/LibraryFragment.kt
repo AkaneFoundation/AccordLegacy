@@ -8,9 +8,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.fluidrecyclerview.widget.ConcatAdapter
-import androidx.fluidrecyclerview.widget.GridLayoutManager
-import androidx.fluidrecyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ConcatAdapter
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.google.android.material.appbar.AppBarLayout

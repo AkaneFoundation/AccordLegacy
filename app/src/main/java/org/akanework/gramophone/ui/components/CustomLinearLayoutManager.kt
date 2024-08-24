@@ -1,8 +1,8 @@
 package org.akanework.gramophone.ui.components
 
 import android.content.Context
-import androidx.fluidrecyclerview.widget.LinearLayoutManager
-import androidx.fluidrecyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import org.akanework.gramophone.logic.dpToPx
 
 class CustomLinearLayoutManager(private val context: Context) : LinearLayoutManager(context) {

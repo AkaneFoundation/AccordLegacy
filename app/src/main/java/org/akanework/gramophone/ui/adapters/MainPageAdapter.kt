@@ -17,10 +17,10 @@
 
 package org.akanework.gramophone.ui.adapters
 
-import androidx.fluidviewpager2.adapter.FragmentStateAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
+import androidx.viewpager2.adapter.FragmentStateAdapter
 import org.akanework.gramophone.ui.fragments.BaseWrapperFragment
 
 /**

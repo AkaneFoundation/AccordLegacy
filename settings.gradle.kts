@@ -22,4 +22,4 @@ plugins {
 }
 
 rootProject.name = "Accord"
-include(":app", ":fluidrecyclerview", ":fastscroll")
+include(":app", ":recyclerview", ":fastscroll")

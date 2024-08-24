@@ -61,7 +61,7 @@ import androidx.media3.session.MediaSession.MediaItemsWithStartPosition
 import androidx.media3.session.MediaSessionService
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
-import androidx.fluidpreference.PreferenceManager
+import androidx.preference.PreferenceManager
 import coil3.BitmapImage
 import coil3.annotation.ExperimentalCoilApi
 import coil3.imageLoader

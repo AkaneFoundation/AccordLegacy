@@ -25,7 +25,7 @@ import android.view.View;
 import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fluidrecyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class FixItemDecorationRecyclerView extends RecyclerView {
 

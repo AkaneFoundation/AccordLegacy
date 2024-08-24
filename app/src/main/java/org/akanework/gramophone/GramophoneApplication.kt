@@ -31,7 +31,7 @@ import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.DefaultMediaNotificationProvider
-import androidx.fluidpreference.PreferenceManager
+import androidx.preference.PreferenceManager
 import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader

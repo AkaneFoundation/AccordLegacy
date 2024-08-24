@@ -21,7 +21,7 @@ import android.view.MenuItem
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
-import androidx.fluidpreference.PreferenceManager
+import androidx.preference.PreferenceManager
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.findBaseWrapperFragment
 import org.akanework.gramophone.logic.getBooleanStrict

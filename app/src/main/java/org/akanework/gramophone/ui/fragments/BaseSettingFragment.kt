@@ -23,7 +23,6 @@ abstract class BaseSettingFragment(
 
         rootView.findViewById<AppBarLayout>(R.id.appbarlayout).enableEdgeToEdgePaddingListener()
         topAppBar.title = getString(str)
-
         topAppBar.setNavigationOnClickListener {
             requireActivity().supportFragmentManager.popBackStack()
         }

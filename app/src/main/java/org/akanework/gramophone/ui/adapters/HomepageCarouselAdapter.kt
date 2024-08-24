@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.fluidrecyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.resourceUri
 import org.akanework.gramophone.logic.utils.MediaStoreUtils

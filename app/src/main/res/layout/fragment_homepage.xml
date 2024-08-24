@@ -73,7 +73,7 @@
                 android:textColor="@color/contrast_colorOnSurface"
                 />
 
-            <androidx.fluidrecyclerview.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerview_top"
                 android:layout_width="match_parent"
                 android:clipToPadding="false"
@@ -93,7 +93,7 @@
                 android:textColor="@color/contrast_colorOnSurface"
                 />
 
-            <androidx.fluidrecyclerview.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_r"
                 android:layout_width="match_parent"
                 android:paddingStart="20dp"

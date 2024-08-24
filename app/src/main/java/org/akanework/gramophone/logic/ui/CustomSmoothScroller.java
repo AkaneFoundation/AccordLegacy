@@ -27,7 +27,7 @@ import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.PathInterpolator;
 
-import androidx.fluidrecyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * {@link RecyclerView.SmoothScroller} implementation which uses a {@link LinearInterpolator} until

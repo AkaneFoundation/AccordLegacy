@@ -5,10 +5,10 @@ import android.util.DisplayMetrics
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.Scroller
-import androidx.fluidrecyclerview.widget.LinearSmoothScroller
-import androidx.fluidrecyclerview.widget.LinearSnapHelper
-import androidx.fluidrecyclerview.widget.OrientationHelper
-import androidx.fluidrecyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.LinearSmoothScroller
+import androidx.recyclerview.widget.LinearSnapHelper
+import androidx.recyclerview.widget.OrientationHelper
+import androidx.recyclerview.widget.RecyclerView
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min

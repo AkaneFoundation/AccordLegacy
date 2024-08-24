@@ -3,7 +3,7 @@ package org.akanework.gramophone.ui.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fluidrecyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 
 class HeaderAdapter(private val viewResId: Int) : RecyclerView.Adapter<HeaderAdapter.HeaderViewHolder>() {
 

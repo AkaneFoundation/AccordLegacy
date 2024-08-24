@@ -28,7 +28,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Consumer;
 import androidx.core.widget.NestedScrollView;
-import androidx.fluidrecyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class FastScrollerBuilder {
 

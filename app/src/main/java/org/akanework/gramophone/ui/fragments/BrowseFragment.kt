@@ -23,7 +23,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.fluidviewpager2.widget.ViewPager2
+import androidx.viewpager2.widget.ViewPager2
 import androidx.fragment.app.activityViewModels
 import androidx.media3.common.util.UnstableApi
 import com.google.android.material.appbar.AppBarLayout

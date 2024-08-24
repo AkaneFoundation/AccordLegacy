@@ -4,8 +4,8 @@ import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Rect
 import android.view.View
-import androidx.fluidrecyclerview.widget.ConcatAdapter
-import androidx.fluidrecyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ConcatAdapter
+import androidx.recyclerview.widget.RecyclerView
 import org.akanework.gramophone.R
 import org.akanework.gramophone.ui.adapters.BaseAdapter
 

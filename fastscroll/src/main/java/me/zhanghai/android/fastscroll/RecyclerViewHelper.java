@@ -23,9 +23,9 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fluidrecyclerview.widget.GridLayoutManager;
-import androidx.fluidrecyclerview.widget.LinearLayoutManager;
-import androidx.fluidrecyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 class RecyclerViewHelper implements FastScroller.ViewHelper {
 

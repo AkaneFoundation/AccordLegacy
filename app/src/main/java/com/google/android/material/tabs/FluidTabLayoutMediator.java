@@ -16,14 +16,14 @@
 
 package com.google.android.material.tabs;
 
-import static androidx.fluidviewpager2.widget.ViewPager2.SCROLL_STATE_DRAGGING;
-import static androidx.fluidviewpager2.widget.ViewPager2.SCROLL_STATE_IDLE;
-import static androidx.fluidviewpager2.widget.ViewPager2.SCROLL_STATE_SETTLING;
+import static androidx.viewpager2.widget.ViewPager2.SCROLL_STATE_DRAGGING;
+import static androidx.viewpager2.widget.ViewPager2.SCROLL_STATE_IDLE;
+import static androidx.viewpager2.widget.ViewPager2.SCROLL_STATE_SETTLING;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fluidrecyclerview.widget.RecyclerView;
-import androidx.fluidviewpager2.widget.ViewPager2;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import java.lang.ref.WeakReference;
 

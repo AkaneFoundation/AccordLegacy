@@ -48,9 +48,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
-import androidx.fluidrecyclerview.widget.ItemTouchHelper
-import androidx.fluidrecyclerview.widget.LinearLayoutManager
-import androidx.fluidrecyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -58,7 +58,7 @@ import androidx.media3.common.Timeline
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
-import androidx.fluidpreference.PreferenceManager
+import androidx.preference.PreferenceManager
 import androidx.transition.TransitionManager
 import coil3.annotation.ExperimentalCoilApi
 import coil3.asDrawable
@@ -1497,8 +1497,11 @@ class FullBottomSheet @JvmOverloads constructor(
                     (12.5f).dpToPx(context).toInt(),
                     paddingBottom.dpToPx(context)
                 )
-                pivotX = 0f
-                pivotY = height.toFloat() / 2
+
+                doOnLayout {
+                    pivotX = 0f
+                    pivotY = height / 2f
+                }
 
                 if (lyric.timeStamp == null) {
                     scaleText(sizeFactor)

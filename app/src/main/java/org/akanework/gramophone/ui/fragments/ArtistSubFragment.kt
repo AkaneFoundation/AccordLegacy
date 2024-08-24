@@ -22,9 +22,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fluidrecyclerview.widget.ConcatAdapter
-import androidx.fluidrecyclerview.widget.GridLayoutManager
-import androidx.fluidrecyclerview.widget.GridLayoutManager.SpanSizeLookup
+import androidx.recyclerview.widget.ConcatAdapter
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.fragment.app.activityViewModels
 import androidx.media3.common.util.UnstableApi
 import com.google.android.material.appbar.AppBarLayout
