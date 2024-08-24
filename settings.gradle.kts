@@ -9,11 +9,11 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
     repositories {
         google()
         mavenCentral()
-        maven { setUrl("https://jitpack.io") }
+        maven("https://jitpack.io")
     }
 }
 
@@ -22,4 +22,4 @@ plugins {
 }
 
 rootProject.name = "Accord"
-include(":app", ":recyclerview", ":fastscroll")
+include(":app", ":recyclerview")

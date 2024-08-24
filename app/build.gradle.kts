@@ -183,10 +183,10 @@ dependencies {
     implementation("androidx.media3:media3-session:$media3Version")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("com.google.android.material:material:1.13.0-alpha05")
+    implementation("me.zhanghai.android.fastscroll:library:1.3.0")
     implementation("io.coil-kt.coil3:coil:3.0.0-alpha10")
     implementation(files("../libs/lib-decoder-ffmpeg-release.aar"))
     implementation(project(":recyclerview"))
-    implementation(project(":fastscroll"))
     // --- below does not apply to release builds ---
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
     // Note: JAudioTagger is not compatible with Android 5, we can't ship it in app
