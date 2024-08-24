@@ -48,9 +48,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -59,6 +56,9 @@ import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.TransitionManager
 import coil3.annotation.ExperimentalCoilApi
 import coil3.asDrawable
@@ -1359,7 +1359,7 @@ class FullBottomSheet @JvmOverloads constructor(
             ViewHolder(
                 LayoutInflater
                     .from(parent.context)
-                    .inflate(R.layout.lyrics, parent, false),
+                    .inflate(R.layout.lyrics, parent, false)
             )
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -1482,8 +1482,9 @@ class FullBottomSheet @JvmOverloads constructor(
 
                 val textSize = if (lyric.isTranslation) 20f else if (lyric.timeStamp != null) 34f else 18f
                 val paddingTop = if (lyric.isTranslation) 2 else if (lyric.timeStamp != null) 18 else 0
-                val paddingBottom =
-                    if (position + 1 < lyricList.size && lyricList[position + 1].isTranslation) 2 else if (lyric.timeStamp != null) 18 else 0
+                val paddingBottom = if (position + 1 < lyricList.size && lyricList[position + 1].isTranslation) 2 else if (lyric.timeStamp != null) 18 else 0
+                val paddingStart = if (lyric.label == "v2: ") 66.5f else 12.5f
+                val paddingEnd = if (lyric.label == "v2: " || !lyric.hasV2Labels) 12.5f else 66.5f
 
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
                 typeface = if (lyric.timeStamp != null) defaultTypeface else disabledTextTypeface
@@ -1492,16 +1493,17 @@ class FullBottomSheet @JvmOverloads constructor(
                     1f
                 )
                 setPadding(
-                    (12.5f).dpToPx(context).toInt(),
+                    paddingStart.dpToPx(context).toInt(),
                     paddingTop.dpToPx(context),
-                    (12.5f).dpToPx(context).toInt(),
+                    paddingEnd.dpToPx(context).toInt(),
                     paddingBottom.dpToPx(context)
                 )
-
-                doOnLayout {
-                    pivotX = 0f
-                    pivotY = height / 2f
+                if (lyric.label.isNotEmpty() && lyric.label == "v2: ") {
+                    gravity = Gravity.END
                 }
+
+                pivotX = 0f
+                pivotY = height / 2f
 
                 if (lyric.timeStamp == null) {
                     scaleText(sizeFactor)
