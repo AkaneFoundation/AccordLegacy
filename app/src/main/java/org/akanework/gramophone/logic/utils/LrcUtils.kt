@@ -119,7 +119,7 @@ object LrcUtils {
                     if (wordTimeMarksRegex.containsMatchIn(lyricLine)) {
                         val wordMatches = wordTimeMarksRegex.findAll(lyricLine)
                         val words = lyricLine.split(wordTimeMarksRegex)
-                        val wordTimestamps = words.mapIndexedNotNull { index, word ->
+                        val wordTimestamps = words.mapIndexedNotNull { index, _ ->
                             wordMatches.elementAtOrNull(index)?.let { match ->
                                 val wordTimestamp =
                                     parseTime(match.groupValues[1] + match.groupValues[2])

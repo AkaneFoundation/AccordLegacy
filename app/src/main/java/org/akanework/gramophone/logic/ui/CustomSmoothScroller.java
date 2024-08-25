@@ -27,6 +27,7 @@ import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.PathInterpolator;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 /**
@@ -105,7 +106,7 @@ public class CustomSmoothScroller extends RecyclerView.SmoothScroller {
      */
     @Override
     @SuppressLint("UnknownNullness") // b/240775049: Cannot annotate properly
-    protected void onTargetFound(View targetView, RecyclerView.State state, Action action) {
+    protected void onTargetFound(@NonNull View targetView, @NonNull RecyclerView.State state, @NonNull Action action) {
         final int dx = calculateDxToMakeVisible(targetView, getHorizontalSnapPreference());
         final int dy = calculateDyToMakeVisible(targetView, getVerticalSnapPreference());
         final int distance = (int) Math.sqrt(dx * dx + dy * dy);
@@ -125,7 +126,7 @@ public class CustomSmoothScroller extends RecyclerView.SmoothScroller {
      */
     @Override
     @SuppressLint("UnknownNullness") // b/240775049: Cannot annotate properly
-    protected void onSeekTargetStep(int dx, int dy, RecyclerView.State state, Action action) {
+    protected void onSeekTargetStep(int dx, int dy, @NonNull RecyclerView.State state, @NonNull Action action) {
         // TODO(b/72745539): Is there ever a time when onSeekTargetStep should be called when
         // getChildCount returns 0?  Should this logic be extracted out of this method such that
         // this method is not called if getChildCount() returns 0?
@@ -133,7 +134,6 @@ public class CustomSmoothScroller extends RecyclerView.SmoothScroller {
             stop();
             return;
         }
-        //noinspection PointlessBooleanExpression
         if (DEBUG && mTargetVector != null
                 && (mTargetVector.x * dx < 0 || mTargetVector.y * dy < 0)) {
             throw new IllegalStateException("Scroll happened in the opposite direction"

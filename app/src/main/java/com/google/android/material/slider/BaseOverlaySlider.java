@@ -201,7 +201,7 @@ import java.util.Locale;
  * @attr ref com.google.android.material.R.styleable#Slider_trackColorInactive
  * @attr ref com.google.android.material.R.styleable#Slider_trackHeight
  */
-@SuppressLint("RestrictedApi")
+@SuppressLint({"RestrictedApi", "PrivateResource"})
 abstract class BaseOverlaySlider<
         S extends BaseOverlaySlider<S, L, T>,
         L extends BaseOnChangeListener<S>,

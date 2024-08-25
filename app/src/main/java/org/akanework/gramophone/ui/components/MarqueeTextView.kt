@@ -19,6 +19,7 @@ package org.akanework.gramophone.ui.components
 
 import android.content.Context
 import android.graphics.Rect
+import android.text.TextUtils
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
 
@@ -40,7 +41,7 @@ class MarqueeTextView @JvmOverloads constructor(
 
     init {
         isSingleLine = true
-        ellipsize = android.text.TextUtils.TruncateAt.MARQUEE
+        ellipsize = TextUtils.TruncateAt.MARQUEE
         marqueeRepeatLimit = -1
         isFocusable = true
         isFocusableInTouchMode = true

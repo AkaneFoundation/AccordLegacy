@@ -525,7 +525,7 @@ fun TextView.scaleText(scale: Float) {
     scaleY = scale
 }
 
-@SuppressLint("StringFormatInvalid")
+@SuppressLint("StringFormatInvalid", "StringFormatMatches")
 fun MaterialToolbar.applyGeneralMenuItem(
     fragment: Fragment,
     libraryViewModel: LibraryViewModel

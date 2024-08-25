@@ -91,7 +91,7 @@ object CalculationUtils {
 
     /** Returns the single argument constrained between [0.0, 1.0].  */
     private fun saturate(value: Float): Float {
-        return constrain(value, 0.0f, 1.0f)
+        return value.coerceAtLeast(0f).coerceAtMost(1f)
     }
 
     /** Returns the saturated (constrained between [0, 1]) result of [.lerpInv].  */

@@ -48,7 +48,6 @@ import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import androidx.preference.PreferenceManager
-import coil3.annotation.ExperimentalCoilApi
 import coil3.asDrawable
 import coil3.imageLoader
 import coil3.request.Disposable
@@ -76,10 +75,9 @@ import org.akanework.gramophone.ui.MainActivity
 
 class PlayerBottomSheet private constructor(
     context: Context, attributeSet: AttributeSet?, defStyleAttr: Int, defStyleRes: Int
-) : FrameLayout(context, attributeSet, defStyleAttr, defStyleRes),
-    Player.Listener, DefaultLifecycleObserver {
-    constructor(context: Context, attributeSet: AttributeSet?)
-            : this(context, attributeSet, 0, 0)
+) : FrameLayout(context, attributeSet, defStyleAttr, defStyleRes), Player.Listener, DefaultLifecycleObserver {
+
+    constructor(context: Context, attributeSet: AttributeSet?) : this(context, attributeSet, 0, 0)
 
     companion object {
         const val TAG = "PlayerBottomSheet"
@@ -484,7 +482,6 @@ class PlayerBottomSheet private constructor(
 
     fun getPlayer(): MediaController? = instance
 
-    @OptIn(ExperimentalCoilApi::class)
     override fun onMediaItemTransition(
         mediaItem: MediaItem?,
         reason: Int,

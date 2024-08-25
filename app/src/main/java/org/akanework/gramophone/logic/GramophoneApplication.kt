@@ -15,7 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.akanework.gramophone
+package org.akanework.gramophone.logic
 
 import android.app.Application
 import android.app.NotificationManager
@@ -35,7 +35,6 @@ import androidx.preference.PreferenceManager
 import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
-import coil3.annotation.ExperimentalCoilApi
 import coil3.asImage
 import coil3.decode.DataSource
 import coil3.fetch.Fetcher
@@ -44,9 +43,6 @@ import coil3.request.NullRequestDataException
 import coil3.request.allowHardware
 import coil3.size.pxOrElse
 import coil3.util.Logger
-import org.akanework.gramophone.logic.getStringStrict
-import org.akanework.gramophone.logic.hasScopedStorageV1
-import org.akanework.gramophone.logic.needsMissingOnDestroyCallWorkarounds
 import org.akanework.gramophone.ui.BugHandlerActivity
 import java.io.File
 import java.io.FileNotFoundException
@@ -116,7 +112,6 @@ class GramophoneApplication : Application(), SingletonImageLoader.Factory {
         }
     }
 
-    @kotlin.OptIn(ExperimentalCoilApi::class)
     override fun newImageLoader(context: PlatformContext): ImageLoader {
         return ImageLoader.Builder(context)
             .diskCache(null)

@@ -13,7 +13,7 @@ import org.akanework.gramophone.logic.resourceUri
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
 
 class HomepageCarouselAdapter(
-    private val context: Context
+    context: Context
 ) : RecyclerView.Adapter<HomepageCarouselAdapter.ViewHolder>() {
 
     val carouselList = mutableListOf(

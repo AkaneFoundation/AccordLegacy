@@ -60,10 +60,10 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSession.MediaItemsWithStartPosition
 import androidx.media3.session.MediaSessionService
 import androidx.media3.session.SessionCommand
+import androidx.media3.session.SessionError
 import androidx.media3.session.SessionResult
 import androidx.preference.PreferenceManager
 import coil3.BitmapImage
-import coil3.annotation.ExperimentalCoilApi
 import coil3.imageLoader
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
@@ -167,7 +167,6 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         }
     }
 
-    @OptIn(ExperimentalCoilApi::class)
     override fun onCreate() {
         handler = Handler(Looper.getMainLooper())
         super.onCreate()
@@ -474,7 +473,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
             }
 
             else -> {
-                SessionResult(SessionResult.RESULT_ERROR_BAD_VALUE)
+                SessionResult(SessionError.ERROR_BAD_VALUE)
             }
         })
     }

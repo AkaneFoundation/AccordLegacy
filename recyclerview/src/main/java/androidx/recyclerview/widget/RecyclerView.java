@@ -8574,15 +8574,11 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
         public static int chooseSize(int spec, int desired, int min) {
             final int mode = View.MeasureSpec.getMode(spec);
             final int size = View.MeasureSpec.getSize(spec);
-            switch (mode) {
-                case View.MeasureSpec.EXACTLY:
-                    return size;
-                case View.MeasureSpec.AT_MOST:
-                    return Math.min(size, Math.max(desired, min));
-                case View.MeasureSpec.UNSPECIFIED:
-                default:
-                    return Math.max(desired, min);
-            }
+            return switch (mode) {
+                case MeasureSpec.EXACTLY -> size;
+                case MeasureSpec.AT_MOST -> Math.min(size, Math.max(desired, min));
+                default -> Math.max(desired, min);
+            };
         }
 
         /**

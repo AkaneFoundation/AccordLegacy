@@ -93,6 +93,7 @@ class PlaylistAdapter(
 
     class PlaylistItemHelper(private val context: Context) :
         StoreItemHelper<MediaStoreUtils.Playlist>() {
+            /*
         override fun getCover(item: MediaStoreUtils.Playlist): Uri? {
             // return if (item is MediaStoreUtils.ManuScript) {
             //    context.resourceUri(R.drawable.ic_default_cover_manuscript)
@@ -100,6 +101,7 @@ class PlaylistAdapter(
             return super.getCover(item)
             //}
         }
+             */
     }
 
 }

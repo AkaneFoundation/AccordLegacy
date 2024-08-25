@@ -12,11 +12,3 @@ plugins {
 tasks.withType(JavaCompile::class.java) {
     options.compilerArgs.add("-Xlint:all")
 }
-
-subprojects {
-    configurations.configureEach {
-        exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
-        exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
-        exclude("androidx.recyclerview", "recyclerview")
-    }
-}

@@ -60,7 +60,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.TransitionManager
-import coil3.annotation.ExperimentalCoilApi
 import coil3.asDrawable
 import coil3.dispose
 import coil3.imageLoader
@@ -1071,7 +1070,6 @@ class FullBottomSheet @JvmOverloads constructor(
             .toWindowInsets()!!
     }
 
-    @OptIn(ExperimentalCoilApi::class)
     @SuppressLint("NotifyDataSetChanged", "SetTextI18n")
     override fun onMediaItemTransition(
         mediaItem: MediaItem?,
@@ -1328,11 +1326,7 @@ class FullBottomSheet @JvmOverloads constructor(
             ResourcesCompat.getColor(resources, R.color.contrast_lyric_defaultColor, null)
 
         private var highlightTranslationTextColor =
-            ResourcesCompat.getColor(
-                resources,
-                R.color.contrast_lyric_highlightTranslationColor,
-                null
-            )
+            ResourcesCompat.getColor(resources, R.color.contrast_lyric_highlightTranslationColor, null)
 
         private var highlightTextColor =
             ResourcesCompat.getColor(resources, R.color.contrast_lyric_highlightColor, null)
@@ -1430,8 +1424,7 @@ class FullBottomSheet @JvmOverloads constructor(
             }
 
             val lyric = lyricList[position]
-            val isHighlightPayload =
-                payloads.isNotEmpty() && (payloads[0] == LYRIC_SET_HIGHLIGHT || payloads[0] == LYRIC_REMOVE_HIGHLIGHT)
+            val isHighlightPayload = payloads.isNotEmpty() && (payloads[0] == LYRIC_SET_HIGHLIGHT || payloads[0] == LYRIC_REMOVE_HIGHLIGHT)
 
             with(holder.lyricCard) {
                 if (lyric.timeStamp != null) {
@@ -1606,8 +1599,7 @@ class FullBottomSheet @JvmOverloads constructor(
                 )
     }
 
-
-    private class PlaylistCardAdapter(
+    private inner class PlaylistCardAdapter(
         private val activity: MainActivity
     ) : RecyclerView.Adapter<PlaylistCardAdapter.ViewHolder>() {
 

@@ -162,6 +162,12 @@ android {
     }
 }
 
+configurations.configureEach {
+    exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
+    exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
+    exclude("androidx.recyclerview", "recyclerview")
+}
+
 dependencies {
     val media3Version = "1.4.0"
     val roomVersion = "2.6.1"

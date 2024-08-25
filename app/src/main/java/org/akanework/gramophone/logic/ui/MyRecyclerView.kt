@@ -41,8 +41,8 @@ import org.akanework.gramophone.R
 class MyRecyclerView(context: Context, attributeSet: AttributeSet?, defStyleAttr: Int) :
     FixOnItemTouchListenerRecyclerView(context, attributeSet, defStyleAttr),
     AppBarLayout.OnOffsetChangedListener {
-    constructor(context: Context, attributeSet: AttributeSet?)
-            : this(context, attributeSet, 0)
+
+    constructor(context: Context, attributeSet: AttributeSet?) : this(context, attributeSet, 0)
 
     constructor(context: Context) : this(context, null)
 
@@ -105,8 +105,7 @@ class MyRecyclerView(context: Context, attributeSet: AttributeSet?, defStyleAttr
             scrollInProgress = true
         } else if (state == SCROLL_STATE_IDLE) {
             if (scrollInProgress && !scrollIsNatural) {
-                val pos =
-                    (layoutManager as? LinearLayoutManager)?.findFirstCompletelyVisibleItemPosition()
+                val pos = (layoutManager as? LinearLayoutManager)?.findFirstCompletelyVisibleItemPosition()
                 setAppBarExpanded(pos == 0)
             }
             scrollInProgress = false

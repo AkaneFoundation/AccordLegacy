@@ -13,7 +13,6 @@ import android.os.SystemClock
 import androidx.annotation.RequiresApi
 import androidx.core.graphics.withSave
 import androidx.vectordrawable.graphics.drawable.Animatable2Compat
-import coil3.annotation.ExperimentalCoilApi
 import coil3.asDrawable
 import coil3.asImage
 import coil3.decode.DataSource
@@ -58,7 +57,6 @@ private class CoolCrossfadeTransition(
     val durationMillis: Int = 200,
     val preferExactIntrinsicSize: Boolean = false
 ) : Transition {
-    @OptIn(ExperimentalCoilApi::class)
     override fun transition() {
         val ph = result.request.placeholder()?.asDrawable(target.view.context.resources)
         val drawable = CoolCrossfadeDrawable(

@@ -14,7 +14,7 @@ import org.akanework.gramophone.ui.fragments.BaseFragment
 import org.akanework.gramophone.ui.fragments.LibrarySongSubFragment
 
 class LibraryCategoryAdapter(
-    private val context: Context,
+    context: Context,
     private val fragment: BaseFragment
 ) : RecyclerView.Adapter<LibraryCategoryAdapter.ViewHolder>() {
 
