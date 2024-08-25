@@ -103,9 +103,9 @@ class MainActivity : AppCompatActivity() {
      * onCreate - core of MainActivity.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         installSplashScreen().setKeepOnScreenCondition { !ready }
         enableEdgeToEdgeProperly()
+        super.onCreate(savedInstanceState)
         autoPlay = intent?.extras?.getBoolean(PLAYBACK_AUTO_START_FOR_FGS, false) == true
         intentSender =
             registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {

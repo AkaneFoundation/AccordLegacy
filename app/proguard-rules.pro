@@ -23,9 +23,6 @@
 # Enable more agressive optimizations changing access of classes and methods
 -allowaccessmodification
 
--dontwarn org.jaudiotagger.**
--keep class org.jaudiotagger.** { *; }
-
 -assumenosideeffects class
                   android.util.Log {
     public static int v(...);

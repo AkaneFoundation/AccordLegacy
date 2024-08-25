@@ -19,7 +19,7 @@ object LrcUtils {
 
     @OptIn(UnstableApi::class)
     fun extractAndParseLyrics(metadata: Metadata, trim: Boolean): MutableList<MediaStoreUtils.Lyric>? {
-        for (i in 0..<metadata.length()) {
+        for (i in 0..< metadata.length()) {
             val meta = metadata.get(i)
             val data =
                 if (meta is VorbisComment && meta.key == "LYRICS") // ogg / flac

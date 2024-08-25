@@ -43,9 +43,10 @@ import coil3.request.NullRequestDataException
 import coil3.request.allowHardware
 import coil3.size.pxOrElse
 import coil3.util.Logger
+import org.akanework.gramophone.BuildConfig
 import org.akanework.gramophone.ui.BugHandlerActivity
 import java.io.File
-import java.io.FileNotFoundException
+import java.io.IOException
 import kotlin.system.exitProcess
 
 /**
@@ -53,63 +54,55 @@ import kotlin.system.exitProcess
  *
  * @author AkaneTan, nift4
  */
-class GramophoneApplication : Application(), SingletonImageLoader.Factory {
+class GramophoneApplication : Application(), SingletonImageLoader.Factory, Thread.UncaughtExceptionHandler {
 
     lateinit var prefs: SharedPreferences
         private set
 
+    init {
+        Thread.setDefaultUncaughtExceptionHandler(this)
+    }
+
     @OptIn(UnstableApi::class)
     override fun onCreate() {
-        // Set up BugHandlerActivity.
-        Thread.setDefaultUncaughtExceptionHandler { _, paramThrowable ->
-            val exceptionMessage = Log.getStackTraceString(paramThrowable)
-            val threadName = Thread.currentThread().name
-            val intent = Intent(this, BugHandlerActivity::class.java)
-            intent.putExtra("exception_message", exceptionMessage)
-            intent.putExtra("thread", threadName)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
-
-            exitProcess(10)
-        }
         super.onCreate()
-        // Cheat by loading preferences before setting up StrictMode.
-        prefs = PreferenceManager.getDefaultSharedPreferences(this)
+
         if (BuildConfig.DEBUG) {
-            // Use StrictMode to find anti-patterns issues (as of writing, no known violations)
-            // (of course not counting SharedPreferences which just is like that by nature)
+            // Use StrictMode to find anti-pattern issues
             StrictMode.setThreadPolicy(
                 ThreadPolicy.Builder()
-                    .detectAll().permitDiskReads() // permit disk reads due to media3 setMetadata()
-                    .penaltyLog().penaltyDialog().build()
-            )
+                    .detectAll().permitDiskReads() // permit disk reads due to media3 setMetadata() TODO extra player thread
+                    .penaltyLog().penaltyDialog().build())
             StrictMode.setVmPolicy(
                 VmPolicy.Builder()
                     .detectAll()
-                    .penaltyLog().penaltyDeath().build()
-            )
+                    .penaltyLog().penaltyDeath().build())
         }
 
-        // https://github.com/androidx/media/issues/805
-        if (needsMissingOnDestroyCallWorkarounds()) {
-            val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            nm.cancel(DefaultMediaNotificationProvider.DEFAULT_NOTIFICATION_ID)
-        }
+        // This is a separate thread to avoid disk read on main thread and improve startup time
+        Thread {
+            val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+            // Set application theme when launching.
+            when (prefs.getString("theme_mode", "0")) {
+                "0" -> {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                }
 
-        // Set application theme when launching.
-        when (prefs.getStringStrict("theme_mode", "0")) {
-            "0" -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                "1" -> {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                }
+
+                "2" -> {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                }
             }
 
-            "1" -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            // https://github.com/androidx/media/issues/805
+            if (needsMissingOnDestroyCallWorkarounds()) {
+                val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+                nm.cancel(DefaultMediaNotificationProvider.DEFAULT_NOTIFICATION_ID)
             }
-
-            "2" -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            }
-        }
+        }.start()
     }
 
     override fun newImageLoader(context: PlatformContext): ImageLoader {
@@ -124,7 +117,6 @@ class GramophoneApplication : Application(), SingletonImageLoader.Factory {
                         if (size !is Size?) return@Factory null
                         val file = data.first as? File ?: return@Factory null
                         return@Factory Fetcher {
-                            // TODO what if theres no cover? does this work correctly at all?
                             ImageFetchResult(
                                 ThumbnailUtils.createAudioThumbnail(file, options.size.let {
                                     Size(it.width.pxOrElse { size?.width ?: 10000 },
@@ -151,15 +143,23 @@ class GramophoneApplication : Application(), SingletonImageLoader.Factory {
                                 Log.println(priority, tag, message)
                             }
                             // Let's keep the log readable and ignore normal events' stack traces.
-                            if (throwable != null && throwable !is NullRequestDataException
-                                && (throwable !is FileNotFoundException
-                                        || throwable.message != "No album art found")
-                            ) {
+                            if (throwable != null && throwable !is NullRequestDataException && (throwable !is IOException || throwable.message != "No album art found")) {
                                 Log.println(priority, tag, Log.getStackTraceString(throwable))
                             }
                         }
                     })
             }
             .build()
+    }
+
+    override fun uncaughtException(t: Thread, e: Throwable) {
+        val exceptionMessage = Log.getStackTraceString(e)
+        val threadName = t.name
+        val intent = Intent(this, BugHandlerActivity::class.java)
+        intent.putExtra("exception_message", exceptionMessage)
+        intent.putExtra("thread", threadName)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        exitProcess(10)
     }
 }
