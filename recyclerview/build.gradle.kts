@@ -61,7 +61,7 @@ dependencies {
     //noinspection KtxExtensionAvailable
     api("androidx.core:core:1.13.1")
     //noinspection KtxExtensionAvailable,GradleDependency
-    implementation("androidx.collection:collection:1.4.2")
+    implementation("androidx.collection:collection:1.4.4")
     api("androidx.customview:customview:1.1.0")
     implementation("androidx.customview:customview-poolingcontainer:1.0.0")
 

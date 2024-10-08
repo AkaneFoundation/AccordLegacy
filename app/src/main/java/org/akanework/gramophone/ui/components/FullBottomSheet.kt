@@ -1639,7 +1639,7 @@ class FullBottomSheet @JvmOverloads constructor(
             ViewHolder(
                 LayoutInflater
                     .from(parent.context)
-                    .inflate(R.layout.adapter_list_card_playlist, parent, false),
+                    .inflate(R.layout.adapter_list_card_playlist, parent, false)
             )
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {

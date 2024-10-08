@@ -20,6 +20,7 @@ android {
     namespace = "org.akanework.gramophone"
     compileSdk = 35
     buildToolsVersion = "35.0.0"
+    ndkVersion = "28.0.12433566-rc1"
 
     androidResources {
         generateLocaleConfig = true
@@ -169,28 +170,28 @@ configurations.configureEach {
 }
 
 dependencies {
-    val media3Version = "1.4.0"
+    val media3Version = "1.4.1"
     val roomVersion = "2.6.1"
 
     ksp("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.activity:activity-ktx:1.9.1")
+    implementation("androidx.activity:activity-ktx:1.9.2")
     implementation("androidx.concurrent:concurrent-futures-ktx:1.2.0")
     implementation("androidx.transition:transition-ktx:1.5.1") // <-- for predictive back
-    implementation("androidx.fragment:fragment-ktx:1.8.2")
+    implementation("androidx.fragment:fragment-ktx:1.8.4")
     implementation("androidx.core:core-splashscreen:1.0.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
     implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.0-alpha14")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.0-beta01")
     implementation("androidx.media3:media3-exoplayer:$media3Version")
     implementation("androidx.media3:media3-exoplayer-midi:$media3Version")
     implementation("androidx.media3:media3-session:$media3Version")
     implementation("androidx.preference:preference-ktx:1.2.1")
-    implementation("com.google.android.material:material:1.13.0-alpha05")
+    implementation("com.google.android.material:material:1.13.0-alpha06")
     implementation("me.zhanghai.android.fastscroll:library:1.3.0")
-    implementation("io.coil-kt.coil3:coil:3.0.0-alpha10")
+    implementation("io.coil-kt.coil3:coil:3.0.0-rc01")
     implementation(files("../libs/lib-decoder-ffmpeg-release.aar"))
     implementation(project(":recyclerview"))
     // --- below does not apply to release builds ---

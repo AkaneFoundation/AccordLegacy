@@ -23,8 +23,7 @@
 # Enable more agressive optimizations changing access of classes and methods
 -allowaccessmodification
 
--assumenosideeffects class
-                  android.util.Log {
+-assumenosideeffects class android.util.Log {
     public static int v(...);
     public static int i(...);
     public static int w(...);
