@@ -1635,12 +1635,11 @@ class FullBottomSheet @JvmOverloads constructor(
         override fun onCreateViewHolder(
             parent: ViewGroup,
             viewType: Int
-        ): PlaylistCardAdapter.ViewHolder =
-            ViewHolder(
-                LayoutInflater
-                    .from(parent.context)
-                    .inflate(R.layout.adapter_list_card_playlist, parent, false)
-            )
+        ): PlaylistCardAdapter.ViewHolder = ViewHolder(
+            LayoutInflater
+                .from(parent.context)
+                .inflate(R.layout.adapter_list_card_playlist, parent, false)
+        )
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = playlist.second[playlist.first[holder.bindingAdapterPosition]]
@@ -1658,7 +1657,6 @@ class FullBottomSheet @JvmOverloads constructor(
                 val idx = playlist.first.removeAt(pos)
                 playlist.first.replaceAll { if (it > idx) it - 1 else it }
                 instance?.removeMediaItem(idx)
-                playlist.second.removeAt(idx)
                 notifyItemRemoved(pos)
             }
             holder.itemView.setOnClickListener {
@@ -1673,9 +1671,9 @@ class FullBottomSheet @JvmOverloads constructor(
             holder.songCover.dispose()
         }
 
-        override fun getItemCount(): Int = if (playlist.first.size != playlist.second.size)
-            throw IllegalStateException()
-        else playlist.first.size
+        override fun getItemCount(): Int =
+            if (playlist.first.size != playlist.second.size) throw IllegalStateException("${playlist.first.size}, ${playlist.second.size}")
+            else playlist.first.size
 
         inner class ViewHolder(
             view: View,
