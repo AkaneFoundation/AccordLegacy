@@ -766,7 +766,6 @@ class FullBottomSheet @JvmOverloads constructor(
                     MotionEvent.ACTION_UP -> {
                         fingerReleaseJob?.cancel()
                         fingerReleaseJob = CoroutineScope(Dispatchers.Default).launch {
-                            delay(3000)
                             isFingerOnScreen = false
                         }
                     }
