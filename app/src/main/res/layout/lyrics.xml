@@ -8,26 +8,23 @@
     android:layout_marginStart="20dp"
     android:layout_marginEnd="20dp"
     android:clickable="true"
+    android:clipChildren="false"
+    android:clipToOutline="false"
+    android:clipToPadding="false"
     android:focusable="true"
     app:cardBackgroundColor="@android:color/transparent"
     app:cardElevation="0dp"
     app:strokeColor="@android:color/transparent"
-    android:clipToPadding="false"
-    android:clipToOutline="false"
-    android:clipChildren="false"
     tools:cardBackgroundColor="@color/contrast_colorOnSurface">
 
-    <TextView
-        android:id="@+id/lyric"
+    <com.google.android.flexbox.FlexboxLayout
+        android:id="@+id/flexbox"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:letterSpacing="0.02"
-        android:paddingTop="18dp"
-        android:paddingBottom="18dp"
-        android:textColor="#FFFFFF"
-        android:fontFamily="sans-serif"
-        android:textFontWeight="600"
-        tools:layout_marginHorizontal="12.5dp"
-        tools:textSize="33sp" />
+        android:clipChildren="false"
+        android:clipToOutline="false"
+        android:clipToPadding="false"
+        app:flexDirection="row"
+        app:flexWrap="wrap" />
 
 </com.google.android.material.card.MaterialCardView>

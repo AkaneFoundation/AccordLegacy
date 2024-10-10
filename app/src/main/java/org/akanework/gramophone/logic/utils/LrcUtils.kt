@@ -106,6 +106,7 @@ object LrcUtils {
                 val lyricLine = line.substring(sequence.last().range.last + 1)
                     .let { if (trim) it.trim() else it }
                     .replace(labelRegex, "")
+                var wordTimestampOld: Long = 0
                 sequence.forEach { match ->
                     val timeString = match.groupValues[1] + match.groupValues[2]
                     val timeStamp = parseTime(timeString)
@@ -121,15 +122,15 @@ object LrcUtils {
                         val words = lyricLine.split(wordTimeMarksRegex)
                         val wordTimestamps = words.mapIndexedNotNull { index, _ ->
                             wordMatches.elementAtOrNull(index)?.let { match ->
-                                val wordTimestamp =
-                                    parseTime(match.groupValues[1] + match.groupValues[2])
-                                Pair(words.take(index).sumOf { it.length }, wordTimestamp)
+                                val wordTimestamp = parseTime(match.groupValues[1] + match.groupValues[2]) - wordTimestampOld
+                                wordTimestampOld = parseTime(match.groupValues[1] + match.groupValues[2])
+                                Pair(words.take(index + 1).sumOf { it.length }, wordTimestamp)
                             }
                         }
                         list.add(
                             MediaStoreUtils.Lyric(
-                                timeStamp,
-                                lyricLine.replace(wordTimeMarksRegex, ""),
+                                timeStamp = timeStamp,
+                                content = lyricLine.replace(wordTimeMarksRegex, ""),
                                 wordTimestamps = wordTimestamps,
                                 label = currentLabel,
                                 hasV2Labels = hasV2Labels
@@ -138,8 +139,8 @@ object LrcUtils {
                     } else {
                         list.add(
                             MediaStoreUtils.Lyric(
-                                timeStamp,
-                                lyricLine,
+                                timeStamp = timeStamp,
+                                content = lyricLine,
                                 label = currentLabel,
                                 hasV2Labels = hasV2Labels
                             )
@@ -184,10 +185,8 @@ object LrcUtils {
         // if one specifies micro/pico/nano/whatever seconds for some insane reason,
         // scrap the extra information
         val milliseconds = (millisecondsString?.substring(
-            0,
-            millisecondsString.length.coerceAtMost(3)
-        )?.toLongOrNull() ?: 0) *
-                10f.pow(3 - (millisecondsString?.length ?: 0)).toLong()
+            0, millisecondsString.length.coerceAtMost(3)
+        )?.toLongOrNull() ?: 0) * 10f.pow(3 - (millisecondsString?.length ?: 0)).toLong()
 
         return minutes * 60000 + seconds * 1000 + milliseconds
     }

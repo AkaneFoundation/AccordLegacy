@@ -642,3 +642,11 @@ inline fun hasScopedStorageWithMediaTypes(): Boolean =
 inline fun mayThrowForegroundServiceStartNotAllowed(): Boolean =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
             Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2
+
+inline fun Sequence<View>.getTextViews(
+    crossinline action: (TextView) -> Unit
+) {
+    this.forEach {
+        if (it is TextView) action.invoke(it)
+    }
+}
