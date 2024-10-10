@@ -50,7 +50,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.children
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
-import androidx.core.view.updatePadding
+import androidx.core.view.updatePaddingRelative
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -1444,21 +1444,22 @@ class FullBottomSheet @JvmOverloads constructor(
 
             with(holder.lyricFlexboxLayout) {
                 visibility = if (lyric.content.isNotEmpty()) View.VISIBLE else View.GONE
+                justifyContent = if (lyric.label.isNotEmpty() && lyric.label == "v2: ") {
+                    JustifyContent.FLEX_END
+                } else {
+                    JustifyContent.FLEX_START
+                }
 
                 val paddingTop = if (lyric.isTranslation) 2 else if (lyric.timeStamp != null) 18 else 0
                 val paddingBottom = if (position + 1 < lyricList.size && lyricList[position + 1].isTranslation) 2 else if (lyric.timeStamp != null) 18 else 0
-                val paddingStart = if (lyric.label == "v2: ") 66.5f else 12.5f
-                val paddingEnd = if (lyric.label == "v2: " || !lyric.hasV2Labels) 12.5f else 66.5f
-                updatePadding(
-                    left = paddingStart.dpToPx(context).toInt(),
+                val paddingStart = 12.5f
+                val paddingEnd = if (lyric.hasV2Labels) 66.5f else 12.5f
+                updatePaddingRelative(
+                    start = paddingStart.dpToPx(context).toInt(),
                     top = paddingTop.dpToPx(context),
-                    right = paddingEnd.dpToPx(context).toInt(),
+                    end = paddingEnd.dpToPx(context).toInt(),
                     bottom = paddingBottom.dpToPx(context)
                 )
-
-                if (lyric.label.isNotEmpty() && lyric.label == "v2: ") {
-                    justifyContent = JustifyContent.FLEX_END
-                }
 
                 if (lyricList[position].timeStamp != null &&
                     lyricList[position].absolutePosition != null &&
