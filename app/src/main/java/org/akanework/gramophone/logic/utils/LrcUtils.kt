@@ -106,7 +106,6 @@ object LrcUtils {
                 val lyricLine = line.substring(sequence.last().range.last + 1)
                     .let { if (trim) it.trim() else it }
                     .replace(labelRegex, "")
-                var wordTimestampOld: Long = 0
                 sequence.forEach { match ->
                     val timeString = match.groupValues[1] + match.groupValues[2]
                     val timeStamp = parseTime(timeString)
@@ -122,8 +121,7 @@ object LrcUtils {
                         val words = lyricLine.split(wordTimeMarksRegex)
                         val wordTimestamps = words.mapIndexedNotNull { index, _ ->
                             wordMatches.elementAtOrNull(index)?.let { match ->
-                                val wordTimestamp = parseTime(match.groupValues[1] + match.groupValues[2]) - wordTimestampOld
-                                wordTimestampOld = parseTime(match.groupValues[1] + match.groupValues[2])
+                                val wordTimestamp = parseTime(match.groupValues[1] + match.groupValues[2])
                                 Pair(words.take(index + 1).sumOf { it.length }, wordTimestamp)
                             }
                         }
