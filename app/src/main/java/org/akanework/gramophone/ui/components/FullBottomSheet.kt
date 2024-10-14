@@ -1348,7 +1348,7 @@ class FullBottomSheet @JvmOverloads constructor(
         var currentFocusPos = -1
         private var currentTranslationPos = -1
 
-        var isExtendedLRC = false
+        val isExtendedLRC: Boolean get() = lyricList.any { it.wordTimestamps.isNotEmpty() == true }
 
         override fun onCreateViewHolder(
             parent: ViewGroup,
@@ -1369,12 +1369,11 @@ class FullBottomSheet @JvmOverloads constructor(
             if (payloads.isNotEmpty() && payloads[0] == LYRIC_UPDATE) {
                 holder.lyricFlexboxLayout.children.getTextViews {
                     if (it is CustomTextView) {
-                        it.setTextColor(Color.WHITE)
+                        if (it.currentTextColor != highlightTextColor) it.setTextColor(highlightTextColor)
                         val position: Long = instance?.currentPosition ?: 0
                         val lyricDurationStart = it.getTag(R.id.lyric_duration_start) as Long
                         val lyricDurationEnd = it.getTag(R.id.lyric_duration_end) as Long
-                        val percent: Float =
-                            ((position.toFloat() - lyricDurationStart.toFloat()) / (lyricDurationEnd.toFloat() - lyricDurationStart.toFloat()))
+                        val percent: Float = ((position.toFloat() - lyricDurationStart.toFloat()) / (lyricDurationEnd.toFloat() - lyricDurationStart.toFloat()))
 //                        Log.d("Percent", "$percent, $position")
                         it.setProgress(percent)
                     }
@@ -1505,10 +1504,12 @@ class FullBottomSheet @JvmOverloads constructor(
                 }
 
                 if (lyric.wordTimestamps.isNotEmpty()) {
-                    if (isExtendedLRC == false) isExtendedLRC = true
                     if (lyric.wordTimestamps.size != childCount) removeAllViews()
                     for (v in children) {
-                        if (v.getTag(R.id.lyric_content_hash) != lyric.content.hashCode()) {
+                        if (
+                            v.getTag(R.id.lyric_content_hash) != lyric.content.hashCode() ||
+                            v.getTag(R.id.lyric_duration_hash) != lyric.wordTimestamps[0].hashCode()
+                        ) {
                             removeAllViews()
                         }
                         break
@@ -1525,6 +1526,7 @@ class FullBottomSheet @JvmOverloads constructor(
                             text = lyricContent
                             setTag(R.id.lyric_duration_start, lyricDurationStart)
                             setTag(R.id.lyric_duration_end, it.second)
+                            setTag(R.id.lyric_duration_hash, it.hashCode())
                             setTag(R.id.lyric_content_hash, lyric.content.hashCode())
                         }
                         if (lyric.wordTimestamps.size != childCount) {
@@ -1534,7 +1536,6 @@ class FullBottomSheet @JvmOverloads constructor(
                         lyricDurationStart = it.second
                     }
                 } else {
-                    if (isExtendedLRC == true) isExtendedLRC = false
                     if (childCount > 0) {
                         children.getTextViews {
                             if (it.text != lyric.content) removeAllViews()
@@ -1993,7 +1994,7 @@ class FullBottomSheet @JvmOverloads constructor(
                 updateLyric(duration - LYRIC_SCROLL_DURATION)
             }
             if (instance?.isPlaying == true) {
-                handler.postDelayed(this, if (bottomSheetFullLyricAdapter.isExtendedLRC) 1L else LYRIC_SCROLL_DURATION)
+                handler.postDelayed(this, if (bottomSheetFullLyricAdapter.isExtendedLRC) 10L else LYRIC_SCROLL_DURATION)
             } else {
                 runnableRunning = false
             }
@@ -2018,10 +2019,8 @@ class FullBottomSheet @JvmOverloads constructor(
                         intent.action == AudioManager.ACTION_AUDIO_BECOMING_NOISY)
                 && !volumeLock
             ) {
-                val targetProgress =
-                    audioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat()
-                val valueAnimator =
-                    ValueAnimator.ofFloat(bottomSheetVolumeSlider.value, targetProgress)
+                val targetProgress = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat()
+                val valueAnimator = ValueAnimator.ofFloat(bottomSheetVolumeSlider.value, targetProgress)
                 valueAnimator.apply {
                     addUpdateListener {
                         val value = animatedValue as Float

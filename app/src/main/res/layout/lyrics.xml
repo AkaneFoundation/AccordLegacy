@@ -24,6 +24,8 @@
         android:clipChildren="false"
         android:clipToOutline="false"
         android:clipToPadding="false"
+        android:layoutDirection="ltr"
+        app:alignItems="baseline"
         app:flexDirection="row"
         app:flexWrap="wrap" />
 
