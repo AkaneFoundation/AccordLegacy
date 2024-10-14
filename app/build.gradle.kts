@@ -169,7 +169,7 @@ configurations.configureEach {
 }
 
 dependencies {
-    val media3Version = "1.4.1"
+    val media3Version = "1.5.0-alpha01"
     val roomVersion = "2.6.1"
 
     ksp("androidx.room:room-compiler:$roomVersion")
