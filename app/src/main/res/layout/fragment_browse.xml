@@ -12,17 +12,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/contrast_colorBackground"
-        app:liftOnScroll="false"
-        app:liftOnScrollColor="@color/contrast_colorBackground">
+        app:liftOnScroll="false">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsingtoolbar"
             style="?attr/collapsingToolbarLayoutMediumStyle"
             android:layout_width="match_parent"
             android:layout_height="@dimen/top_app_bar_height"
-            android:layout_marginStart="0dp"
             android:background="@color/contrast_colorBackground"
-            android:paddingStart="0dp"
             app:collapsedTitleTextAppearance="@style/TextAppearance.App.TitleLarge"
             app:collapsedTitleTextColor="@color/contrast_colorOnSurface"
             app:contentScrim="@android:color/transparent"
@@ -30,8 +27,7 @@
             app:expandedTitleTextAppearance="@style/TextAppearance.App.HeadlineLarge"
             app:expandedTitleTextColor="@color/contrast_colorOnSurface"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
-            app:title="@string/browse"
-            >
+            app:title="@string/browse">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/topAppBar"

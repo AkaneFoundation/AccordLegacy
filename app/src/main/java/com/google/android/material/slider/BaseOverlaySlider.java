@@ -34,7 +34,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
-import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -81,6 +80,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
@@ -289,7 +289,7 @@ abstract class BaseOverlaySlider<
     private int defaultTrackHeight;
     private int defaultTickActiveRadius;
     private int defaultTickInactiveRadius;
-    @Dimension(unit = Dimension.PX)
+    @Dimension
     private int minTouchTargetSize;
     private int minWidgetHeight;
     private int widgetHeight;
@@ -420,7 +420,7 @@ abstract class BaseOverlaySlider<
      * @return Index of the closest tick coordinate.
      */
     private static int pivotIndex(float[] coordinates, float position) {
-        return Math.round(position * (coordinates.length / 2 - 1));
+        return Math.round(position * ((float) coordinates.length / 2 - 1));
     }
 
     /**
@@ -571,7 +571,7 @@ abstract class BaseOverlaySlider<
             return false;
         }
         trackSidePadding = newTrackSidePadding;
-        if (ViewCompat.isLaidOut(this)) {
+        if (this.isLaidOut()) {
             updateTrackWidth(getWidth());
         }
         return true;
@@ -807,7 +807,7 @@ abstract class BaseOverlaySlider<
         if (labels.size() > values.size()) {
             List<TooltipDrawable> tooltipDrawables = labels.subList(values.size(), labels.size());
             for (TooltipDrawable label : tooltipDrawables) {
-                if (ViewCompat.isAttachedToWindow(this)) {
+                if (this.isAttachedToWindow()) {
                     detachLabelFromContentView(label);
                 }
             }
@@ -821,7 +821,7 @@ abstract class BaseOverlaySlider<
             TooltipDrawable tooltipDrawable =
                     TooltipDrawable.createFromAttributes(getContext(), null, 0, labelStyle);
             labels.add(tooltipDrawable);
-            if (ViewCompat.isAttachedToWindow(this)) {
+            if (this.isAttachedToWindow()) {
                 attachLabelToContentView(tooltipDrawable);
             }
         }
@@ -887,7 +887,7 @@ abstract class BaseOverlaySlider<
      * @see #setCustomThumbDrawablesForValues(Drawable...)
      */
     void setCustomThumbDrawable(@DrawableRes int drawableResId) {
-        setCustomThumbDrawable(getResources().getDrawable(drawableResId));
+        setCustomThumbDrawable(ResourcesCompat.getDrawable(getResources(), drawableResId, null));
     }
 
     /**
@@ -921,7 +921,7 @@ abstract class BaseOverlaySlider<
     void setCustomThumbDrawablesForValues(@NonNull @DrawableRes int... customThumbDrawableResIds) {
         Drawable[] customThumbDrawables = new Drawable[customThumbDrawableResIds.length];
         for (int i = 0; i < customThumbDrawableResIds.length; i++) {
-            customThumbDrawables[i] = getResources().getDrawable(customThumbDrawableResIds[i]);
+            customThumbDrawables[i] = ResourcesCompat.getDrawable(getResources(), customThumbDrawableResIds[i], null);
         }
         setCustomThumbDrawablesForValues(customThumbDrawables);
     }
@@ -2305,16 +2305,13 @@ abstract class BaseOverlaySlider<
         animator.setDuration(duration);
         animator.setInterpolator(interpolator);
         animator.addUpdateListener(
-                new AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
-                        float fraction = (float) animation.getAnimatedValue();
-                        for (TooltipDrawable label : labels) {
-                            label.setRevealFraction(fraction);
-                        }
-                        // Ensure the labels are redrawn even if the slider has stopped moving
-                        ViewCompat.postInvalidateOnAnimation(BaseOverlaySlider.this);
+                animation -> {
+                    float fraction = (float) animation.getAnimatedValue();
+                    for (TooltipDrawable label : labels) {
+                        label.setRevealFraction(fraction);
                     }
+                    // Ensure the labels are redrawn even if the slider has stopped moving
+                    BaseOverlaySlider.this.postInvalidateOnAnimation();
                 });
         return animator;
     }
@@ -2421,8 +2418,7 @@ abstract class BaseOverlaySlider<
      */
     private boolean isInVerticalScrollingContainer() {
         ViewParent p = getParent();
-        while (p instanceof ViewGroup) {
-            ViewGroup parent = (ViewGroup) p;
+        while (p instanceof ViewGroup parent) {
             boolean canScrollVertically = parent.canScrollVertically(1) || parent.canScrollVertically(-1);
             if (canScrollVertically && parent.shouldDelayChildPressedState()) {
                 return true;
@@ -2592,7 +2588,7 @@ abstract class BaseOverlaySlider<
     }
 
     final boolean isRtl() {
-        return ViewCompat.getLayoutDirection(this) == ViewCompat.LAYOUT_DIRECTION_RTL;
+        return this.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
     }
 
     /**
@@ -2640,20 +2636,14 @@ abstract class BaseOverlaySlider<
         // If this is a long press, increase the increment so it will only take around 20 steps.
         // Otherwise choose the smallest valid increment.
         float increment = isLongPress ? calculateStepIncrement(20) : calculateStepIncrement();
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_DPAD_LEFT:
-                return isRtl() ? increment : -increment;
-            case KeyEvent.KEYCODE_DPAD_RIGHT:
-                return isRtl() ? -increment : increment;
-            case KeyEvent.KEYCODE_MINUS:
-                return -increment;
-            case KeyEvent.KEYCODE_EQUALS:
-                // Numpad Plus == Shift + Equals, at least in AVD, so fall through.
-            case KeyEvent.KEYCODE_PLUS:
-                return increment;
-            default:
-                return null;
-        }
+        return switch (keyCode) {
+            case KeyEvent.KEYCODE_DPAD_LEFT -> isRtl() ? increment : -increment;
+            case KeyEvent.KEYCODE_DPAD_RIGHT -> isRtl() ? -increment : increment;
+            case KeyEvent.KEYCODE_MINUS -> -increment;
+            // Numpad Plus == Shift + Equals, at least in AVD, so fall through.
+            case KeyEvent.KEYCODE_EQUALS, KeyEvent.KEYCODE_PLUS -> increment;
+            default -> null;
+        };
     }
 
     /**
@@ -2812,7 +2802,7 @@ abstract class BaseOverlaySlider<
     static class SliderState extends BaseSavedState {
 
         public static final Creator<SliderState> CREATOR =
-                new Creator<SliderState>() {
+                new Creator<>() {
 
                     @NonNull
                     @Override

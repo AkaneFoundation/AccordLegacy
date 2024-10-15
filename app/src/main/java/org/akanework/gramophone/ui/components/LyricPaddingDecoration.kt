@@ -7,9 +7,9 @@ import androidx.recyclerview.widget.RecyclerView
 import org.akanework.gramophone.R
 
 class LyricPaddingDecoration(context: Context) : RecyclerView.ItemDecoration() {
+
     private val topPadding = context.resources.getDimensionPixelSize(R.dimen.lyric_top_padding)
-    private val bottomPadding =
-        context.resources.getDimensionPixelSize(R.dimen.lyric_bottom_padding)
+    private val bottomPadding = context.resources.getDimensionPixelSize(R.dimen.lyric_bottom_padding)
 
     override fun getItemOffsets(
         outRect: Rect,

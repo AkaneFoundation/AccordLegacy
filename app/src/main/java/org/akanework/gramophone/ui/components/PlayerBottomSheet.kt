@@ -150,7 +150,7 @@ class PlayerBottomSheet private constructor(
         bottomSheetPreviewCoverFrame = findViewById(R.id.preview_album_frame)
         bottomSheetPreviewCoverFrame.visibilityChanged { view ->
             when (view.visibility) {
-                View.VISIBLE -> {
+                VISIBLE -> {
                     animateAlbumCover(1f)
                 }
                 else -> {
@@ -183,9 +183,9 @@ class PlayerBottomSheet private constructor(
         ) {
             when (newState) {
                 BottomSheetBehavior.STATE_COLLAPSED -> {
-                    fullPlayer.visibility = View.GONE
-                    previewPlayer.visibility = View.VISIBLE
-                    bottomSheetPreviewCoverFrame.visibility = View.VISIBLE
+                    fullPlayer.visibility = GONE
+                    previewPlayer.visibility = VISIBLE
+                    bottomSheetPreviewCoverFrame.visibility = VISIBLE
                     previewPlayer.alpha = 1f
                     bottomSheetBlendView.alpha = 0f
                     fullPlayer.alpha = 0f
@@ -193,37 +193,34 @@ class PlayerBottomSheet private constructor(
                     bottomSheetBackCallback!!.isEnabled = false
                     bottomSheetBackCallback!!.remove()
                     if (!isDarkMode && !insetController.isAppearanceLightStatusBars) {
-                        WindowCompat.getInsetsController(activity.window, this@PlayerBottomSheet)
-                            .isAppearanceLightStatusBars = true
+                        WindowCompat.getInsetsController(activity.window, this@PlayerBottomSheet).isAppearanceLightStatusBars = true
                     }
                     fullPlayer.applyElevation(true)
                 }
 
                 BottomSheetBehavior.STATE_DRAGGING, BottomSheetBehavior.STATE_SETTLING -> {
-                    fullPlayer.visibility = View.VISIBLE
-                    previewPlayer.visibility = View.VISIBLE
-                    bottomSheetPreviewCoverFrame.visibility = View.VISIBLE
+                    fullPlayer.visibility = VISIBLE
+                    previewPlayer.visibility = VISIBLE
+                    bottomSheetPreviewCoverFrame.visibility = VISIBLE
                     if (instance?.isPlaying == true) {
                         bottomSheetBlendView.startRotationAnimation()
                     }
                     if (!isDarkMode && !insetController.isAppearanceLightStatusBars) {
-                        WindowCompat.getInsetsController(activity.window, this@PlayerBottomSheet)
-                            .isAppearanceLightStatusBars = true
+                        WindowCompat.getInsetsController(activity.window, this@PlayerBottomSheet).isAppearanceLightStatusBars = true
                     }
-                    fullPlayer.changeBottomCoverVisibility(View.INVISIBLE)
+                    fullPlayer.changeBottomCoverVisibility(INVISIBLE)
                 }
 
                 BottomSheetBehavior.STATE_EXPANDED, BottomSheetBehavior.STATE_HALF_EXPANDED -> {
-                    previewPlayer.visibility = View.GONE
-                    fullPlayer.visibility = View.VISIBLE
+                    previewPlayer.visibility = GONE
+                    fullPlayer.visibility = VISIBLE
                     if (!isDarkMode && insetController.isAppearanceLightStatusBars) {
-                        WindowCompat.getInsetsController(activity.window, this@PlayerBottomSheet)
-                            .isAppearanceLightStatusBars = false
+                        WindowCompat.getInsetsController(activity.window, this@PlayerBottomSheet).isAppearanceLightStatusBars = false
                     }
                     previewPlayer.alpha = 0f
                     fullPlayer.alpha = 1f
-                    bottomSheetPreviewCoverFrame.visibility = View.GONE
-                    fullPlayer.changeBottomCoverVisibility(View.VISIBLE)
+                    bottomSheetPreviewCoverFrame.visibility = GONE
+                    fullPlayer.changeBottomCoverVisibility(VISIBLE)
                     if (instance?.isPlaying == true) {
                         bottomSheetBlendView.startRotationAnimation()
                     }
@@ -238,8 +235,8 @@ class PlayerBottomSheet private constructor(
                 }
 
                 BottomSheetBehavior.STATE_HIDDEN -> {
-                    previewPlayer.visibility = View.GONE
-                    fullPlayer.visibility = View.GONE
+                    previewPlayer.visibility = GONE
+                    fullPlayer.visibility = GONE
                     fullPlayer.alpha = 0f
                     previewPlayer.alpha = 0f
                     bottomSheetBlendView.alpha = 0f
@@ -427,8 +424,7 @@ class PlayerBottomSheet private constructor(
         val bottomNavigationHeight = resources.getDimensionPixelSize(R.dimen.bottom_sheet_height)
         val insets = WindowInsetsCompat.toWindowInsetsCompat(platformInsets)
         val myInsets = insets.getInsets(
-            WindowInsetsCompat.Type.systemBars()
-                    or WindowInsetsCompat.Type.displayCutout()
+            WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
         )
         // We here have to set up inset padding manually as the bottom sheet won't know what
         // View is behind the status bar, paddingTopSystemWindowInsets just allows it to go
@@ -581,5 +577,4 @@ class PlayerBottomSheet private constructor(
         controllerFuture?.cancel(true)
         controllerFuture = null
     }
-
 }

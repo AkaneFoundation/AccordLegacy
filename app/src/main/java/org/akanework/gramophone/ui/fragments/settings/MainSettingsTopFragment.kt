@@ -25,8 +25,7 @@ import org.akanework.gramophone.ui.fragments.AboutFragment
 import org.akanework.gramophone.ui.fragments.BasePreferenceFragment
 import org.akanework.gramophone.ui.fragments.BaseSettingFragment
 
-class MainSettingsFragment : BaseSettingFragment(R.string.home_menu_settings,
-    { MainSettingsTopFragment() })
+class MainSettingsFragment : BaseSettingFragment(R.string.home_menu_settings, { MainSettingsTopFragment() })
 
 class MainSettingsTopFragment : BasePreferenceFragment() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {

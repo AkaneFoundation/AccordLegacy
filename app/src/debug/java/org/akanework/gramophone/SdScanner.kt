@@ -83,8 +83,7 @@ class SdScanner(private val context: Context) {
                         lastUpdate = this
                         progress.set(
                             SimpleProgress.Step.SCAN, path,
-                            (100 * (filesToProcess.size - pathsToProcess.size))
-                                    / filesToProcess.size
+                            (100 * (filesToProcess.size - pathsToProcess.size)) / filesToProcess.size
                         )
                     }
                 }

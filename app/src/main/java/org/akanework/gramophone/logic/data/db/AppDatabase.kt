@@ -21,6 +21,7 @@ const val APP_DATABASE_FILE_NAME = "app.db"
     version = 1,
 )
 abstract class AppDatabase : RoomDatabase() {
+
     abstract fun playlistDao(): PlaylistDao
     abstract fun mediaItemDao(): MediaItemDao
 

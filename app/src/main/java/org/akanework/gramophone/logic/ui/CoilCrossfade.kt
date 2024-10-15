@@ -203,14 +203,14 @@ private class CoolCrossfadeDrawable @JvmOverloads constructor(
     }
 
     override fun onLevelChange(level: Int): Boolean {
-        val startChanged = start?.setLevel(level) ?: false
-        val endChanged = end?.setLevel(level) ?: false
+        val startChanged = start?.setLevel(level) == true
+        val endChanged = end?.setLevel(level) == true
         return startChanged || endChanged
     }
 
     override fun onStateChange(state: IntArray): Boolean {
-        val startChanged = start?.setState(state) ?: false
-        val endChanged = end?.setState(state) ?: false
+        val startChanged = start?.setState(state) == true
+        val endChanged = end?.setState(state) == true
         return startChanged || endChanged
     }
 

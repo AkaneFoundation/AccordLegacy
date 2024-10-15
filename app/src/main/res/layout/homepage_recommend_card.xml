@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="168dp"
     android:layout_height="wrap_content"
+    android:layout_marginStart="4dp"
+    android:layout_marginTop="12dp"
+    android:layout_marginEnd="4dp"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:layout_marginStart="4dp"
-    android:layout_marginEnd="4dp"
-    android:layout_marginTop="12dp">
+    android:orientation="vertical">
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="168dp"
         android:layout_height="168dp"
+        app:cardCornerRadius="6dp"
         app:strokeColor="@color/contrast_colorOutline"
-        app:strokeWidth="1dp"
-        app:cardCornerRadius="6dp">
+        app:strokeWidth="1dp">
 
         <ImageView
             android:id="@+id/cover"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            />
+            android:importantForAccessibility="no" />
 
     </com.google.android.material.card.MaterialCardView>
 
@@ -30,17 +30,15 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:maxLines="1"
         android:layout_marginTop="8dp"
-        android:textColor="@color/contrast_colorOnSurface"
-        />
+        android:maxLines="1"
+        android:textColor="@color/contrast_colorOnSurface" />
 
     <TextView
         android:id="@+id/subtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:maxLines="1"
-        android:textColor="@color/contrast_colorOnSurfaceSecondary"
-        />
+        android:textColor="@color/contrast_colorOnSurfaceSecondary" />
 
 </LinearLayout>

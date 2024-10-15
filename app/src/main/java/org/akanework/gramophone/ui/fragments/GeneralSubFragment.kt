@@ -92,7 +92,7 @@ class GeneralSubFragment : BaseFragment(true) {
             }
 
             R.id.special_album -> {
-                if (libraryViewModel.privateAlbumList.size != 0) {
+                if (libraryViewModel.privateAlbumList.isNotEmpty()) {
                     val item = libraryViewModel.privateAlbumList[position]
                     title = item.title ?: requireContext().getString(R.string.unknown_album)
                     itemList = item.songList

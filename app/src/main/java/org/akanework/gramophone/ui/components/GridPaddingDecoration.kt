@@ -11,8 +11,7 @@ import org.akanework.gramophone.ui.adapters.BaseAdapter
 
 class GridPaddingDecoration(context: Context) : RecyclerView.ItemDecoration() {
     private var mPadding = context.resources.getDimensionPixelSize(R.dimen.grid_card_side_padding)
-    private val columnSize = if (context.resources.configuration.orientation
-        == Configuration.ORIENTATION_PORTRAIT
+    private val columnSize = if (context.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
     ) 2 else 4
 
     override fun getItemOffsets(

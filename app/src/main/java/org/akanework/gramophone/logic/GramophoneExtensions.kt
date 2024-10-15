@@ -537,7 +537,7 @@ fun MaterialToolbar.applyGeneralMenuItem(
                     .addCategory("android.intent.category.CATEGORY_CONTENT_MUSIC")
                 try {
                     (fragment.requireActivity() as MainActivity).startingActivity.launch(intent)
-                } catch (e: ActivityNotFoundException) {
+                } catch (_: ActivityNotFoundException) {
                     // Let's show a toast here if no system inbuilt EQ was found.
                     Toast.makeText(
                         fragment.requireContext(),

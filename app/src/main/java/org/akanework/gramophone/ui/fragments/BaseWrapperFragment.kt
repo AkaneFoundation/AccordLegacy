@@ -27,7 +27,7 @@ class BaseWrapperFragment : BaseFragment {
         savedInstanceState: Bundle?
     ): View? {
         val rootView = inflater.inflate(R.layout.fragment_wrapper, container, false)
-        if (childFragmentManager.fragments.size == 0) {
+        if (childFragmentManager.fragments.isEmpty()) {
             childFragmentManager
                 .beginTransaction()
                 .replace(

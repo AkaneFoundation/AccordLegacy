@@ -263,34 +263,27 @@ public final class FluidTabLayoutMediator {
         }
     }
 
-    /**
-     * A {@link TabLayout.OnTabSelectedListener} class which contains the necessary calls back to the
-     * provided {@link ViewPager2} so that the tab position is kept in sync.
-     */
-    private static class ViewPagerOnTabSelectedListener implements TabLayout.OnTabSelectedListener {
-        private final ViewPager2 viewPager;
-        private final boolean smoothScroll;
-
-        ViewPagerOnTabSelectedListener(ViewPager2 viewPager, boolean smoothScroll) {
-            this.viewPager = viewPager;
-            this.smoothScroll = smoothScroll;
-        }
+        /**
+         * A {@link TabLayout.OnTabSelectedListener} class which contains the necessary calls back to the
+         * provided {@link ViewPager2} so that the tab position is kept in sync.
+         */
+        private record ViewPagerOnTabSelectedListener(ViewPager2 viewPager, boolean smoothScroll) implements TabLayout.OnTabSelectedListener {
 
         @Override
-        public void onTabSelected(@NonNull TabLayout.Tab tab) {
-            viewPager.setCurrentItem(tab.getPosition(), smoothScroll);
-        }
+            public void onTabSelected(@NonNull TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition(), smoothScroll);
+            }
 
-        @Override
-        public void onTabUnselected(TabLayout.Tab tab) {
-            // No-op
-        }
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                // No-op
+            }
 
-        @Override
-        public void onTabReselected(TabLayout.Tab tab) {
-            // No-op
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                // No-op
+            }
         }
-    }
 
     private class PagerAdapterObserver extends RecyclerView.AdapterDataObserver {
         PagerAdapterObserver() {

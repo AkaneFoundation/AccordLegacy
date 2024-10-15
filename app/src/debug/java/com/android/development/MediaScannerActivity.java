@@ -156,7 +156,7 @@ public class MediaScannerActivity extends Activity {
         } else {
             registerReceiver(mReceiver, intentFilter);
         }
-        EditText t = (EditText) findViewById(R.id.numsongs);
+        EditText t = findViewById(R.id.numsongs);
         t.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
                 String text = s.toString();
@@ -174,7 +174,7 @@ public class MediaScannerActivity extends Activity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
         });
-        mTitle = (TextView) findViewById(R.id.title);
+        mTitle = findViewById(R.id.title);
         mResolver = getContentResolver();
         mAudioUri = Audio.Media.EXTERNAL_CONTENT_URI;
         for (int i = 0; i < 10; i++) {
@@ -196,7 +196,7 @@ public class MediaScannerActivity extends Activity {
 
     private void setInsertButtonText() {
         String label = getString(R.string.insertbutton, mNumToInsert);
-        Button b = (Button) findViewById(R.id.insertbutton);
+        Button b = findViewById(R.id.insertbutton);
         b.setText(label);
     }
 

@@ -89,9 +89,9 @@ class FadingVerticalEdgeLayout : FrameLayout {
         }
         val mode = PorterDuffXfermode(PorterDuff.Mode.DST_IN)
         gradientPaintTop = Paint(Paint.ANTI_ALIAS_FLAG)
-        gradientPaintTop!!.setXfermode(mode)
+        gradientPaintTop!!.xfermode = mode
         gradientPaintBottom = Paint(Paint.ANTI_ALIAS_FLAG)
-        gradientPaintBottom!!.setXfermode(mode)
+        gradientPaintBottom!!.xfermode = mode
         gradientRectTop = Rect()
         gradientRectBottom = Rect()
     }

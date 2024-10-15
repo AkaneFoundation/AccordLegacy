@@ -14,6 +14,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 class ItemSnapHelper : LinearSnapHelper() {
+
     companion object {
         private const val MILLISECONDS_PER_INCH = 100f
         private const val MAX_SCROLL_ON_FLING_DURATION_MS = 1000

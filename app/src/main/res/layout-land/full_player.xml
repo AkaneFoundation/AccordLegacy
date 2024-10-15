@@ -123,11 +123,11 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@drawable/ic_nowplaying_favorite"
-                app:tint="@color/contrast_primaryOverlayColor"
+                app:layout_constraintBottom_toBottomOf="@id/star_btn_playlist"
                 app:layout_constraintEnd_toEndOf="@id/star_btn_playlist"
                 app:layout_constraintStart_toStartOf="@id/star_btn_playlist"
                 app:layout_constraintTop_toTopOf="@id/star_btn_playlist"
-                app:layout_constraintBottom_toBottomOf="@id/star_btn_playlist" />
+                app:tint="@color/contrast_primaryOverlayColor" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/star_btn_playlist"
@@ -135,6 +135,7 @@
                 android:layout_height="28dp"
                 android:layout_marginEnd="16dp"
                 android:background="@drawable/rp_buttons"
+                android:checkable="true"
                 android:gravity="center"
                 app:backgroundTint="#00FFFFFF"
                 app:cornerRadius="128dp"
@@ -142,7 +143,6 @@
                 app:iconGravity="textStart"
                 app:iconPadding="0dp"
                 app:iconSize="28dp"
-                android:checkable="true"
                 app:iconTint="@color/contrast_primaryOverlayShadeColor"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/more_btn_playlist"
@@ -154,11 +154,11 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@drawable/ic_nowplaying_more"
-                app:tint="@color/contrast_primaryOverlayColor"
-                app:layout_constraintStart_toStartOf="@id/more_btn_playlist"
                 app:layout_constraintBottom_toBottomOf="@id/more_btn_playlist"
                 app:layout_constraintEnd_toEndOf="@id/more_btn_playlist"
-                app:layout_constraintTop_toTopOf="@id/more_btn_playlist" />
+                app:layout_constraintStart_toStartOf="@id/more_btn_playlist"
+                app:layout_constraintTop_toTopOf="@id/more_btn_playlist"
+                app:tint="@color/contrast_primaryOverlayColor" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/more_btn_playlist"
@@ -276,10 +276,10 @@
         android:id="@+id/fadingEdgeLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:visibility="gone"
         app:fel_edge="top|bottom"
         app:fel_size_bottom="80dp"
         app:fel_size_top="40dp"
-        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/actionBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -334,9 +334,9 @@
         android:layout_marginBottom="20dp"
         android:layout_weight="1"
         android:gravity="center_vertical"
-        app:layout_constraintTop_toTopOf="@id/album_cover_frame"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/album_cover_frame">
+        app:layout_constraintStart_toEndOf="@id/album_cover_frame"
+        app:layout_constraintTop_toTopOf="@id/album_cover_frame">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/textLayout"
@@ -413,11 +413,11 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@drawable/ic_nowplaying_favorite"
-                app:tint="@color/contrast_primaryOverlayColor"
-                app:layout_constraintTop_toTopOf="@id/star_btn"
-                app:layout_constraintEnd_toEndOf="@id/star_btn"
                 app:layout_constraintBottom_toBottomOf="@id/star_btn"
-                app:layout_constraintStart_toStartOf="@id/star_btn" />
+                app:layout_constraintEnd_toEndOf="@id/star_btn"
+                app:layout_constraintStart_toStartOf="@id/star_btn"
+                app:layout_constraintTop_toTopOf="@id/star_btn"
+                app:tint="@color/contrast_primaryOverlayColor" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/star_btn"
@@ -425,12 +425,12 @@
                 android:layout_height="28dp"
                 android:layout_marginEnd="16dp"
                 android:background="@drawable/rp_buttons"
+                android:checkable="true"
                 android:gravity="center"
                 app:backgroundTint="#00FFFFFF"
                 app:cornerRadius="128dp"
                 app:icon="@drawable/ic_favourite"
                 app:iconGravity="textStart"
-                android:checkable="true"
                 app:iconPadding="0dp"
                 app:iconSize="28dp"
                 app:iconTint="@color/contrast_primaryOverlayShadeColor"
@@ -444,11 +444,11 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@drawable/ic_nowplaying_more"
-                app:tint="@color/contrast_primaryOverlayColor"
-                app:layout_constraintTop_toTopOf="@id/more_btn"
-                app:layout_constraintEnd_toEndOf="@id/more_btn"
                 app:layout_constraintBottom_toBottomOf="@id/more_btn"
-                app:layout_constraintStart_toStartOf="@id/more_btn" />
+                app:layout_constraintEnd_toEndOf="@id/more_btn"
+                app:layout_constraintStart_toStartOf="@id/more_btn"
+                app:layout_constraintTop_toTopOf="@id/more_btn"
+                app:tint="@color/contrast_primaryOverlayColor" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/more_btn"
@@ -586,37 +586,7 @@
                         android:layout_marginStart="7.5dp"
                         android:layout_marginTop="0.5dp"
                         android:adjustViewBounds="true"
-                        android:src="@drawable/apple_lossless_seeklogo"
-                        app:tint="#80FFFFFF" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginTop="3dp"
-                        android:layout_marginEnd="7.5dp"
-                        android:layout_marginBottom="3dp"
-                        android:fontFamily="sans-serif"
-                        android:text="@string/lossless"
-                        android:textColor="#80FFFFFF"
-                        android:textFontWeight="500"
-                        android:textSize="11sp" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/quality_frame_1"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <ImageView
-                        android:layout_width="15dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="7.5dp"
-                        android:layout_marginTop="0.5dp"
-                        android:adjustViewBounds="true"
+                        android:importantForAccessibility="no"
                         android:src="@drawable/apple_lossless_seeklogo"
                         app:tint="#80FFFFFF" />
 
@@ -711,57 +681,53 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@id/actionBar"
+        app:layout_constraintEnd_toEndOf="@id/controls"
         app:layout_constraintStart_toStartOf="@id/controls"
-        app:layout_constraintTop_toBottomOf="@id/sheet_mid_button"
-        app:layout_constraintEnd_toEndOf="@id/controls">
+        app:layout_constraintTop_toBottomOf="@id/sheet_mid_button">
 
         <ImageView
             android:id="@+id/volume_icon_start_bottom"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
+            android:src="@drawable/ic_speaker_24dp"
             app:layout_constraintBottom_toBottomOf="@id/volume_icon_start_top"
+            app:layout_constraintEnd_toEndOf="@id/volume_icon_start_top"
             app:layout_constraintStart_toStartOf="@id/volume_icon_start_top"
             app:layout_constraintTop_toTopOf="@id/volume_icon_start_top"
-            app:layout_constraintEnd_toEndOf="@id/volume_icon_start_top"
-            android:src="@drawable/ic_speaker_24dp"
-            app:tint="@color/contrast_primaryOverlayColor"
-            />
+            app:tint="@color/contrast_primaryOverlayColor" />
 
         <ImageView
             android:id="@+id/volume_icon_start_top"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
+            android:layout_marginStart="27dp"
+            android:src="@drawable/ic_speaker_24dp"
             app:layout_constraintBottom_toBottomOf="@id/slider_volume"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="27dp"
             app:layout_constraintTop_toTopOf="@id/slider_volume"
-            android:src="@drawable/ic_speaker_24dp"
-            app:tint="@color/contrast_primaryOverlayShadeColor"
-            />
+            app:tint="@color/contrast_primaryOverlayShadeColor" />
 
         <ImageView
             android:id="@+id/volume_icon_end_bottom"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
+            android:src="@drawable/ic_speaker_wave_3_24dp"
             app:layout_constraintBottom_toBottomOf="@id/volume_icon_end_top"
+            app:layout_constraintEnd_toEndOf="@id/volume_icon_end_top"
             app:layout_constraintStart_toStartOf="@id/volume_icon_end_top"
             app:layout_constraintTop_toTopOf="@id/volume_icon_end_top"
-            app:layout_constraintEnd_toEndOf="@id/volume_icon_end_top"
-            android:src="@drawable/ic_speaker_wave_3_24dp"
-            app:tint="@color/contrast_primaryOverlayColor"
-            />
+            app:tint="@color/contrast_primaryOverlayColor" />
 
         <ImageView
             android:id="@+id/volume_icon_end_top"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
+            android:layout_marginEnd="32dp"
+            android:src="@drawable/ic_speaker_wave_3_24dp"
             app:layout_constraintBottom_toBottomOf="@id/slider_volume"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="32dp"
             app:layout_constraintTop_toTopOf="@id/slider_volume"
-            android:src="@drawable/ic_speaker_wave_3_24dp"
-            app:tint="@color/contrast_primaryOverlayShadeColor"
-            />
+            app:tint="@color/contrast_primaryOverlayShadeColor" />
 
         <com.google.android.material.slider.OverlaySlider
             android:id="@+id/slider_volume"
@@ -774,10 +740,10 @@
             app:haloColor="@android:color/transparent"
             app:haloRadius="0dp"
             app:labelBehavior="gone"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:thumbColor="@android:color/transparent"
             app:thumbElevation="0dp"
             app:thumbRadius="0dp"
@@ -810,6 +776,7 @@
                 android:id="@+id/lyric_btn_under"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
+                android:layout_gravity="center"
                 android:background="@android:color/transparent"
                 android:checkable="true"
                 android:gravity="center"
@@ -818,7 +785,6 @@
                 android:insetRight="0dp"
                 android:insetBottom="0dp"
                 android:saveEnabled="false"
-                android:layout_gravity="center"
                 app:icon="@drawable/ic_lyrics_btn"
                 app:iconGravity="textStart"
                 app:iconPadding="0dp"
@@ -829,6 +795,7 @@
                 android:id="@+id/lyric_btn"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
+                android:layout_gravity="center"
                 android:background="@android:color/transparent"
                 android:checkable="true"
                 android:gravity="center"
@@ -837,7 +804,6 @@
                 android:insetRight="0dp"
                 android:insetBottom="0dp"
                 android:saveEnabled="false"
-                android:layout_gravity="center"
                 app:icon="@drawable/ic_lyrics_btn"
                 app:iconGravity="textStart"
                 app:iconPadding="0dp"
@@ -875,6 +841,7 @@
                 android:id="@+id/playlist_under"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
+                android:layout_gravity="center"
                 android:background="@android:color/transparent"
                 android:checkable="true"
                 android:gravity="center"
@@ -882,7 +849,6 @@
                 android:insetTop="0dp"
                 android:insetRight="0dp"
                 android:insetBottom="0dp"
-                android:layout_gravity="center"
                 app:icon="@drawable/ic_queue_btn"
                 app:iconGravity="textStart"
                 app:iconPadding="0dp"
@@ -894,6 +860,7 @@
                 android:id="@+id/playlist"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
+                android:layout_gravity="center"
                 android:background="@android:color/transparent"
                 android:checkable="true"
                 android:gravity="center"
@@ -901,7 +868,6 @@
                 android:insetTop="0dp"
                 android:insetRight="0dp"
                 android:insetBottom="0dp"
-                android:layout_gravity="center"
                 app:icon="@drawable/ic_queue_btn"
                 app:iconGravity="textStart"
                 app:iconPadding="0dp"

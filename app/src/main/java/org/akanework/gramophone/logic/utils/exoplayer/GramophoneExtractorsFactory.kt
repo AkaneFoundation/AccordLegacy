@@ -207,7 +207,7 @@ class GramophoneExtractorsFactory : ExtractorsFactory {
 					val var10000: Constructor<*>?
 					try {
 						var10000 = constructorSupplier.getConstructor()
-					} catch (var4: ClassNotFoundException) {
+					} catch (_: ClassNotFoundException) {
 						extensionLoaded.set(true)
 						return this.extractorConstructor
 					} catch (var5: Exception) {

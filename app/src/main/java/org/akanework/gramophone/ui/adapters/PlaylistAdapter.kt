@@ -17,8 +17,6 @@
 
 package org.akanework.gramophone.ui.adapters
 
-import android.content.Context
-import android.net.Uri
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
@@ -37,7 +35,7 @@ class PlaylistAdapter(
     (
     fragment,
     liveData = playlistList,
-    sortHelper = PlaylistItemHelper(fragment.requireContext()),
+    sortHelper = PlaylistItemHelper(/* fragment.requireContext() */),
     naturalOrderHelper = null,
     initialSortType = Sorter.Type.ByTitleAscending,
     pluralStr = R.plurals.items,
@@ -91,7 +89,7 @@ class PlaylistAdapter(
         }
     }
 
-    class PlaylistItemHelper(private val context: Context) :
+    class PlaylistItemHelper(/* private val context: Context */) :
         StoreItemHelper<MediaStoreUtils.Playlist>() {
             /*
         override fun getCover(item: MediaStoreUtils.Playlist): Uri? {

@@ -173,12 +173,12 @@ class FullBottomSheet @JvmOverloads constructor(
     ) {
         if (bottomSheetFullCoverFrame.isVisible) {
             val scaleX = PropertyValuesHolder.ofFloat(
-                View.SCALE_X,
+                SCALE_X,
                 if (isShrink) 1f else shrinkValue,
                 if (isShrink) shrinkValue else 1f
             )
             val scaleY = PropertyValuesHolder.ofFloat(
-                View.SCALE_Y,
+                SCALE_Y,
                 if (isShrink) 1f else shrinkValue,
                 if (isShrink) shrinkValue else 1f
             )
@@ -576,7 +576,7 @@ class FullBottomSheet @JvmOverloads constructor(
                 )
                 isPlaylistEnabled = true
                 bottomSheetFullHeaderFrame.fadInAnimation(interpolator, VIEW_TRANSIT_DURATION) {
-                    manipulateTopOverlayVisibility(View.VISIBLE)
+                    manipulateTopOverlayVisibility(VISIBLE)
                     playlistCoverCoordinateX = bottomSheetFullPlaylistCoverFrame.left + bottomSheetFullHeaderFrame.left
                     playlistCoverCoordinateY = bottomSheetFullPlaylistCoverFrame.top + bottomSheetFullHeaderFrame.top
                     playlistCoverScale = bottomSheetFullPlaylistCoverFrame.height / 48.dpToPx(context).toFloat() - 1f
@@ -591,14 +591,18 @@ class FullBottomSheet @JvmOverloads constructor(
                 bottomSheetFadingVerticalEdgeLayout.fadOutAnimation(interpolator, VIEW_TRANSIT_DURATION)
                 bottomSheetFullPlaylistFrame.fadInAnimation(interpolator, VIEW_TRANSIT_DURATION)
                 hideJob?.cancel()
-                if (bottomSheetFullControllerButton.visibility == View.GONE || bottomSheetFullControllerButton.visibility == View.INVISIBLE) {
+                if (bottomSheetFullControllerButton.visibility == GONE || bottomSheetFullControllerButton.visibility == INVISIBLE) {
                     showEveryController()
                 }
             } else {
                 changeMovableFrame(true)
                 isPlaylistEnabled = false
-                bottomSheetFullHeaderFrame.fadOutAnimation(interpolator, VIEW_TRANSIT_DURATION, View.GONE)
-                bottomSheetFullPlaylistFrame.fadOutAnimation(interpolator, VIEW_TRANSIT_DURATION, View.GONE)
+                bottomSheetFullHeaderFrame.fadOutAnimation(interpolator, VIEW_TRANSIT_DURATION,
+                    GONE
+                )
+                bottomSheetFullPlaylistFrame.fadOutAnimation(interpolator, VIEW_TRANSIT_DURATION,
+                    GONE
+                )
                 bottomSheetFullBlendView?.animateBlurRadius(true, VIEW_TRANSIT_DURATION)
             }
         }
@@ -614,7 +618,7 @@ class FullBottomSheet @JvmOverloads constructor(
                 changeMovableFrame(false)
                 isPlaylistEnabled = true
                 bottomSheetFullHeaderFrame.fadInAnimation(interpolator, VIEW_TRANSIT_DURATION) {
-                    manipulateTopOverlayVisibility(View.VISIBLE)
+                    manipulateTopOverlayVisibility(VISIBLE)
                     playlistCoverCoordinateX = bottomSheetFullPlaylistCoverFrame.left + bottomSheetFullHeaderFrame.left
                     playlistCoverCoordinateY = bottomSheetFullPlaylistCoverFrame.top + bottomSheetFullHeaderFrame.top
                     playlistCoverScale = bottomSheetFullPlaylistCoverFrame.height / 48.dpToPx(context).toFloat() - 1f
@@ -655,12 +659,16 @@ class FullBottomSheet @JvmOverloads constructor(
                 activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                 changeMovableFrame(true)
                 isPlaylistEnabled = false
-                bottomSheetFullHeaderFrame.fadOutAnimation(interpolator, VIEW_TRANSIT_DURATION, View.GONE)
+                bottomSheetFullHeaderFrame.fadOutAnimation(interpolator, VIEW_TRANSIT_DURATION,
+                    GONE
+                )
                 bottomSheetFadingVerticalEdgeLayout.changeOverlayVisibility(false)
-                bottomSheetFadingVerticalEdgeLayout.fadOutAnimation(interpolator, VIEW_TRANSIT_DURATION, View.GONE)
+                bottomSheetFadingVerticalEdgeLayout.fadOutAnimation(interpolator, VIEW_TRANSIT_DURATION,
+                    GONE
+                )
 
                 hideJob?.cancel()
-                if (bottomSheetFullControllerButton.visibility == View.GONE || bottomSheetFullControllerButton.visibility == View.INVISIBLE) {
+                if (bottomSheetFullControllerButton.visibility == GONE || bottomSheetFullControllerButton.visibility == INVISIBLE) {
                     showEveryController()
                 }
                 bottomSheetFullBlendView?.animateBlurRadius(true, VIEW_TRANSIT_DURATION)
@@ -736,7 +744,7 @@ class FullBottomSheet @JvmOverloads constructor(
                     MotionEvent.ACTION_DOWN -> {
                         startY = e.y
                         if (!animationBroadcastLock && e.y >= rv.measuredHeight / 4 * 3 &&
-                            bottomSheetFullControllerButton.visibility != View.VISIBLE
+                            bottomSheetFullControllerButton.visibility != VISIBLE
                         ) {
                             // Down
                             animationBroadcastLock = true
@@ -781,7 +789,7 @@ class FullBottomSheet @JvmOverloads constructor(
                     MotionEvent.ACTION_MOVE -> {
                         val currentY = e.y
                         isScrollingDown = currentY < startY
-                        if (!animationBroadcastLock && !isScrollingDown && bottomSheetFullControllerButton.visibility != View.VISIBLE) {
+                        if (!animationBroadcastLock && !isScrollingDown && bottomSheetFullControllerButton.visibility != VISIBLE) {
                             // Down
                             animationBroadcastLock = true
                             showEveryController()
@@ -869,8 +877,7 @@ class FullBottomSheet @JvmOverloads constructor(
     }
 
     private fun getDistanceToBottom(view: View): Int {
-        val windowMetrics =
-            (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).currentWindowMetrics
+        val windowMetrics = (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).currentWindowMetrics
         val screenHeight = windowMetrics.bounds.height()
 
         val location = IntArray(2)
@@ -881,7 +888,9 @@ class FullBottomSheet @JvmOverloads constructor(
 
     private fun hideControllerJob() {
         hideJob?.cancel()
-        hideJob = CoroutineScope(Dispatchers.Default)
+        if (hideJob == null) {
+            hideJob = CoroutineScope(Dispatchers.Default)
+        }
         hideJob!!.launch {
             delay(5000)
             hideEveryController()
@@ -917,7 +926,7 @@ class FullBottomSheet @JvmOverloads constructor(
     }
 
     private fun hideEveryController() {
-        manipulateBottomOverlayVisibility(View.INVISIBLE)
+        manipulateBottomOverlayVisibility(INVISIBLE)
         bottomSheetFullControllerFrame.fadOutAnimation(interpolator, BOTTOM_TRANSIT_DURATION)
         bottomSheetFullControllerButton.fadOutAnimation(interpolator, BOTTOM_TRANSIT_DURATION)
         bottomSheetVolumeSliderFrame.fadOutAnimation(interpolator, BOTTOM_TRANSIT_DURATION)
@@ -927,7 +936,9 @@ class FullBottomSheet @JvmOverloads constructor(
     }
 
     private fun showEveryController() {
-        bottomSheetFullControllerFrame.fadInAnimation(interpolator, BOTTOM_TRANSIT_DURATION) { manipulateBottomOverlayVisibility(View.VISIBLE) }
+        bottomSheetFullControllerFrame.fadInAnimation(interpolator, BOTTOM_TRANSIT_DURATION) { manipulateBottomOverlayVisibility(
+            VISIBLE
+        ) }
         bottomSheetFullControllerButton.fadInAnimation(interpolator, BOTTOM_TRANSIT_DURATION)
         bottomSheetVolumeSliderFrame.fadInAnimation(interpolator, BOTTOM_TRANSIT_DURATION)
         bottomSheetFullNextButton.fadInAnimation(interpolator, BOTTOM_TRANSIT_DURATION)
@@ -979,28 +990,30 @@ class FullBottomSheet @JvmOverloads constructor(
 
     private fun changeMovableFrame(isVisible: Boolean) {
         if (isVisible) {
-            manipulateTopOverlayVisibility(View.INVISIBLE)
-            bottomSheetFullTextLayout.fadInAnimation(interpolator, VIEW_TRANSIT_DURATION) { manipulateTopOverlayVisibility(View.VISIBLE) }
+            manipulateTopOverlayVisibility(INVISIBLE)
+            bottomSheetFullTextLayout.fadInAnimation(interpolator, VIEW_TRANSIT_DURATION) { manipulateTopOverlayVisibility(
+                VISIBLE
+            ) }
             bottomSheetFullDragHandle.fadInAnimation(interpolator, VIEW_TRANSIT_DURATION)
             TransitionManager.beginDelayedTransition(this, transformOut)
-            bottomSheetFullPlaylistCoverFrame.visibility = View.INVISIBLE
-            bottomSheetFullCoverFrame.visibility = View.VISIBLE
+            bottomSheetFullPlaylistCoverFrame.visibility = INVISIBLE
+            bottomSheetFullCoverFrame.visibility = VISIBLE
         } else {
             if (bottomSheetFullCoverFrame.scaleX == 1.0f) {
-                manipulateTopOverlayVisibility(View.INVISIBLE)
+                manipulateTopOverlayVisibility(INVISIBLE)
                 bottomSheetFullTextLayout.fadOutAnimation(interpolator, VIEW_TRANSIT_DURATION)
                 bottomSheetFullDragHandle.fadOutAnimation(interpolator, VIEW_TRANSIT_DURATION)
                 TransitionManager.beginDelayedTransition(this, transformIn)
-                bottomSheetFullPlaylistCoverFrame.visibility = View.VISIBLE
-                bottomSheetFullCoverFrame.visibility = View.INVISIBLE
+                bottomSheetFullPlaylistCoverFrame.visibility = VISIBLE
+                bottomSheetFullCoverFrame.visibility = INVISIBLE
             } else {
-                manipulateTopOverlayVisibility(View.INVISIBLE)
+                manipulateTopOverlayVisibility(INVISIBLE)
                 bottomSheetFullTextLayout.fadOutAnimation(interpolator, VIEW_TRANSIT_DURATION)
                 bottomSheetFullDragHandle.fadOutAnimation(interpolator, VIEW_TRANSIT_DURATION)
                 buildShrinkAnimator(false, bottomSheetFullCoverFrame.scaleX) {
                     TransitionManager.beginDelayedTransition(this, transformIn)
-                    bottomSheetFullPlaylistCoverFrame.visibility = View.VISIBLE
-                    bottomSheetFullCoverFrame.visibility = View.INVISIBLE
+                    bottomSheetFullPlaylistCoverFrame.visibility = VISIBLE
+                    bottomSheetFullCoverFrame.visibility = INVISIBLE
                 }
             }
         }
@@ -1353,7 +1366,7 @@ class FullBottomSheet @JvmOverloads constructor(
         override fun onCreateViewHolder(
             parent: ViewGroup,
             viewType: Int
-        ): LyricAdapter.ViewHolder = ViewHolder(
+        ): ViewHolder = ViewHolder(
             LayoutInflater.from(parent.context).inflate(R.layout.lyrics, parent, false)
         )
 
@@ -1362,7 +1375,7 @@ class FullBottomSheet @JvmOverloads constructor(
         }
 
         override fun onBindViewHolder(
-            holder: LyricAdapter.ViewHolder,
+            holder: ViewHolder,
             position: Int,
             payloads: MutableList<Any>
         ) {
@@ -1463,7 +1476,7 @@ class FullBottomSheet @JvmOverloads constructor(
             }
 
             with(holder.lyricFlexboxLayout) {
-                visibility = if (lyric.content.isNotEmpty()) View.VISIBLE else View.GONE
+                visibility = if (lyric.content.isNotEmpty()) VISIBLE else GONE
                 justifyContent = if (lyric.label.isNotEmpty() && lyric.label == "v2: ") {
                     JustifyContent.FLEX_END
                 } else {
@@ -1548,7 +1561,7 @@ class FullBottomSheet @JvmOverloads constructor(
 
                 children.getTextViews {
                     with(it) {
-                        visibility = if (lyric.content.isNotEmpty()) View.VISIBLE else View.GONE
+                        visibility = if (lyric.content.isNotEmpty()) VISIBLE else GONE
                         translationY = 0f
 
                         val textSize = if (lyric.isTranslation) 20f else if (lyric.timeStamp != null) 34f else 18f
@@ -1706,7 +1719,7 @@ class FullBottomSheet @JvmOverloads constructor(
         override fun onCreateViewHolder(
             parent: ViewGroup,
             viewType: Int
-        ): PlaylistCardAdapter.ViewHolder = ViewHolder(
+        ): ViewHolder = ViewHolder(
             LayoutInflater
                 .from(parent.context)
                 .inflate(R.layout.adapter_list_card_playlist, parent, false)
@@ -2039,7 +2052,7 @@ class FullBottomSheet @JvmOverloads constructor(
 
     private fun manipulateTopOverlayVisibility(visibility: Int) {
         val targetColorPrimary =
-            if (visibility == View.VISIBLE)
+            if (visibility == VISIBLE)
                 ContextCompat.getColor(
                     context,
                     R.color.contrast_primaryOverlayColor
@@ -2057,19 +2070,13 @@ class FullBottomSheet @JvmOverloads constructor(
 
     private fun manipulateBottomOverlayVisibility(visibility: Int) {
         val targetColorPrimary =
-            if (visibility == View.VISIBLE)
-                ContextCompat.getColor(
-                    context,
-                    R.color.contrast_primaryOverlayColor
-                )
+            if (visibility == VISIBLE)
+                ContextCompat.getColor(context, R.color.contrast_primaryOverlayColor)
             else
                 Color.TRANSPARENT
         val targetColorSecondary =
-            if (visibility == View.VISIBLE)
-                ContextCompat.getColor(
-                    context,
-                    R.color.contrast_secondaryOverlayColor
-                )
+            if (visibility == VISIBLE)
+                ContextCompat.getColor(context, R.color.contrast_secondaryOverlayColor)
             else
                 Color.TRANSPARENT
         bottomSheetVolumeSlider.setTrackColorActiveOverlay(targetColorPrimary)

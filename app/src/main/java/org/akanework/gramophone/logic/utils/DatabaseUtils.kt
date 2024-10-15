@@ -133,6 +133,6 @@ object DatabaseUtils {
             it.playlist.playlistId == libraryViewModel.privatePlaylistId
         }?.mediaItems?.any {
             it.mediaItemId == mediaItemId
-        } ?: false
+        } == true
     }
 }

@@ -66,7 +66,7 @@ class BugHandlerActivity : AppCompatActivity() {
         val currentDateTime = Calendar.getInstance().time
         val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
         val formattedDateTime = formatter.format(currentDateTime)
-        val gramophoneVersion = BuildConfig.MY_VERSION_NAME
+        val gramophoneVersion: String = BuildConfig.MY_VERSION_NAME
 
         val logString = buildString {
             append(getString(R.string.crash_accord_version)).append(':').append(' ')
