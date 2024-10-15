@@ -44,6 +44,8 @@ android {
             excludes += "DebugProbesKt.bin"
             // https://issueantenna.com/repo/kotlin/kotlinx.coroutines/issues/3158
             excludes += "kotlin-tooling-metadata.json"
+
+            excludes += "META-INF/androidx/constraintlayout/constraintlayout-core/LICENSE.txt"
         }
     }
 
@@ -57,11 +59,11 @@ android {
         minSdk = 31
         targetSdk = 35
         versionCode = 18
-        versionName = "beta1"
+        versionName = "beta2"
         buildConfigField(
             "String",
             "MY_VERSION_NAME",
-            "\"Beta 1\""
+            "\"Beta 2\""
         )
         buildConfigField(
             "String",
@@ -196,8 +198,6 @@ dependencies {
     implementation(project(":recyclerview"))
     // --- below does not apply to release builds ---
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
-    // Note: JAudioTagger is not compatible with Android 5, we can't ship it in app
-    debugImplementation("net.jthink:jaudiotagger:3.0.1") // <-- for "SD Exploder"
     testImplementation("junit:junit:4.13.2")
 }
 
