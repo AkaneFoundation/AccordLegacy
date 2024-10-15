@@ -888,9 +888,7 @@ class FullBottomSheet @JvmOverloads constructor(
 
     private fun hideControllerJob() {
         hideJob?.cancel()
-        if (hideJob == null) {
-            hideJob = CoroutineScope(Dispatchers.Default)
-        }
+        hideJob = CoroutineScope(Dispatchers.Default)
         hideJob!!.launch {
             delay(5000)
             hideEveryController()
