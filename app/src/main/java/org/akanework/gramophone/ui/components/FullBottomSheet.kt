@@ -1671,7 +1671,7 @@ class FullBottomSheet @JvmOverloads constructor(
         }
 
         override fun getItemId(position: Int): Long {
-            return playlist.hashCode().toLong()
+            return playlist.second[position].hashCode().toLong()
         }
 
         private var playlist = Pair(mutableListOf<Int>(), mutableListOf<MediaItem>())
@@ -1722,6 +1722,8 @@ class FullBottomSheet @JvmOverloads constructor(
                 error(R.drawable.ic_default_cover)
             }
             holder.closeButton.setOnClickListener { v ->
+                holder.closeButton.setOnClickListener(null)
+                holder.itemView.setOnClickListener(null)
                 ViewCompat.performHapticFeedback(v, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
                 val instance = activity.getPlayer()
                 val pos = holder.bindingAdapterPosition
