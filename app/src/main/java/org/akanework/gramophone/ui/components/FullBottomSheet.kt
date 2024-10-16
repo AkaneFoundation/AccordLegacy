@@ -572,7 +572,9 @@ class FullBottomSheet @JvmOverloads constructor(
             if (isChecked && !bottomSheetFullLyricButton.isChecked) {
                 changeMovableFrame(false)
                 bottomSheetFullPlaylistRecyclerView.scrollToPosition(
-                    dumpPlaylist().first.indexOf(instance?.currentMediaItemIndex ?: 0)
+                    bottomSheetFullPlaylistAdapter.playlist.first.indexOfFirst { i ->
+                        i == (instance?.currentMediaItemIndex ?: 0)
+                    }
                 )
                 isPlaylistEnabled = true
                 bottomSheetFullHeaderFrame.fadInAnimation(interpolator, VIEW_TRANSIT_DURATION) {
@@ -1685,7 +1687,7 @@ class FullBottomSheet @JvmOverloads constructor(
             return playlist.second[position].hashCode().toLong()
         }
 
-        private var playlist = Pair(mutableListOf<Int>(), mutableListOf<MediaItem>())
+        var playlist = Pair(mutableListOf<Int>(), mutableListOf<MediaItem>())
         var ignoreCount = 0
         var isShuffleEvent = false
         private lateinit var mRecyclerView: RecyclerView
@@ -1797,8 +1799,8 @@ class FullBottomSheet @JvmOverloads constructor(
         }
     }
 
-    private class PlaylistCardMoveCallback(private val touchHelperContract: (Int, Int) -> Unit) :
-        ItemTouchHelper.Callback() {
+    private class PlaylistCardMoveCallback(private val touchHelperContract: (Int, Int) -> Unit) : ItemTouchHelper.Callback() {
+
         override fun isLongPressDragEnabled(): Boolean {
             return true
         }
