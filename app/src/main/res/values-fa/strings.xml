@@ -46,7 +46,7 @@
     <string name="settings_version">نگارش</string>
     <string name="dialog_album_artist">هنرمند آلبوم</string>
     <string name="folders">پوشه‌ها</string>
-    <string name="settings_mediastore_filter">پنهان‌سازی موسیقی‌های کوتاه‌تر از ... (ثانیه)</string>
+    <string name="settings_mediastore_filter">پنهان‌سازی موسیقی‌های کوتاه‌تر از … (ثانیه)</string>
     <string name="dialog_path">مسیر</string>
     <string name="recently_added">افزوده‌های اخیر</string>
     <string name="settings_repository">مخزن</string>

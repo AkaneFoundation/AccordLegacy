@@ -8,8 +8,7 @@
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
     android:paddingStart="4dp"
-    android:paddingEnd="16dp"
-    tools:targetApi="m">
+    android:paddingEnd="16dp">
 
     <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/checkbox"
@@ -30,7 +29,6 @@
         android:textColor="?attr/colorOnSurface"
         android:textFontWeight="500"
         android:textSize="16sp"
-        tools:targetApi="p"
         tools:text="/storage/0/emulated/Downloads/Ringtone/Every" />
 
 </LinearLayout>

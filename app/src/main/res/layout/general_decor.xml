@@ -15,7 +15,6 @@
         android:textColor="@color/contrast_colorOnSurface"
         android:textFontWeight="600"
         android:textSize="15sp"
-        tools:targetApi="p"
         tools:text="0 Song" />
 
     <LinearLayout
@@ -73,7 +72,6 @@
             app:iconPadding="0dp"
             app:iconSize="24dp"
             app:iconTint="@color/contrast_colorOnSurface" />
-
 
     </LinearLayout>
 

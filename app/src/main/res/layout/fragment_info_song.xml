@@ -74,8 +74,7 @@
                 android:text="@string/album_cover"
                 android:textColor="@color/contrast_colorOnSurface"
                 android:textFontWeight="700"
-                android:textSize="17sp"
-                tools:targetApi="p" />
+                android:textSize="17sp" />
 
             <ImageView
                 android:id="@+id/album_cover"
@@ -127,8 +126,7 @@
                     android:text="@string/dialog_title"
                     android:textColor="@color/contrast_colorOnSurface"
                     android:textFontWeight="700"
-                    android:textSize="17sp"
-                    tools:targetApi="p" />
+                    android:textSize="17sp" />
 
                 <TextView
                     android:id="@+id/title"
@@ -142,8 +140,7 @@
                     android:textColor="?colorOnSurface"
                     android:textFontWeight="500"
                     android:textIsSelectable="true"
-                    android:textSize="16sp"
-                    tools:targetApi="p" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -164,8 +161,7 @@
                     android:text="@string/dialog_artist"
                     android:textColor="@color/contrast_colorOnSurface"
                     android:textFontWeight="700"
-                    android:textSize="17sp"
-                    tools:targetApi="p" />
+                    android:textSize="17sp" />
 
                 <TextView
                     android:id="@+id/artist"
@@ -179,8 +175,7 @@
                     android:textColor="?colorOnSurface"
                     android:textFontWeight="500"
                     android:textIsSelectable="true"
-                    android:textSize="16sp"
-                    tools:targetApi="p" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -201,8 +196,7 @@
                     android:text="@string/dialog_album"
                     android:textColor="@color/contrast_colorOnSurface"
                     android:textFontWeight="700"
-                    android:textSize="17sp"
-                    tools:targetApi="p" />
+                    android:textSize="17sp" />
 
                 <TextView
                     android:id="@+id/album"
@@ -216,8 +210,7 @@
                     android:textColor="?colorOnSurface"
                     android:textFontWeight="500"
                     android:textIsSelectable="true"
-                    android:textSize="16sp"
-                    tools:targetApi="p" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -238,8 +231,7 @@
                     android:text="@string/dialog_album_artist"
                     android:textColor="@color/contrast_colorOnSurface"
                     android:textFontWeight="700"
-                    android:textSize="17sp"
-                    tools:targetApi="p" />
+                    android:textSize="17sp" />
 
                 <TextView
                     android:id="@+id/album_artist"
@@ -253,8 +245,7 @@
                     android:textColor="?colorOnSurface"
                     android:textFontWeight="500"
                     android:textIsSelectable="true"
-                    android:textSize="16sp"
-                    tools:targetApi="p" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -275,8 +266,7 @@
                     android:text="@string/dialog_disc_number"
                     android:textColor="@color/contrast_colorOnSurface"
                     android:textFontWeight="700"
-                    android:textSize="17sp"
-                    tools:targetApi="p" />
+                    android:textSize="17sp" />
 
                 <TextView
                     android:id="@+id/disc_number"
@@ -290,7 +280,6 @@
                     android:textFontWeight="500"
                     android:textIsSelectable="true"
                     android:textSize="16sp"
-                    tools:targetApi="p"
                     tools:text="0" />
 
             </LinearLayout>
@@ -312,8 +301,7 @@
                     android:text="@string/dialog_track_number"
                     android:textColor="@color/contrast_colorOnSurface"
                     android:textFontWeight="700"
-                    android:textSize="17sp"
-                    tools:targetApi="p" />
+                    android:textSize="17sp" />
 
                 <TextView
                     android:id="@+id/track_num"
@@ -327,7 +315,6 @@
                     android:textFontWeight="500"
                     android:textIsSelectable="true"
                     android:textSize="16sp"
-                    tools:targetApi="p"
                     tools:text="0" />
 
             </LinearLayout>
@@ -349,8 +336,7 @@
                     android:text="@string/dialog_genre"
                     android:textColor="@color/contrast_colorOnSurface"
                     android:textFontWeight="700"
-                    android:textSize="17sp"
-                    tools:targetApi="p" />
+                    android:textSize="17sp" />
 
                 <TextView
                     android:id="@+id/genre"
@@ -364,8 +350,7 @@
                     android:textColor="?colorOnSurface"
                     android:textFontWeight="500"
                     android:textIsSelectable="true"
-                    android:textSize="16sp"
-                    tools:targetApi="p" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -386,8 +371,7 @@
                     android:text="@string/dialog_year"
                     android:textColor="@color/contrast_colorOnSurface"
                     android:textFontWeight="700"
-                    android:textSize="17sp"
-                    tools:targetApi="p" />
+                    android:textSize="17sp" />
 
                 <TextView
                     android:id="@+id/date"
@@ -401,8 +385,7 @@
                     android:textColor="?colorOnSurface"
                     android:textFontWeight="500"
                     android:textIsSelectable="true"
-                    android:textSize="16sp"
-                    tools:targetApi="p" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -433,8 +416,7 @@
                     android:text="@string/dialog_duration"
                     android:textColor="@color/contrast_colorOnSurface"
                     android:textFontWeight="700"
-                    android:textSize="17sp"
-                    tools:targetApi="p" />
+                    android:textSize="17sp" />
 
                 <TextView
                     android:id="@+id/duration"
@@ -447,8 +429,7 @@
                     android:textColor="?colorOnSurface"
                     android:textFontWeight="500"
                     android:textIsSelectable="true"
-                    android:textSize="16sp"
-                    tools:targetApi="p" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -469,8 +450,7 @@
                     android:text="@string/dialog_mime"
                     android:textColor="@color/contrast_colorOnSurface"
                     android:textFontWeight="700"
-                    android:textSize="17sp"
-                    tools:targetApi="p" />
+                    android:textSize="17sp" />
 
                 <TextView
                     android:id="@+id/mime"
@@ -483,8 +463,7 @@
                     android:textColor="?colorOnSurface"
                     android:textFontWeight="500"
                     android:textIsSelectable="true"
-                    android:textSize="16sp"
-                    tools:targetApi="p" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -505,8 +484,7 @@
                     android:text="@string/dialog_path"
                     android:textColor="@color/contrast_colorOnSurface"
                     android:textFontWeight="700"
-                    android:textSize="17sp"
-                    tools:targetApi="p" />
+                    android:textSize="17sp" />
 
                 <TextView
                     android:id="@+id/path"
@@ -519,8 +497,7 @@
                     android:textColor="?colorOnSurface"
                     android:textFontWeight="500"
                     android:textIsSelectable="true"
-                    android:textSize="16sp"
-                    tools:targetApi="p" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
             <!--

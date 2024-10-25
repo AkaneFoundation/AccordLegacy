@@ -54,7 +54,6 @@
                 android:textColor="@color/contrast_colorOnSurface"
                 android:textFontWeight="400"
                 android:textSize="17sp"
-                tools:targetApi="p"
                 tools:text="Example Title" />
 
         </LinearLayout>

@@ -67,7 +67,6 @@
                 app:layout_constraintBottom_toTopOf="@id/playlist_desc_frame"
                 app:layout_constraintEnd_toStartOf="@id/star_btn_playlist"
                 app:layout_constraintStart_toStartOf="parent"
-                tools:targetApi="p"
                 tools:text="Artifiction" />
 
             <FrameLayout
@@ -90,7 +89,6 @@
                     android:textColor="@color/contrast_primaryOverlayColor"
                     android:textFontWeight="400"
                     android:textSize="18sp"
-                    tools:targetApi="p"
                     tools:text="Artifiction" />
 
                 <org.akanework.gramophone.ui.components.MarqueeTextView
@@ -104,7 +102,6 @@
                     android:textColor="@color/contrast_primaryOverlayShadeColor"
                     android:textFontWeight="400"
                     android:textSize="18sp"
-                    tools:targetApi="p"
                     tools:text="Artifiction" />
 
             </FrameLayout>
@@ -128,7 +125,7 @@
                 android:background="@drawable/rp_buttons"
                 android:checkable="true"
                 android:gravity="center"
-                app:backgroundTint="#00FFFFFF"
+                app:backgroundTint="@android:color/transparent"
                 app:cornerRadius="128dp"
                 app:icon="@drawable/ic_favourite"
                 app:iconGravity="textStart"
@@ -157,7 +154,7 @@
                 android:layout_height="28dp"
                 android:background="@drawable/rp_buttons"
                 android:gravity="center"
-                app:backgroundTint="#00FFFFFF"
+                app:backgroundTint="@android:color/transparent"
                 app:cornerRadius="128dp"
                 app:icon="@drawable/ic_nowplaying_more"
                 app:iconGravity="textStart"
@@ -388,7 +385,6 @@
                     android:textColor="@color/contrast_primaryOverlayColor"
                     android:textFontWeight="400"
                     android:textSize="20sp"
-                    tools:targetApi="p"
                     tools:text="Artifiction" />
 
                 <org.akanework.gramophone.ui.components.MarqueeTextView
@@ -402,7 +398,6 @@
                     android:textColor="@color/contrast_primaryOverlayShadeColor"
                     android:textFontWeight="400"
                     android:textSize="20sp"
-                    tools:targetApi="p"
                     tools:text="Artifiction" />
 
             </FrameLayout>
@@ -411,6 +406,7 @@
                 android:id="@+id/star_bg"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
+                android:importantForAccessibility="no"
                 android:src="@drawable/ic_nowplaying_favorite"
                 app:layout_constraintBottom_toBottomOf="@id/star_btn"
                 app:layout_constraintEnd_toEndOf="@id/star_btn"
@@ -426,7 +422,7 @@
                 android:background="@android:color/transparent"
                 android:checkable="true"
                 android:gravity="center"
-                app:backgroundTint="#00FFFFFF"
+                app:backgroundTint="@android:color/transparent"
                 app:cornerRadius="128dp"
                 app:icon="@drawable/ic_favourite"
                 app:iconGravity="textStart"
@@ -442,6 +438,7 @@
                 android:id="@+id/more_bg"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
+                android:importantForAccessibility="no"
                 android:src="@drawable/ic_nowplaying_more"
                 app:layout_constraintBottom_toBottomOf="@id/more_btn"
                 app:layout_constraintEnd_toEndOf="@id/more_btn"
@@ -455,7 +452,7 @@
                 android:layout_height="28dp"
                 android:background="@drawable/rp_buttons"
                 android:gravity="center"
-                app:backgroundTint="#00FFFFFF"
+                app:backgroundTint="@android:color/transparent"
                 app:cornerRadius="128dp"
                 app:icon="@drawable/ic_nowplaying_more"
                 app:iconGravity="textStart"
@@ -513,8 +510,7 @@
                 android:text="@string/default_time"
                 android:textColor="@color/contrast_secondaryOverlayColor"
                 android:textFontWeight="500"
-                android:textSize="12sp"
-                tools:targetApi="p" />
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/position"
@@ -526,8 +522,7 @@
                 android:text="@string/default_time"
                 android:textColor="@color/contrast_secondaryOverlayShadeColor"
                 android:textFontWeight="500"
-                android:textSize="12sp"
-                tools:targetApi="p" />
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/duration_back"
@@ -539,8 +534,7 @@
                 android:text="@string/default_time"
                 android:textColor="@color/contrast_secondaryOverlayColor"
                 android:textFontWeight="500"
-                android:textSize="12sp"
-                tools:targetApi="p" />
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/duration"
@@ -552,8 +546,7 @@
                 android:text="@string/default_time"
                 android:textColor="@color/contrast_secondaryOverlayShadeColor"
                 android:textFontWeight="500"
-                android:textSize="12sp"
-                tools:targetApi="p" />
+                android:textSize="12sp" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/quality_card"
@@ -562,7 +555,7 @@
                 android:layout_gravity="center"
                 android:clickable="true"
                 android:focusable="true"
-                app:cardBackgroundColor="#0DFFFFFF"
+                app:cardBackgroundColor="@color/contrast_tertiaryOverlayColor"
                 app:cardCornerRadius="5dp"
                 app:strokeWidth="0dp">
 
@@ -570,7 +563,7 @@
                     android:id="@+id/quality_overlay"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="#26FFFFFF" />
+                    android:background="@color/contrast_secondaryOverlayColor" />
 
                 <LinearLayout
                     android:id="@+id/quality_frame"
@@ -586,7 +579,7 @@
                         android:adjustViewBounds="true"
                         android:importantForAccessibility="no"
                         android:src="@drawable/apple_lossless_seeklogo"
-                        app:tint="#80FFFFFF" />
+                        app:tint="@color/contrast_primaryOverlayColor" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -598,7 +591,38 @@
                         android:layout_marginBottom="3dp"
                         android:fontFamily="sans-serif"
                         android:text="@string/lossless"
-                        android:textColor="#80FFFFFF"
+                        android:textColor="@color/contrast_primaryOverlayColor"
+                        android:textFontWeight="500"
+                        android:textSize="11sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:layout_width="15dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="7.5dp"
+                        android:layout_marginTop="0.5dp"
+                        android:adjustViewBounds="true"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/apple_lossless_seeklogo"
+                        app:tint="@color/contrast_primaryOverlayShadeColor" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="3dp"
+                        android:layout_marginEnd="7.5dp"
+                        android:layout_marginBottom="3dp"
+                        android:fontFamily="sans-serif"
+                        android:text="@string/lossless"
+                        android:textColor="@color/contrast_primaryOverlayShadeColor"
                         android:textFontWeight="500"
                         android:textSize="11sp" />
 

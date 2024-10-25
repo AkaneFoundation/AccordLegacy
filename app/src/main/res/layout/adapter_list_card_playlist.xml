@@ -60,7 +60,6 @@
                 android:textColor="#EBFFFFFF"
                 android:textFontWeight="400"
                 android:textSize="17sp"
-                tools:targetApi="p"
                 tools:text="Example Title" />
 
             <TextView
@@ -73,7 +72,6 @@
                 android:textColor="#66FFFFFF"
                 android:textFontWeight="400"
                 android:textSize="14sp"
-                tools:targetApi="p"
                 tools:text="Example Artist" />
 
         </LinearLayout>

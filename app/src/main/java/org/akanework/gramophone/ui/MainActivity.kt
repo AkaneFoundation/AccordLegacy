@@ -69,8 +69,7 @@ class MainActivity : AppCompatActivity() {
 
     // Import our viewModels.
     val libraryViewModel: LibraryViewModel by viewModels()
-    val startingActivity =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
+    val startingActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
 
     private val handler = Handler(Looper.getMainLooper())
     private val reportFullyDrawnRunnable = Runnable { if (!ready) reportFullyDrawn() }

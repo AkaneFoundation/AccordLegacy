@@ -45,7 +45,7 @@ android {
             // https://issueantenna.com/repo/kotlin/kotlinx.coroutines/issues/3158
             excludes += "kotlin-tooling-metadata.json"
 
-            excludes += "META-INF/androidx/constraintlayout/constraintlayout-core/LICENSE.txt"
+            excludes += "META-INF/**/LICENSE.txt"
         }
     }
 
@@ -172,32 +172,32 @@ configurations.configureEach {
 
 dependencies {
     val media3Version = "1.5.0-alpha01"
-    val roomVersion = "2.6.1"
+    val roomVersion = "2.7.0-alpha10"
 
     ksp("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.activity:activity-ktx:1.9.2")
+    implementation("androidx.core:core-ktx:1.15.0-rc01")
+    implementation("androidx.activity:activity-ktx:1.10.0-alpha02")
     implementation("androidx.concurrent:concurrent-futures-ktx:1.2.0")
     implementation("androidx.transition:transition-ktx:1.5.1") // <-- for predictive back
     implementation("androidx.fragment:fragment-ktx:1.8.4")
-    implementation("androidx.core:core-splashscreen:1.0.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
+    implementation("androidx.core:core-splashscreen:1.2.0-alpha02")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.0-alpha05")
     implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.0-beta01")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.0-rc01")
     implementation("androidx.media3:media3-exoplayer:$media3Version")
     implementation("androidx.media3:media3-exoplayer-midi:$media3Version")
     implementation("androidx.media3:media3-session:$media3Version")
     implementation("androidx.preference:preference-ktx:1.2.1")
-    implementation("com.google.android.material:material:1.13.0-alpha06")
+    implementation("com.google.android.material:material:1.13.0-alpha07")
     implementation("com.google.android.flexbox:flexbox:3.0.0")
     implementation("me.zhanghai.android.fastscroll:library:1.3.0")
     implementation("io.coil-kt.coil3:coil:3.0.0-rc01")
     implementation(files("../libs/lib-decoder-ffmpeg-release.aar"))
     implementation(project(":recyclerview"))
     // --- below does not apply to release builds ---
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:3.0-alpha-8")
     testImplementation("junit:junit:4.13.2")
 }
 

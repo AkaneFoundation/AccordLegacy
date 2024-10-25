@@ -57,7 +57,7 @@ android {
 }
 
 dependencies {
-    api("androidx.annotation:annotation:1.8.2")
+    api("androidx.annotation:annotation:1.9.0")
     //noinspection KtxExtensionAvailable
     api("androidx.core:core:1.13.1")
     //noinspection KtxExtensionAvailable,GradleDependency
