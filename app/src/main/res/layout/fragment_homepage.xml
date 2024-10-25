@@ -24,8 +24,7 @@
             app:expandedTitleTextAppearance="@style/TextAppearance.App.HeadlineLarge"
             app:expandedTitleTextColor="@color/contrast_colorOnSurface"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
-            app:title="@string/home"
-            >
+            app:title="@string/home">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/topAppBar"
@@ -55,7 +54,7 @@
         android:id="@+id/nested"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -65,41 +64,39 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
                 android:layout_marginTop="12dp"
                 android:text="@string/recommendations"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_marginStart="24dp"
                 android:textColor="@color/contrast_colorOnSurface"
-                />
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerview_top"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:clipToPadding="false"
                 android:paddingStart="20dp"
-                android:paddingEnd="20dp"
-                android:layout_height="wrap_content" />
+                android:paddingEnd="20dp" />
 
             <TextView
                 android:id="@+id/recommend"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
                 android:layout_marginTop="32dp"
                 android:text="@string/recently_played"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_marginStart="24dp"
                 android:textColor="@color/contrast_colorOnSurface"
-                />
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_r"
                 android:layout_width="match_parent"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
+                android:layout_height="wrap_content"
                 android:clipToPadding="false"
-                android:layout_height="wrap_content" />
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp" />
 
         </LinearLayout>
 

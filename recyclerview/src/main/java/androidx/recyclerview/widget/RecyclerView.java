@@ -220,7 +220,7 @@ import java.util.Set;
  * information about the Paging library, see the
  * <a href="https://developer.android.com/topic/libraries/architecture/paging/">library
  * documentation</a>.
- *
+ * <p>
  * {@link androidx.recyclerview.R.attr#layoutManager}
  */
 @SuppressLint("RestrictedApi")
@@ -367,10 +367,10 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
      * - There might be a problem in Recycling (e.g. custom Animations that set transient state and
      * prevent recycling or ItemAnimator not implementing the contract properly. ({@link
      * > Adapter#onFailedToRecycleView(ViewHolder)})
-     *
+     * <p>
      * - There might be too many item view types.
      * > Try merging them
-     *
+     * <p>
      * - There might be too many itemChange animations and not enough space in RecyclerPool.
      * >Try increasing your pool size and item cache size.
      */
@@ -508,10 +508,10 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
     /**
      * True after an event occurs that signals that the entire data set has changed. In that case,
      * we cannot run any animations since we don't know what happened until layout.
-     *
+     * <p>
      * Attached items are invalid until next layout, at which point layout will animate/replace
      * items as necessary, building up content from the (effectively) new adapter from scratch.
-     *
+     * <p>
      * Cached items must be discarded when setting this to true, so that the cache may be freely
      * used by prefetching until the next layout occurs.
      *
@@ -636,22 +636,16 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
     @VisibleForTesting
     final List<ViewHolder> mPendingAccessibilityImportanceChange = new ArrayList<>();
 
-    private Runnable mItemAnimatorRunner = new Runnable() {
-        @Override
-        public void run() {
-            if (mItemAnimator != null) {
-                mItemAnimator.runPendingAnimations();
-            }
-            mPostedAnimatorRunner = false;
+    private Runnable mItemAnimatorRunner = () -> {
+        if (mItemAnimator != null) {
+            mItemAnimator.runPendingAnimations();
         }
+        mPostedAnimatorRunner = false;
     };
 
-    static final Interpolator sQuinticInterpolator = new Interpolator() {
-        @Override
-        public float getInterpolation(float t) {
-            t -= 1.0f;
-            return t * t * t * t * t + 1.0f;
-        }
+    static final Interpolator sQuinticInterpolator = t -> {
+        t -= 1.0f;
+        return t * t * t * t * t + 1.0f;
     };
 
     // These fields are only used to track whether we need to layout and measure RV children in
@@ -13211,11 +13205,9 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
         /**
          * called by CREATOR
          */
-        @SuppressWarnings("deprecation")
         SavedState(Parcel in, ClassLoader loader) {
             super(in, loader);
-            mLayoutState = in.readParcelable(
-                    loader != null ? loader : LayoutManager.class.getClassLoader());
+            mLayoutState = in.readParcelable(loader != null ? loader : LayoutManager.class.getClassLoader());
         }
 
         /**
@@ -13235,7 +13227,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
             mLayoutState = other.mLayoutState;
         }
 
-        public static final Creator<SavedState> CREATOR = new ClassLoaderCreator<SavedState>() {
+        public static final Creator<SavedState> CREATOR = new ClassLoaderCreator<>() {
             @Override
             public SavedState createFromParcel(Parcel in, ClassLoader loader) {
                 return new SavedState(in, loader);
@@ -13696,8 +13688,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
         }
 
         private ItemAnimatorListener mListener = null;
-        private ArrayList<ItemAnimatorFinishedListener> mFinishedListeners =
-                new ArrayList<ItemAnimatorFinishedListener>();
+        private ArrayList<ItemAnimatorFinishedListener> mFinishedListeners = new ArrayList<>();
 
         private long mAddDuration = 120;
         private long mRemoveDuration = 120;
