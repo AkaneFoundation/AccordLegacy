@@ -8,6 +8,7 @@ import android.graphics.Matrix
 import android.graphics.Shader
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.doOnLayout
 
 class CustomTextView @JvmOverloads constructor(
     context: Context,
@@ -19,50 +20,49 @@ class CustomTextView @JvmOverloads constructor(
         val FADE_COLORS_REVERSE = intArrayOf(Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, 0x24FFFFFF)
     }
 
-    private var gradient: LinearGradient? = null
-    private val localMatrix = Matrix()
+    var gradient: LinearGradient? = null
+    val localMatrix = Matrix()
+    var currentProgress = 0f
+    private var firstSetProgress = true
 
-//    override fun onAttachedToWindow() {
-//        super.onAttachedToWindow()
-//        doOnLayout {
-//            initGradient()
-//        }
-//    }
-
-    fun setProgress(percent: Float) {
-//        Log.d("Percent", "$percent")
-        if (gradient == null) {
-            gradient = LinearGradient(
-                -width / 1f,
-                0f,
-                0f,
-                0f,
-                FADE_COLORS_REVERSE,
-                null,
-                Shader.TileMode.CLAMP
-            )
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        doOnLayout {
+            setDefaultGradient()
         }
-        localMatrix.setTranslate(percent * width, height.toFloat())
-        gradient!!.setLocalMatrix(localMatrix)
-        invalidate()
     }
 
-//    private fun initGradient() {
-//        gradient = LinearGradient(
-//            -width / 1f,
-//            0f,
-//            0f,
-//            0f,
-//            FADE_COLORS_REVERSE,
-//            null,
-//            Shader.TileMode.CLAMP
-//        )
-//    }
+    fun setProgress(
+        percent: Float,
+        invalidate: Boolean = true
+    ) {
+        if (firstSetProgress) {
+            setDefaultGradient()
+            firstSetProgress = false
+        }
+        currentProgress = percent
+        localMatrix.setTranslate(percent * width, height.toFloat())
+        gradient?.setLocalMatrix(localMatrix)
+        if (invalidate == true) {
+            invalidate()
+        }
+    }
+
+    fun setDefaultGradient() = updateGradient(FADE_COLORS_REVERSE)
+
+    fun updateGradient(colors: IntArray) {
+        gradient = LinearGradient(
+            -width / 1f,
+            0f,
+            0f,
+            0f,
+            colors,
+            null,
+            Shader.TileMode.CLAMP
+        )
+    }
 
     override fun onDraw(canvas: Canvas) {
-//        val currentCanvas = canvas.saveLayer(null, null)
-//        super.onDraw(canvas)
-//        canvas.restoreToCount(currentCanvas)
         paint.setShader(gradient)
         super.onDraw(canvas)
         paint.setShader(null)

@@ -39,6 +39,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.os.StrictMode
+import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.WindowInsets
@@ -64,6 +65,7 @@ import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
+import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.appbar.MaterialToolbar
@@ -81,6 +83,7 @@ import org.akanework.gramophone.logic.GramophonePlaybackService.Companion.SERVIC
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
 import org.akanework.gramophone.ui.LibraryViewModel
 import org.akanework.gramophone.ui.MainActivity
+import org.akanework.gramophone.ui.components.CustomTextView
 import org.akanework.gramophone.ui.components.FullBottomSheet
 import org.akanework.gramophone.ui.fragments.BaseWrapperFragment
 import org.akanework.gramophone.ui.fragments.settings.MainSettingsFragment
@@ -205,11 +208,23 @@ fun View.visibilityChanged(action: (View) -> Unit) {
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun Int.dpToPx(context: Context): Int =
-    (this.toFloat() * context.resources.displayMetrics.density).toInt()
+    TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), context.resources.displayMetrics
+    ).toInt()
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun Float.dpToPx(context: Context): Float =
-    (this * context.resources.displayMetrics.density)
+    TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this, context.resources.displayMetrics)
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun Int.spToPx(context: Context): Int =
+    TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_SP, this.toFloat(), context.resources.displayMetrics
+    ).toInt()
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun Float.spToPx(context: Context): Float =
+    TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, this, context.resources.displayMetrics)
 
 fun MediaController.getTimer(): Int =
     sendCustomCommand(
@@ -445,7 +460,10 @@ fun Float?.checkIfNegativeOrNullOrMaxedOut(maxedOut: Float): Float {
     }
 }
 
-inline fun <reified T> SharedPreferences.use(relax: Boolean = false, doIt: SharedPreferences.() -> T): T {
+inline fun <reified T> SharedPreferences.use(
+    relax: Boolean = false,
+    doIt: SharedPreferences.() -> T
+): T {
     return allowDiskAccessInStrictMode(relax) { doIt() }
 }
 
@@ -492,7 +510,7 @@ fun Context.resourceUri(resourceId: Int): Uri = with(resources) {
         .build()
 }
 
-fun TextView.animateText(targetScale: Float, targetColor: Int, interpolator: TimeInterpolator) {
+fun TextView.animateTextWithColor(targetScale: Float, targetColor: Int, interpolator: TimeInterpolator) {
     val animator = ValueAnimator.ofFloat(scaleX, targetScale)
     animator.addUpdateListener { animation ->
         val animatedValue = animation.animatedValue as Float
@@ -518,6 +536,39 @@ fun TextView.animateText(targetScale: Float, targetColor: Int, interpolator: Tim
     colorAnimator.duration = FullBottomSheet.LYRIC_SCROLL_DURATION
     colorAnimator.interpolator = interpolator
     colorAnimator.start()
+}
+
+fun CustomTextView.resetShader(interpolator: TimeInterpolator) {
+    val colorAnimator = ValueAnimator.ofArgb(Color.WHITE, 0x24FFFFFF)
+    colorAnimator.addUpdateListener { animation ->
+        val animatedValue = animation.animatedValue as Int
+        val animatedFadeColors = intArrayOf(animatedValue, animatedValue, animatedValue, animatedValue, 0x24FFFFFF)
+        updateGradient(animatedFadeColors)
+        setProgress(currentProgress)
+    }
+    colorAnimator.doOnEnd {
+        setDefaultGradient()
+        setProgress(0f)
+    }
+    colorAnimator.duration = FullBottomSheet.LYRIC_SCROLL_DURATION
+    colorAnimator.interpolator = interpolator
+    colorAnimator.start()
+}
+
+fun FlexboxLayout.scaleText(targetScale: Float, interpolator: TimeInterpolator) {
+    val animator = ValueAnimator.ofFloat(scaleX, targetScale)
+    animator.addUpdateListener { animation ->
+        val animatedValue = animation.animatedValue as Float
+        scaleX = animatedValue
+        scaleY = animatedValue
+    }
+    animator.doOnEnd {
+        scaleX = targetScale
+        scaleY = targetScale
+    }
+    animator.duration = FullBottomSheet.LYRIC_SCROLL_DURATION
+    animator.interpolator = interpolator
+    animator.start()
 }
 
 fun TextView.scaleText(scale: Float) {

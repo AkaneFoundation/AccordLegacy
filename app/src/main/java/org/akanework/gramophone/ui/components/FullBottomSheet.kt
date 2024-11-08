@@ -93,7 +93,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.GramophonePlaybackService
-import org.akanework.gramophone.logic.animateText
+import org.akanework.gramophone.logic.animateTextWithColor
 import org.akanework.gramophone.logic.checkIfNegativeOrNullOrMaxedOut
 import org.akanework.gramophone.logic.dpToPx
 import org.akanework.gramophone.logic.fadInAnimation
@@ -107,6 +107,7 @@ import org.akanework.gramophone.logic.hasScopedStorageV1
 import org.akanework.gramophone.logic.hasScopedStorageWithMediaTypes
 import org.akanework.gramophone.logic.hasTimer
 import org.akanework.gramophone.logic.playOrPause
+import org.akanework.gramophone.logic.resetShader
 import org.akanework.gramophone.logic.scaleText
 import org.akanework.gramophone.logic.setTextAnimation
 import org.akanework.gramophone.logic.setTimer
@@ -157,6 +158,7 @@ class FullBottomSheet @JvmOverloads constructor(
         const val LYRIC_SET_BLUR = 3
         const val LYRIC_UPDATE = 4
         const val LYRIC_SCROLL_DURATION = 600L
+        const val LYRIC_UPDATE_DURATION = 10L
         const val SHRINK_VALUE_DEFAULT = 0.93F
         const val ALBUM_SHRINK_DURATION_ANIMATION = 300L
         const val SHRINK_TRIGGER_DURATION = 300L
@@ -387,7 +389,8 @@ class FullBottomSheet @JvmOverloads constructor(
         bottomSheetPlaylistButtonUnder = findViewById(R.id.playlist_under)
 
         bottomSheetFullPlaylistAdapter = PlaylistCardAdapter(activity)
-        val callback: ItemTouchHelper.Callback = PlaylistCardMoveCallback(bottomSheetFullPlaylistAdapter::onRowMoved)
+        val callback: ItemTouchHelper.Callback =
+            PlaylistCardMoveCallback(bottomSheetFullPlaylistAdapter::onRowMoved)
         val touchHelper = ItemTouchHelper(callback)
         bottomSheetFullPlaylistRecyclerView.layoutManager = LinearLayoutManager(context)
         bottomSheetFullPlaylistRecyclerView.adapter = bottomSheetFullPlaylistAdapter
@@ -486,7 +489,8 @@ class FullBottomSheet @JvmOverloads constructor(
 
         bottomSheetStarButton.addOnCheckedChangeListener { _, b ->
             if (!favouriteLock) {
-                val mediaId = instance?.currentMediaItem?.mediaId?.toLong() ?: return@addOnCheckedChangeListener
+                val mediaId = instance?.currentMediaItem?.mediaId?.toLong()
+                    ?: return@addOnCheckedChangeListener
                 CoroutineScope(Dispatchers.Main).launch {
                     if (b) {
                         favouriteLock = true
@@ -497,7 +501,9 @@ class FullBottomSheet @JvmOverloads constructor(
                         favouriteLock = true
                         bottomSheetStarButtonPlaylist.isChecked = false
                         favouriteLock = false
-                        DatabaseUtils.removeFavouriteSong(mediaId, activity.libraryViewModel, context)
+                        DatabaseUtils.removeFavouriteSong(
+                            mediaId, activity.libraryViewModel, context
+                        )
                     }
                     val targetRes = if (b)
                         R.drawable.ic_nowplaying_favorited
@@ -515,7 +521,8 @@ class FullBottomSheet @JvmOverloads constructor(
 
         bottomSheetStarButtonPlaylist.addOnCheckedChangeListener { _, b ->
             if (!favouriteLock) {
-                val mediaId = instance?.currentMediaItem?.mediaId?.toLong() ?: return@addOnCheckedChangeListener
+                val mediaId = instance?.currentMediaItem?.mediaId?.toLong()
+                    ?: return@addOnCheckedChangeListener
                 CoroutineScope(Dispatchers.Main).launch {
                     if (b) {
                         favouriteLock = true
@@ -526,7 +533,9 @@ class FullBottomSheet @JvmOverloads constructor(
                         favouriteLock = true
                         bottomSheetStarButton.isChecked = false
                         favouriteLock = false
-                        DatabaseUtils.removeFavouriteSong(mediaId, activity.libraryViewModel, context)
+                        DatabaseUtils.removeFavouriteSong(
+                            mediaId, activity.libraryViewModel, context
+                        )
                     }
                     val targetRes = if (b)
                         R.drawable.ic_nowplaying_favorited
@@ -579,9 +588,12 @@ class FullBottomSheet @JvmOverloads constructor(
                 isPlaylistEnabled = true
                 bottomSheetFullHeaderFrame.fadInAnimation(interpolator, VIEW_TRANSIT_DURATION) {
                     manipulateTopOverlayVisibility(VISIBLE)
-                    playlistCoverCoordinateX = bottomSheetFullPlaylistCoverFrame.left + bottomSheetFullHeaderFrame.left
-                    playlistCoverCoordinateY = bottomSheetFullPlaylistCoverFrame.top + bottomSheetFullHeaderFrame.top
-                    playlistCoverScale = bottomSheetFullPlaylistCoverFrame.height / 48.dpToPx(context).toFloat() - 1f
+                    playlistCoverCoordinateX =
+                        bottomSheetFullPlaylistCoverFrame.left + bottomSheetFullHeaderFrame.left
+                    playlistCoverCoordinateY =
+                        bottomSheetFullPlaylistCoverFrame.top + bottomSheetFullHeaderFrame.top
+                    playlistCoverScale =
+                        bottomSheetFullPlaylistCoverFrame.height / 48.dpToPx(context).toFloat() - 1f
                 }
                 bottomSheetFullPlaylistFrame.fadInAnimation(interpolator, VIEW_TRANSIT_DURATION)
                 bottomSheetFullBlendView?.animateBlurRadius(false, VIEW_TRANSIT_DURATION)
@@ -590,7 +602,10 @@ class FullBottomSheet @JvmOverloads constructor(
                 triggerLock = true
                 bottomSheetFullLyricButton.isChecked = false
                 bottomSheetFadingVerticalEdgeLayout.changeOverlayVisibility(false)
-                bottomSheetFadingVerticalEdgeLayout.fadOutAnimation(interpolator, VIEW_TRANSIT_DURATION)
+                bottomSheetFadingVerticalEdgeLayout.fadOutAnimation(
+                    interpolator,
+                    VIEW_TRANSIT_DURATION
+                )
                 bottomSheetFullPlaylistFrame.fadInAnimation(interpolator, VIEW_TRANSIT_DURATION)
                 hideJob?.cancel()
                 if (bottomSheetFullControllerButton.visibility == GONE || bottomSheetFullControllerButton.visibility == INVISIBLE) {
@@ -599,11 +614,11 @@ class FullBottomSheet @JvmOverloads constructor(
             } else {
                 changeMovableFrame(true)
                 isPlaylistEnabled = false
-                bottomSheetFullHeaderFrame.fadOutAnimation(interpolator, VIEW_TRANSIT_DURATION,
-                    GONE
+                bottomSheetFullHeaderFrame.fadOutAnimation(
+                    interpolator, VIEW_TRANSIT_DURATION, GONE
                 )
-                bottomSheetFullPlaylistFrame.fadOutAnimation(interpolator, VIEW_TRANSIT_DURATION,
-                    GONE
+                bottomSheetFullPlaylistFrame.fadOutAnimation(
+                    interpolator, VIEW_TRANSIT_DURATION, GONE
                 )
                 bottomSheetFullBlendView?.animateBlurRadius(true, VIEW_TRANSIT_DURATION)
             }
@@ -621,9 +636,12 @@ class FullBottomSheet @JvmOverloads constructor(
                 isPlaylistEnabled = true
                 bottomSheetFullHeaderFrame.fadInAnimation(interpolator, VIEW_TRANSIT_DURATION) {
                     manipulateTopOverlayVisibility(VISIBLE)
-                    playlistCoverCoordinateX = bottomSheetFullPlaylistCoverFrame.left + bottomSheetFullHeaderFrame.left
-                    playlistCoverCoordinateY = bottomSheetFullPlaylistCoverFrame.top + bottomSheetFullHeaderFrame.top
-                    playlistCoverScale = bottomSheetFullPlaylistCoverFrame.height / 48.dpToPx(context).toFloat() - 1f
+                    playlistCoverCoordinateX =
+                        bottomSheetFullPlaylistCoverFrame.left + bottomSheetFullHeaderFrame.left
+                    playlistCoverCoordinateY =
+                        bottomSheetFullPlaylistCoverFrame.top + bottomSheetFullHeaderFrame.top
+                    playlistCoverScale =
+                        bottomSheetFullPlaylistCoverFrame.height / 48.dpToPx(context).toFloat() - 1f
                 }
                 bottomSheetFadingVerticalEdgeLayout.setPadding(
                     bottomSheetFadingVerticalEdgeLayout.paddingLeft,
@@ -634,7 +652,9 @@ class FullBottomSheet @JvmOverloads constructor(
                     else
                         0
                 )
-                bottomSheetFadingVerticalEdgeLayout.fadInAnimation(interpolator, VIEW_TRANSIT_DURATION) {
+                bottomSheetFadingVerticalEdgeLayout.fadInAnimation(
+                    interpolator, VIEW_TRANSIT_DURATION
+                ) {
                     bottomSheetFadingVerticalEdgeLayout.changeOverlayVisibility(true)
                 }
                 hideControllerJob()
@@ -653,7 +673,9 @@ class FullBottomSheet @JvmOverloads constructor(
                     else
                         0
                 )
-                bottomSheetFadingVerticalEdgeLayout.fadInAnimation(interpolator, VIEW_TRANSIT_DURATION) {
+                bottomSheetFadingVerticalEdgeLayout.fadInAnimation(
+                    interpolator, VIEW_TRANSIT_DURATION
+                ) {
                     bottomSheetFadingVerticalEdgeLayout.changeOverlayVisibility(true)
                 }
                 hideControllerJob()
@@ -661,12 +683,12 @@ class FullBottomSheet @JvmOverloads constructor(
                 activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                 changeMovableFrame(true)
                 isPlaylistEnabled = false
-                bottomSheetFullHeaderFrame.fadOutAnimation(interpolator, VIEW_TRANSIT_DURATION,
-                    GONE
+                bottomSheetFullHeaderFrame.fadOutAnimation(
+                    interpolator, VIEW_TRANSIT_DURATION, GONE
                 )
                 bottomSheetFadingVerticalEdgeLayout.changeOverlayVisibility(false)
-                bottomSheetFadingVerticalEdgeLayout.fadOutAnimation(interpolator, VIEW_TRANSIT_DURATION,
-                    GONE
+                bottomSheetFadingVerticalEdgeLayout.fadOutAnimation(
+                    interpolator, VIEW_TRANSIT_DURATION, GONE
                 )
 
                 hideJob?.cancel()
@@ -822,8 +844,9 @@ class FullBottomSheet @JvmOverloads constructor(
                             hideJob?.cancel()
                             // Up
                             hideEveryController()
-                            val animator =
-                                ValueAnimator.ofInt(bottomSheetFadingVerticalEdgeLayout.paddingBottom, 0)
+                            val animator = ValueAnimator.ofInt(
+                                bottomSheetFadingVerticalEdgeLayout.paddingBottom, 0
+                            )
                             animator.addUpdateListener {
                                 val value = it.animatedValue as Int
                                 bottomSheetFadingVerticalEdgeLayout.setPadding(
@@ -895,7 +918,9 @@ class FullBottomSheet @JvmOverloads constructor(
             delay(5000)
             hideEveryController()
             withContext(Dispatchers.Main) {
-                val animator = ValueAnimator.ofInt(bottomSheetFadingVerticalEdgeLayout.paddingBottom, 0)
+                val animator = ValueAnimator.ofInt(
+                    bottomSheetFadingVerticalEdgeLayout.paddingBottom, 0
+                )
                 animator.addUpdateListener {
                     val value = it.animatedValue as Int
                     bottomSheetFadingVerticalEdgeLayout.setPadding(
@@ -936,9 +961,9 @@ class FullBottomSheet @JvmOverloads constructor(
     }
 
     private fun showEveryController() {
-        bottomSheetFullControllerFrame.fadInAnimation(interpolator, BOTTOM_TRANSIT_DURATION) { manipulateBottomOverlayVisibility(
-            VISIBLE
-        ) }
+        bottomSheetFullControllerFrame.fadInAnimation(interpolator, BOTTOM_TRANSIT_DURATION) {
+            manipulateBottomOverlayVisibility(VISIBLE)
+        }
         bottomSheetFullControllerButton.fadInAnimation(interpolator, BOTTOM_TRANSIT_DURATION)
         bottomSheetVolumeSliderFrame.fadInAnimation(interpolator, BOTTOM_TRANSIT_DURATION)
         bottomSheetFullNextButton.fadInAnimation(interpolator, BOTTOM_TRANSIT_DURATION)
@@ -955,12 +980,16 @@ class FullBottomSheet @JvmOverloads constructor(
     }
 
     fun isCoverFrameElevated(): Boolean =
-        bottomSheetFullCoverFrame.elevation == resources.getDimensionPixelSize(R.dimen.full_cover_elevation).toFloat()
+        bottomSheetFullCoverFrame.elevation == resources.getDimensionPixelSize(
+            R.dimen.full_cover_elevation
+        ).toFloat()
 
     fun applyElevation(remove: Boolean) {
         val animator = ValueAnimator.ofFloat(
-            if (remove) resources.getDimensionPixelSize(R.dimen.full_cover_elevation).toFloat() else 0f,
-            if (remove) 0f else resources.getDimensionPixelSize(R.dimen.full_cover_elevation).toFloat()
+            if (remove) resources.getDimensionPixelSize(R.dimen.full_cover_elevation).toFloat()
+            else 0f,
+            if (remove) 0f
+            else resources.getDimensionPixelSize(R.dimen.full_cover_elevation).toFloat()
         )
         animator.apply {
             addUpdateListener {
@@ -991,9 +1020,9 @@ class FullBottomSheet @JvmOverloads constructor(
     private fun changeMovableFrame(isVisible: Boolean) {
         if (isVisible) {
             manipulateTopOverlayVisibility(INVISIBLE)
-            bottomSheetFullTextLayout.fadInAnimation(interpolator, VIEW_TRANSIT_DURATION) { manipulateTopOverlayVisibility(
-                VISIBLE
-            ) }
+            bottomSheetFullTextLayout.fadInAnimation(interpolator, VIEW_TRANSIT_DURATION) {
+                manipulateTopOverlayVisibility(VISIBLE)
+            }
             bottomSheetFullDragHandle.fadInAnimation(interpolator, VIEW_TRANSIT_DURATION)
             TransitionManager.beginDelayedTransition(this, transformOut)
             bottomSheetFullPlaylistCoverFrame.visibility = INVISIBLE
@@ -1342,13 +1371,21 @@ class FullBottomSheet @JvmOverloads constructor(
         private val lyricList: MutableList<MediaStoreUtils.Lyric>
     ) : RecyclerView.Adapter<LyricAdapter.ViewHolder>() {
 
-        private var defaultTextColor = ResourcesCompat.getColor(resources, R.color.contrast_lyric_defaultColor, null)
+        private var defaultTextColor = ResourcesCompat.getColor(
+            resources, R.color.contrast_lyric_defaultColor, null
+        )
 
-        private var highlightTranslationTextColor = ResourcesCompat.getColor(resources, R.color.contrast_lyric_highlightTranslationColor, null)
+        private var highlightTranslationTextColor = ResourcesCompat.getColor(
+            resources, R.color.contrast_lyric_highlightTranslationColor, null
+        )
 
-        private var highlightTextColor = ResourcesCompat.getColor(resources, R.color.contrast_lyric_highlightColor, null)
+        private var highlightTextColor = ResourcesCompat.getColor(
+            resources, R.color.contrast_lyric_highlightColor, null
+        )
 
-        private var disabledTextColor = ResourcesCompat.getColor(resources, R.color.contrast_lyric_disabledColor, null)
+        private var disabledTextColor = ResourcesCompat.getColor(
+            resources, R.color.contrast_lyric_disabledColor, null
+        )
 
         private val sizeFactor = 1f
 
@@ -1356,12 +1393,14 @@ class FullBottomSheet @JvmOverloads constructor(
 
         private val disabledTextTypeface = TypefaceCompat.create(context, null, 500, false)
 
-        private val extraLineHeight = resources.getDimensionPixelSize(R.dimen.lyric_extra_line_height)
+        private val extraLineHeight = resources.getDimensionPixelSize(
+            R.dimen.lyric_extra_line_height
+        )
 
         var currentFocusPos = -1
-        private var currentTranslationPos = -1
+        var currentTranslationPos = -1
 
-        val isExtendedLRC: Boolean get() = lyricList.any { it.wordTimestamps.isNotEmpty() == true }
+        val isExtendedLRC: Boolean get() = lyricList.any { it.wordTimestamps.isNotEmpty() }
 
         override fun onCreateViewHolder(
             parent: ViewGroup,
@@ -1379,81 +1418,60 @@ class FullBottomSheet @JvmOverloads constructor(
             position: Int,
             payloads: MutableList<Any>
         ) {
-            if (payloads.isNotEmpty() && payloads[0] == LYRIC_UPDATE) {
+            val hasUpdateLyricPayload = payloads.contains(LYRIC_UPDATE)
+            val hasSetHighlightPayload = payloads.contains(LYRIC_SET_HIGHLIGHT)
+            val hasRemoveHighlightPayload = payloads.contains(LYRIC_REMOVE_HIGHLIGHT)
+            val hasHighlightPayload = hasSetHighlightPayload || hasRemoveHighlightPayload
+
+            val lyric = lyricList[position]
+
+            if (hasUpdateLyricPayload) {
                 holder.lyricFlexboxLayout.children.getTextViews {
                     if (it is CustomTextView) {
-                        if (it.currentTextColor != highlightTextColor) it.setTextColor(highlightTextColor)
-                        val position: Long = instance?.currentPosition ?: 0
                         val lyricDurationStart = it.getTag(R.id.lyric_duration_start) as Long
                         val lyricDurationEnd = it.getTag(R.id.lyric_duration_end) as Long
-                        val percent: Float = ((position.toFloat() - lyricDurationStart.toFloat()) / (lyricDurationEnd.toFloat() - lyricDurationStart.toFloat()))
+                        val position: Long = instance?.currentPosition ?: 0
+                        val percent: Float =
+                            ((position.toFloat() - lyricDurationStart.toFloat()) / (lyricDurationEnd.toFloat() - lyricDurationStart.toFloat()))
 //                        Log.d("Percent", "$percent, $position")
                         it.setProgress(percent)
                     }
                 }
-                return
+                if (payloads.size <= 1) return
             }
-            if (payloads.isNotEmpty() &&
-                payloads[0] as Int >= 2 &&
-                payloads[0] as Int <= 3 &&
+
+            val hasSetBlurPayload = payloads.contains(LYRIC_SET_BLUR)
+            val hasRemoveBlurPayload = payloads.contains(LYRIC_REMOVE_BLUR)
+            val hasBlurPayload = hasSetBlurPayload || hasRemoveBlurPayload
+
+            if (
+                hasBlurPayload &&
                 lyricList.isNotEmpty() &&
                 !blurLock
             ) {
-                when (payloads[0]) {
-                    LYRIC_SET_BLUR -> {
-                        val animator = ValueAnimator.ofFloat(
-                            holder.blurRadius,
-                            getBlurRadius(position)
+                val value = if (hasSetBlurPayload) getBlurRadius(position) else 0f
+                with(ValueAnimator.ofFloat(holder.blurRadius, value)) {
+                    duration = LYRIC_SCROLL_DURATION
+                    interpolator = interpolator
+                    addUpdateListener {
+                        val value = animatedValue as Float
+                        holder.blurRadius = value
+                        holder.lyricFlexboxLayout.setRenderEffect(
+                            if (holder.blurRadius != 0F) {
+                                RenderEffect.createBlurEffect(
+                                    holder.blurRadius,
+                                    holder.blurRadius,
+                                    Shader.TileMode.MIRROR
+                                )
+                            } else {
+                                null
+                            }
                         )
-                        animator.duration = LYRIC_SCROLL_DURATION
-                        animator.interpolator = interpolator
-                        animator.addUpdateListener {
-                            val value = animator.animatedValue as Float
-                            holder.blurRadius = value
-                            holder.lyricFlexboxLayout.setRenderEffect(
-                                if (holder.blurRadius != 0F) {
-                                    RenderEffect.createBlurEffect(
-                                        holder.blurRadius,
-                                        holder.blurRadius,
-                                        Shader.TileMode.MIRROR
-                                    )
-                                } else {
-                                    null
-                                }
-                            )
-                        }
-                        animator.start()
                     }
-                    LYRIC_REMOVE_BLUR -> {
-                        val animator = ValueAnimator.ofFloat(
-                            holder.blurRadius,
-                            0f
-                        )
-                        animator.duration = LYRIC_SCROLL_DURATION
-                        animator.interpolator = interpolator
-                        animator.addUpdateListener {
-                            val value = animator.animatedValue as Float
-                            holder.blurRadius = value
-                            holder.lyricFlexboxLayout.setRenderEffect(
-                                if (holder.blurRadius != 0F) {
-                                    RenderEffect.createBlurEffect(
-                                        holder.blurRadius,
-                                        holder.blurRadius,
-                                        Shader.TileMode.MIRROR
-                                    )
-                                } else {
-                                    null
-                                }
-                            )
-                        }
-                        animator.start()
-                    }
+                    start()
                 }
-                return
+                if (!hasHighlightPayload) return
             }
-
-            val lyric = lyricList[position]
-            val isHighlightPayload = payloads.isNotEmpty() && (payloads[0] == LYRIC_SET_HIGHLIGHT || payloads[0] == LYRIC_REMOVE_HIGHLIGHT)
 
             with(holder.lyricCard) {
                 if (lyric.timeStamp != null) {
@@ -1477,14 +1495,20 @@ class FullBottomSheet @JvmOverloads constructor(
 
             with(holder.lyricFlexboxLayout) {
                 visibility = if (lyric.content.isNotEmpty()) VISIBLE else GONE
-                justifyContent = if (lyric.label.isNotEmpty() && lyric.label == "v2: ") {
-                    JustifyContent.FLEX_END
-                } else {
-                    JustifyContent.FLEX_START
-                }
+                justifyContent =
+                    if (lyric.label.isNotEmpty() && lyric.label == "v2: ")
+                        JustifyContent.FLEX_END
+                    else
+                        JustifyContent.FLEX_START
 
-                val paddingTop = if (lyric.isTranslation) 2 else if (lyric.timeStamp != null) 18 else 0
-                val paddingBottom = if (position + 1 < lyricList.size && lyricList[position + 1].isTranslation) 2 else if (lyric.timeStamp != null) 18 else 0
+                val paddingTop =
+                    if (lyric.isTranslation) 2
+                    else if (lyric.timeStamp != null) 18
+                    else 0
+                val paddingBottom =
+                    if (position + 1 < lyricList.size && lyricList[position + 1].isTranslation) 2
+                    else if (lyric.timeStamp != null) 18
+                    else 0
                 val paddingStart = 12.5f
                 val paddingEnd = if (lyric.hasV2Labels) 66.5f else 12.5f
                 updatePaddingRelative(
@@ -1494,8 +1518,8 @@ class FullBottomSheet @JvmOverloads constructor(
                     bottom = paddingBottom.dpToPx(context)
                 )
 
-                if (lyricList[position].timeStamp != null &&
-                    lyricList[position].absolutePosition != null &&
+                if (lyric.timeStamp != null &&
+                    lyric.absolutePosition != null &&
                     payloads.isEmpty() &&
                     !blurLock
                 ) {
@@ -1516,21 +1540,22 @@ class FullBottomSheet @JvmOverloads constructor(
                     setRenderEffect(null)
                 }
 
-                if (lyric.wordTimestamps.isNotEmpty()) {
+                // Add TextViews
+                if (lyric.wordTimestamps.isNotEmpty() && lyric.isTranslation == false) {
+                    // Remove old views
                     if (lyric.wordTimestamps.size != childCount) removeAllViews()
-                    for (v in children) {
-                        if (
-                            v.getTag(R.id.lyric_content_hash) != lyric.content.hashCode() ||
-                            v.getTag(R.id.lyric_duration_hash) != lyric.wordTimestamps[0].hashCode()
-                        ) {
-                            removeAllViews()
+                    if (childCount > 0) {
+                        with(children.first()) {
+                            if (
+                                getTag(R.id.lyric_content_hash) != lyric.content.hashCode() ||
+                                getTag(R.id.lyric_duration_hash) != lyric.wordTimestamps[0].hashCode()
+                            ) {
+                                removeAllViews()
+                            }
                         }
-                        break
                     }
 
-//                    Log.d("LyricList", lyric.wordTimestamps.toString())
-//                    Log.d("LyricList", lyric.content)
-
+                    // Add new views after check
                     var wordIndex = 0
                     var lyricDurationStart: Long = 0
                     lyric.wordTimestamps.forEach {
@@ -1549,11 +1574,14 @@ class FullBottomSheet @JvmOverloads constructor(
                         lyricDurationStart = it.second
                     }
                 } else {
+                    // Remove old views
                     if (childCount > 0) {
                         children.getTextViews {
                             if (it.text != lyric.content) removeAllViews()
                         }
                     }
+
+                    // Add if no view found
                     if (childCount < 1) addView(
                         AppCompatTextView(context).apply { text = lyric.content }
                     )
@@ -1564,47 +1592,90 @@ class FullBottomSheet @JvmOverloads constructor(
                         visibility = if (lyric.content.isNotEmpty()) VISIBLE else GONE
                         translationY = 0f
 
-                        val textSize = if (lyric.isTranslation) 20f else if (lyric.timeStamp != null) 34f else 18f
+                        val textSize =
+                            if (lyric.isTranslation) 20f
+                            else if (lyric.timeStamp != null) 34f
+                            else 18f
                         setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
-                        typeface = if (lyric.timeStamp != null) defaultTypeface else disabledTextTypeface
-                        setLineSpacing(if (lyric.timeStamp != null) 0f else extraLineHeight.toFloat(), 1f)
+                        typeface =
+                            if (lyric.timeStamp != null)
+                                defaultTypeface
+                            else
+                                disabledTextTypeface
+                        setLineSpacing(
+                            if (lyric.timeStamp != null) 0f else extraLineHeight.toFloat(),
+                            1f
+                        )
+                        scaleText(LYRIC_DEFAULT_SIZE)
 
                         pivotX = 0f
                         pivotY = height / 2f
 
                         if (lyric.timeStamp == null) {
                             scaleText(sizeFactor)
-                            setTextColor(disabledTextColor)
+                            if (it !is CustomTextView) {
+                                setTextColor(disabledTextColor)
+                            }
                             return@with
                         }
+                    }
+                }
 
+                // Highlight Stuffs
+                if (lyric.wordTimestamps.isNotEmpty()) {
+                    when {
+                        hasRemoveHighlightPayload -> {
+                            scaleText(
+                                if (hasSetHighlightPayload) sizeFactor else LYRIC_DEFAULT_SIZE,
+                                interpolator
+                            )
+                            children.getTextViews {
+                                if (it is CustomTextView) {
+                                    it.resetShader(interpolator)
+                                }
+                            }
+                        }
+
+                        position == currentFocusPos -> scaleText(sizeFactor, interpolator)
+                        else -> {
+                            if (scaleX != LYRIC_DEFAULT_SIZE && scaleY != LYRIC_DEFAULT_SIZE)
+                                scaleText(LYRIC_DEFAULT_SIZE, interpolator)
+                            children.getTextViews {
+                                if (scaleX != LYRIC_DEFAULT_SIZE && scaleY != LYRIC_DEFAULT_SIZE)
+                                    it.scaleText(LYRIC_DEFAULT_SIZE)
+                            }
+                        }
+                    }
+                } else {
+                    children.getTextViews {
                         when {
-                            isHighlightPayload -> {
+                            hasHighlightPayload -> {
                                 val targetScale =
-                                    if (payloads[0] == LYRIC_SET_HIGHLIGHT) sizeFactor else LYRIC_DEFAULT_SIZE
+                                    if (hasSetHighlightPayload) sizeFactor else LYRIC_DEFAULT_SIZE
                                 val targetColor =
-                                    if (payloads[0] == LYRIC_SET_HIGHLIGHT && lyric.isTranslation)
+                                    if (hasSetHighlightPayload && lyric.isTranslation)
                                         highlightTranslationTextColor
-                                    else if (payloads[0] == LYRIC_SET_HIGHLIGHT)
+                                    else if (hasSetHighlightPayload)
                                         highlightTextColor
                                     else
                                         defaultTextColor
-                                animateText(targetScale, targetColor, interpolator)
+                                it.animateTextWithColor(targetScale, targetColor, interpolator)
                             }
 
                             position == currentFocusPos -> {
-                                scaleText(sizeFactor)
-                                setTextColor(highlightTextColor)
+                                it.scaleText(sizeFactor)
+                                it.setTextColor(highlightTextColor)
                             }
 
                             position == currentTranslationPos -> {
-                                scaleText(sizeFactor)
-                                setTextColor(highlightTranslationTextColor)
+                                it.scaleText(sizeFactor)
+                                it.setTextColor(highlightTranslationTextColor)
                             }
 
                             else -> {
-                                scaleText(LYRIC_DEFAULT_SIZE)
-                                setTextColor(defaultTextColor)
+                                if (scaleX != LYRIC_DEFAULT_SIZE && scaleY != LYRIC_DEFAULT_SIZE)
+                                    it.scaleText(LYRIC_DEFAULT_SIZE)
+                                it.setTextColor(defaultTextColor)
                             }
                         }
                     }
@@ -1616,7 +1687,9 @@ class FullBottomSheet @JvmOverloads constructor(
             holder.lyricFlexboxLayout.children.getTextViews {
                 it.translationY = 0f
                 it.scaleText(LYRIC_DEFAULT_SIZE)
-                it.setTextColor(defaultTextColor)
+                if (it !is CustomTextView) {
+                    it.setTextColor(defaultTextColor)
+                }
             }
             holder.blurRadius = 0F
             holder.lyricFlexboxLayout.setRenderEffect(null)
@@ -1799,7 +1872,9 @@ class FullBottomSheet @JvmOverloads constructor(
         }
     }
 
-    private class PlaylistCardMoveCallback(private val touchHelperContract: (Int, Int) -> Unit) : ItemTouchHelper.Callback() {
+    private class PlaylistCardMoveCallback(
+        private val touchHelperContract: (Int, Int) -> Unit
+    ) : ItemTouchHelper.Callback() {
 
         override fun isLongPressDragEnabled(): Boolean {
             return true
@@ -1847,13 +1922,13 @@ class FullBottomSheet @JvmOverloads constructor(
                 newIndex != bottomSheetFullLyricAdapter.currentFocusPos
             ) {
                 if (bottomSheetFullLyricList[newIndex].content.isNotEmpty() &&
-                    !isFingerOnScreen) {
+                    !isFingerOnScreen
+                ) {
                     blurLock = false
-                    val smoothScroller = createSmoothScroller(animationLock || newIndex == 0)
-                    smoothScroller.targetPosition = newIndex
-                    bottomSheetFullLyricLinearLayoutManager.startSmoothScroll(
-                        smoothScroller
-                    )
+                    val smoothScroller = createSmoothScroller(animationLock || newIndex == 0).apply {
+                        targetPosition = newIndex
+                    }
+                    bottomSheetFullLyricLinearLayoutManager.startSmoothScroll(smoothScroller)
                     if (animationLock) animationLock = false
                 }
 
@@ -2002,14 +2077,16 @@ class FullBottomSheet @JvmOverloads constructor(
                 bottomSheetFullSlider.value = instance?.currentPosition?.toFloat().checkIfNegativeOrNullOrMaxedOut(bottomSheetFullSlider.valueTo)
                 bottomSheetFullPosition.text = position
                 bottomSheetFullPositionBack.text = bottomSheetFullPosition.text
-                bottomSheetFullDuration.text = '-' + CalculationUtils.convertDurationToTimeStamp(instance?.currentMediaItem?.mediaMetadata?.extras?.getLong("Duration")?.minus((currentPosition ?: 0)) ?: 0)
+                bottomSheetFullDuration.text = '-' + CalculationUtils.convertDurationToTimeStamp(
+                    instance?.currentMediaItem?.mediaMetadata?.extras?.getLong("Duration")?.minus((currentPosition ?: 0)) ?: 0
+                )
                 bottomSheetFullDurationBack.text = bottomSheetFullDuration.text
             }
             if (duration != null && duration >= LYRIC_SCROLL_DURATION) {
                 updateLyric(duration - LYRIC_SCROLL_DURATION)
             }
             if (instance?.isPlaying == true) {
-                handler.postDelayed(this, if (bottomSheetFullLyricAdapter.isExtendedLRC) 10L else LYRIC_SCROLL_DURATION)
+                handler.postDelayed(this, if (bottomSheetFullLyricAdapter.isExtendedLRC) LYRIC_UPDATE_DURATION else LYRIC_SCROLL_DURATION)
             } else {
                 runnableRunning = false
             }
