@@ -1431,8 +1431,7 @@ class FullBottomSheet @JvmOverloads constructor(
                         val lyricDurationStart = it.getTag(R.id.lyric_duration_start) as Long
                         val lyricDurationEnd = it.getTag(R.id.lyric_duration_end) as Long
                         val position: Long = instance?.currentPosition ?: 0
-                        val percent: Float =
-                            ((position.toFloat() - lyricDurationStart.toFloat()) / (lyricDurationEnd.toFloat() - lyricDurationStart.toFloat()))
+                        val percent: Float = ((position.toFloat() - lyricDurationStart.toFloat()) / (lyricDurationEnd.toFloat() - lyricDurationStart.toFloat()))
 //                        Log.d("Percent", "$percent, $position")
                         it.setProgress(percent)
                     }
@@ -1566,6 +1565,12 @@ class FullBottomSheet @JvmOverloads constructor(
                             setTag(R.id.lyric_duration_end, it.second)
                             setTag(R.id.lyric_duration_hash, it.hashCode())
                             setTag(R.id.lyric_content_hash, lyric.content.hashCode())
+
+                            val textSize = if (lyric.isTranslation) 20f else if (lyric.timeStamp != null) 34f else 18f
+                            setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
+                            typeface = if (lyric.timeStamp != null) defaultTypeface else disabledTextTypeface
+                            setLineSpacing(if (lyric.timeStamp != null) 0f else extraLineHeight.toFloat(), 1f)
+                            scaleText(LYRIC_DEFAULT_SIZE)
                         }
                         if (lyric.wordTimestamps.size != childCount) {
                             addView(lyricTextView)
@@ -1583,7 +1588,14 @@ class FullBottomSheet @JvmOverloads constructor(
 
                     // Add if no view found
                     if (childCount < 1) addView(
-                        AppCompatTextView(context).apply { text = lyric.content }
+                        AppCompatTextView(context).apply {
+                            text = lyric.content
+                            val textSize = if (lyric.isTranslation) 20f else if (lyric.timeStamp != null) 34f else 18f
+                            setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
+                            typeface = if (lyric.timeStamp != null) defaultTypeface else disabledTextTypeface
+                            setLineSpacing(if (lyric.timeStamp != null) 0f else extraLineHeight.toFloat(), 1f)
+                            scaleText(LYRIC_DEFAULT_SIZE)
+                        }
                     )
                 }
 
@@ -1591,22 +1603,6 @@ class FullBottomSheet @JvmOverloads constructor(
                     with(it) {
                         visibility = if (lyric.content.isNotEmpty()) VISIBLE else GONE
                         translationY = 0f
-
-                        val textSize =
-                            if (lyric.isTranslation) 20f
-                            else if (lyric.timeStamp != null) 34f
-                            else 18f
-                        setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
-                        typeface =
-                            if (lyric.timeStamp != null)
-                                defaultTypeface
-                            else
-                                disabledTextTypeface
-                        setLineSpacing(
-                            if (lyric.timeStamp != null) 0f else extraLineHeight.toFloat(),
-                            1f
-                        )
-                        scaleText(LYRIC_DEFAULT_SIZE)
 
                         pivotX = 0f
                         pivotY = height / 2f
