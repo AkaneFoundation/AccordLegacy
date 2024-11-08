@@ -39,16 +39,6 @@ android {
         res.srcDirs("res-public")
     }
 
-    java {
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(17)
-        }
-    }
-
-    kotlin {
-        jvmToolchain(17)
-    }
-
     publishing {
         singleVariant("release") {
             withSourcesJar()
@@ -56,12 +46,22 @@ android {
     }
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
 dependencies {
-    api("androidx.annotation:annotation:1.9.0")
+    api("androidx.annotation:annotation:1.9.1")
     //noinspection KtxExtensionAvailable
-    api("androidx.core:core:1.13.1")
+    api("androidx.core:core:1.15.0")
     //noinspection KtxExtensionAvailable,GradleDependency
-    implementation("androidx.collection:collection:1.4.4")
+    implementation("androidx.collection:collection:1.4.5")
     api("androidx.customview:customview:1.1.0")
     implementation("androidx.customview:customview-poolingcontainer:1.0.0")
 

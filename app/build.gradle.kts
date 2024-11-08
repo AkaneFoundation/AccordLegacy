@@ -71,13 +71,6 @@ android {
             "\"$releaseType\""
         )
         setProperty("archivesBaseName", "Accord-$versionName")
-
-        ksp {
-            arg("room.schemaLocation", "$projectDir/schemas")
-        }
-
-        renderscriptTargetApi = 21
-        renderscriptSupportModeEnabled = true
     }
 
     signingConfigs {
@@ -135,23 +128,6 @@ android {
         }
     }
 
-    java {
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(17)
-        }
-    }
-
-    kotlin {
-        jvmToolchain(17)
-        compilerOptions {
-            freeCompilerArgs = listOf(
-                "-Xno-param-assertions",
-                "-Xno-call-assertions",
-                "-Xno-receiver-assertions"
-            )
-        }
-    }
-
     // https://gitlab.com/IzzyOnDroid/repo/-/issues/491
     dependenciesInfo {
         includeInApk = false
@@ -164,6 +140,27 @@ android {
     }
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+kotlin {
+    jvmToolchain(17)
+    compilerOptions {
+        freeCompilerArgs = listOf(
+            "-Xno-param-assertions",
+            "-Xno-call-assertions",
+            "-Xno-receiver-assertions"
+        )
+    }
+}
+
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 configurations.configureEach {
     exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
     exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
@@ -171,21 +168,21 @@ configurations.configureEach {
 }
 
 dependencies {
-    val media3Version = "1.5.0-alpha01"
-    val roomVersion = "2.7.0-alpha10"
+    val media3Version = "1.5.0-beta01"
+    val roomVersion = "2.7.0-alpha11"
 
     ksp("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
-    implementation("androidx.core:core-ktx:1.15.0-rc01")
-    implementation("androidx.activity:activity-ktx:1.10.0-alpha02")
+    implementation("androidx.core:core-ktx:1.15.0")
+    implementation("androidx.activity:activity-ktx:1.10.0-alpha03")
     implementation("androidx.concurrent:concurrent-futures-ktx:1.2.0")
     implementation("androidx.transition:transition-ktx:1.5.1") // <-- for predictive back
-    implementation("androidx.fragment:fragment-ktx:1.8.4")
+    implementation("androidx.fragment:fragment-ktx:1.8.5")
     implementation("androidx.core:core-splashscreen:1.2.0-alpha02")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.0-alpha05")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.0-alpha06")
     implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.0-rc01")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
     implementation("androidx.media3:media3-exoplayer:$media3Version")
     implementation("androidx.media3:media3-exoplayer-midi:$media3Version")
     implementation("androidx.media3:media3-session:$media3Version")
@@ -193,7 +190,7 @@ dependencies {
     implementation("com.google.android.material:material:1.13.0-alpha07")
     implementation("com.google.android.flexbox:flexbox:3.0.0")
     implementation("me.zhanghai.android.fastscroll:library:1.3.0")
-    implementation("io.coil-kt.coil3:coil:3.0.0-rc01")
+    implementation("io.coil-kt.coil3:coil:3.0.1")
     implementation(files("../libs/lib-decoder-ffmpeg-release.aar"))
     implementation(project(":recyclerview"))
     // --- below does not apply to release builds ---
