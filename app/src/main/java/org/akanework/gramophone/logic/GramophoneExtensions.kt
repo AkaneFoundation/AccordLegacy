@@ -65,7 +65,6 @@ import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
-import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.appbar.MaterialToolbar
@@ -510,21 +509,7 @@ fun Context.resourceUri(resourceId: Int): Uri = with(resources) {
         .build()
 }
 
-fun TextView.animateTextWithColor(targetScale: Float, targetColor: Int, interpolator: TimeInterpolator) {
-    val animator = ValueAnimator.ofFloat(scaleX, targetScale)
-    animator.addUpdateListener { animation ->
-        val animatedValue = animation.animatedValue as Float
-        scaleX = animatedValue
-        scaleY = animatedValue
-    }
-    animator.doOnEnd {
-        scaleX = targetScale
-        scaleY = targetScale
-    }
-    animator.duration = FullBottomSheet.LYRIC_SCROLL_DURATION
-    animator.interpolator = interpolator
-    animator.start()
-
+fun TextView.animateText(targetColor: Int, interpolator: TimeInterpolator) {
     val colorAnimator = ValueAnimator.ofArgb(textColors.defaultColor, targetColor)
     colorAnimator.addUpdateListener { animation ->
         val animatedValue = animation.animatedValue as Int
@@ -555,7 +540,7 @@ fun CustomTextView.resetShader(interpolator: TimeInterpolator) {
     colorAnimator.start()
 }
 
-fun FlexboxLayout.scaleText(targetScale: Float, interpolator: TimeInterpolator) {
+fun View.scaleText(targetScale: Float, interpolator: TimeInterpolator) {
     val animator = ValueAnimator.ofFloat(scaleX, targetScale)
     animator.addUpdateListener { animation ->
         val animatedValue = animation.animatedValue as Float
@@ -571,7 +556,7 @@ fun FlexboxLayout.scaleText(targetScale: Float, interpolator: TimeInterpolator) 
     animator.start()
 }
 
-fun TextView.scaleText(scale: Float) {
+fun View.scaleText(scale: Float) {
     scaleX = scale
     scaleY = scale
 }

@@ -1,5 +1,6 @@
 package org.akanework.gramophone.logic.utils
 
+import android.os.Parcelable
 import android.util.Log
 import androidx.annotation.OptIn
 import androidx.annotation.VisibleForTesting
@@ -9,6 +10,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.extractor.metadata.id3.BinaryFrame
 import androidx.media3.extractor.metadata.id3.TextInformationFrame
 import androidx.media3.extractor.metadata.vorbis.VorbisComment
+import kotlinx.parcelize.Parcelize
 import java.io.File
 import java.nio.charset.Charset
 import kotlin.math.pow
@@ -16,6 +18,17 @@ import kotlin.math.pow
 object LrcUtils {
 
     private const val TAG = "LrcUtils"
+
+    @Parcelize
+    enum class SpeakerLabel(val isWalaoke: Boolean) : Parcelable {
+        Male(true), // Walaoke
+        Female(true), // Walaoke
+        Duet(true), // Walaoke
+        Background(false), // iTunes
+        Voice1(false), // iTunes
+        Voice2(false), // iTunes
+        None(false)
+    }
 
     @OptIn(UnstableApi::class)
     fun extractAndParseLyrics(metadata: Metadata, trim: Boolean): MutableList<MediaStoreUtils.Lyric>? {
@@ -89,16 +102,15 @@ object LrcUtils {
         val timeMarksRegex = "\\[(\\d{2}:\\d{2})([.:]\\d+)?]".toRegex()
         val wordTimeMarksRegex = "<(\\d{2}:\\d{2})([.:]\\d+)?>".toRegex()
         val labelRegex = "(v\\d+|bg):\\s?".toRegex()
-        val v2LabelRegex = "(v2):\\s?".toRegex()
+        val bgRegex = "\\[bg: (.*?)]".toRegex()
         val list = mutableListOf<MediaStoreUtils.Lyric>()
         var foundNonNull = false
         var lyricsText: StringBuilder? = StringBuilder()
-        var currentLabel = ""
-        val hasV2Labels = v2LabelRegex.containsMatchIn(lrcContent)
-        //val measureTime = measureTimeMillis {
+        var currentLabel = SpeakerLabel.None
+        var currentTimeStamp = -1L
         // Add all lines found on LRC (probably will be unordered because of "compression" or translation type)
         lrcContent.lines().forEach { line ->
-            currentLabel = labelRegex.find(line)?.value ?: currentLabel
+            currentLabel = parseSpeakerLabel(line.replace(timeMarksRegex, ""))
             timeMarksRegex.findAll(line).let { sequence ->
                 if (sequence.count() == 0) {
                     return@let
@@ -108,9 +120,9 @@ object LrcUtils {
                     .replace(labelRegex, "")
                 sequence.forEach { match ->
                     val timeString = match.groupValues[1] + match.groupValues[2]
-                    val timeStamp = parseTime(timeString)
+                    currentTimeStamp = parseTime(timeString)
 
-                    if (!foundNonNull && timeStamp > 0) {
+                    if (!foundNonNull && currentTimeStamp > 0) {
                         foundNonNull = true
                         lyricsText = null
                     }
@@ -127,37 +139,80 @@ object LrcUtils {
                         }
                         list.add(
                             MediaStoreUtils.Lyric(
-                                timeStamp = timeStamp,
+                                timeStamp = currentTimeStamp,
                                 content = lyricLine.replace(wordTimeMarksRegex, ""),
                                 wordTimestamps = wordTimestamps,
-                                label = currentLabel,
-                                hasV2Labels = hasV2Labels
+                                label = currentLabel
                             )
                         )
                     } else {
                         list.add(
                             MediaStoreUtils.Lyric(
-                                timeStamp = timeStamp,
+                                timeStamp = currentTimeStamp,
                                 content = lyricLine,
-                                label = currentLabel,
-                                hasV2Labels = hasV2Labels
+                                label = currentLabel
+                            )
+                        )
+                    }
+                }
+            }
+
+            bgRegex.findAll(line).let { result ->
+                if (result.count() == 0) {
+                    return@let
+                }
+                result.forEach { match ->
+                    currentLabel = SpeakerLabel.Background
+                    val lyricLine = match.value.substring(4, match.value.length - 1)
+                    if (wordTimeMarksRegex.containsMatchIn(lyricLine)) {
+                        val wordMatches = wordTimeMarksRegex.findAll(lyricLine)
+                        val words = lyricLine.split(wordTimeMarksRegex)
+                        val wordTimestamps = words.mapIndexedNotNull { index, _ ->
+                            wordMatches.elementAtOrNull(index)?.let { match ->
+                                val wordTimestamp = parseTime(match.groupValues[1] + match.groupValues[2])
+                                Pair(words.take(index + 1).sumOf { it.length }, wordTimestamp)
+                            }
+                        }
+                        list.add(
+                            MediaStoreUtils.Lyric(
+                                timeStamp = currentTimeStamp + 1,
+                                content = lyricLine.replace(wordTimeMarksRegex, ""),
+                                wordTimestamps = wordTimestamps,
+                                label = currentLabel
+                            )
+                        )
+                    } else {
+                        list.add(
+                            MediaStoreUtils.Lyric(
+                                timeStamp = currentTimeStamp,
+                                content = lyricLine,
+                                label = currentLabel
                             )
                         )
                     }
                 }
             }
         }
+
         // Sort and mark as translations all found duplicated timestamps (usually one)
         list.sortBy { it.timeStamp }
         var previousTs = -1L
+        var translationItems = intArrayOf()
         list.forEach {
-            it.isTranslation = (it.timeStamp == previousTs)
+            // Merge lyric and translation
+            if (it.timeStamp == previousTs && it.label != SpeakerLabel.Background) {
+                list[list.indexOf(it) - 1].translationContent = it.content
+                translationItems += list.indexOf(it)
+            }
             previousTs = it.timeStamp!!
         }
+        // Remove translation items
+        translationItems.reversed().forEach { list.removeAt(it) }
+
         list.takeWhile { it.content.isEmpty() }.forEach { _ -> list.removeAt(0) }
         var absolutePosition = 0
         list.forEachIndexed { index, it ->
-            if (!it.isTranslation && it.content.isNotEmpty()) {
+            if (it.content.isNotEmpty()) {
                 it.absolutePosition = absolutePosition
                 absolutePosition ++
             } else {
@@ -165,12 +220,24 @@ object LrcUtils {
             }
         }
         if (list.isEmpty() && lrcContent.isNotEmpty()) {
-            list.add(MediaStoreUtils.Lyric(null, lrcContent, false))
+            list.add(MediaStoreUtils.Lyric(null, lrcContent))
         } else if (!foundNonNull) {
             list.clear()
-            list.add(MediaStoreUtils.Lyric(null, lyricsText!!.toString(), false))
+            list.add(MediaStoreUtils.Lyric(null, lyricsText!!.toString()))
         }
         return list
+    }
+
+    private fun parseSpeakerLabel(lyricContent: String): SpeakerLabel {
+        val lyricLabel = lyricContent.substring(0, lyricContent.length.coerceAtMost(4)).trim()
+        return when {
+            lyricLabel.startsWith("v1") -> SpeakerLabel.Voice1
+            lyricLabel.startsWith("v2") -> SpeakerLabel.Voice2
+            lyricLabel.startsWith("F") -> SpeakerLabel.Female
+            lyricLabel.startsWith("M") -> SpeakerLabel.Male
+            lyricLabel.startsWith("D") -> SpeakerLabel.Duet
+            else -> SpeakerLabel.None
+        }
     }
 
     private fun parseTime(timeString: String): Long {
