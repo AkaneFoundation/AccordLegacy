@@ -33,6 +33,8 @@
             android:clipToOutline="false"
             android:clipToPadding="false"
             android:layoutDirection="ltr"
+            android:scaleX="0.98"
+            android:scaleY="0.98"
             app:alignItems="baseline"
             app:flexDirection="row"
             app:flexWrap="wrap" />

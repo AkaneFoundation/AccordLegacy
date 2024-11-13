@@ -1553,6 +1553,9 @@ class FullBottomSheet @JvmOverloads constructor(
                     else
                         JustifyContent.FLEX_START
 
+                pivotX = if (currentLyricHasMultiSpeaker) width / 1f else 0f
+                pivotY = height / 2f
+
                 val paddingTop =
                     if (lyric.timeStamp != null) 18
                     else 0
@@ -1586,13 +1589,12 @@ class FullBottomSheet @JvmOverloads constructor(
 
                     // Add new views after check
                     var wordIndex = 0
-                    var lyricDurationStart: Long = 0
                     lyric.wordTimestamps.forEach {
                         val lyricContent = lyric.content.substring(wordIndex, it.first)
                         val lyricTextView = CustomTextView(context).apply {
                             text = lyricContent
-                            setTag(R.id.lyric_duration_start, lyricDurationStart)
-                            setTag(R.id.lyric_duration_end, it.second)
+                            setTag(R.id.lyric_duration_start, it.second)
+                            setTag(R.id.lyric_duration_end, it.third)
                             setTag(R.id.lyric_duration_hash, it.hashCode())
                             setTag(R.id.lyric_content_hash, lyric.content.hashCode())
 
@@ -1610,7 +1612,6 @@ class FullBottomSheet @JvmOverloads constructor(
                             addView(lyricTextView)
                         }
                         wordIndex = it.first
-                        lyricDurationStart = it.second
                     }
                 } else {
                     // Remove old views
@@ -1642,9 +1643,6 @@ class FullBottomSheet @JvmOverloads constructor(
                     with(it) {
                         visibility = if (lyric.content.isNotEmpty()) VISIBLE else GONE
                         translationY = 0f
-
-                        pivotX = 0f
-                        pivotY = height / 2f
 
                         if (lyric.timeStamp == null) {
                             scaleText(sizeFactor)
@@ -1883,20 +1881,6 @@ class FullBottomSheet @JvmOverloads constructor(
         }
     }
 
-    private fun updateNewIndex(): Int {
-        val filteredList = bottomSheetFullLyricList.filterIndexed { _, lyric ->
-            (lyric.timeStamp ?: 0) <= (instance?.currentPosition ?: 0)
-        }
-
-        return if (filteredList.isNotEmpty()) {
-            filteredList.indices.maxBy {
-                (filteredList[it].timeStamp ?: 0)
-            }
-        } else {
-            -1
-        }
-    }
-
     private class PlaylistCardMoveCallback(
         private val touchHelperContract: (Int, Int) -> Unit
     ) : ItemTouchHelper.Callback() {
@@ -1928,6 +1912,20 @@ class FullBottomSheet @JvmOverloads constructor(
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             throw IllegalStateException()
+        }
+    }
+
+    private fun updateNewIndex(): Int {
+        val filteredList = bottomSheetFullLyricList.filterIndexed { _, lyric ->
+            (lyric.timeStamp ?: 0) <= (instance?.currentPosition ?: 0)
+        }
+
+        return if (filteredList.isNotEmpty()) {
+            filteredList.indices.maxBy {
+                (filteredList[it].timeStamp ?: 0)
+            }
+        } else {
+            -1
         }
     }
 
@@ -2119,7 +2117,6 @@ class FullBottomSheet @JvmOverloads constructor(
         )
         bottomSheetFullLyricAdapter.updateHighlight(0)
         bottomSheetFullLyricAdapter.notifyItemChanged(0)
-        bottomSheetFullLyricAdapter.notifyItemChanged(1)
     }
 
     inner class VolumeChangeReceiver : BroadcastReceiver() {

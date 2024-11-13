@@ -139,7 +139,7 @@ object MediaStoreUtils {
         val content: String = "",
         var translationContent: String = "",
         var absolutePosition: Int? = null,
-        val wordTimestamps: List<Pair<Int, Long>> = emptyList(),
+        val wordTimestamps: List<Triple<Int, Long, Long>> = emptyList(),
         val label: SpeakerLabel = SpeakerLabel.None
     ) : Parcelable
 

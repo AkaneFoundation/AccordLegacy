@@ -131,10 +131,13 @@ object LrcUtils {
                     if (wordTimeMarksRegex.containsMatchIn(lyricLine)) {
                         val wordMatches = wordTimeMarksRegex.findAll(lyricLine)
                         val words = lyricLine.split(wordTimeMarksRegex)
+                        var lastWordTimestamp = currentTimeStamp
                         val wordTimestamps = words.mapIndexedNotNull { index, _ ->
                             wordMatches.elementAtOrNull(index)?.let { match ->
                                 val wordTimestamp = parseTime(match.groupValues[1] + match.groupValues[2])
-                                Pair(words.take(index + 1).sumOf { it.length }, wordTimestamp)
+                                Triple(words.take(index + 1).sumOf { it.length }, lastWordTimestamp, wordTimestamp).also {
+                                    lastWordTimestamp = wordTimestamp
+                                }
                             }
                         }
                         list.add(
@@ -167,10 +170,13 @@ object LrcUtils {
                     if (wordTimeMarksRegex.containsMatchIn(lyricLine)) {
                         val wordMatches = wordTimeMarksRegex.findAll(lyricLine)
                         val words = lyricLine.split(wordTimeMarksRegex)
+                        var lastWordTimestamp = currentTimeStamp
                         val wordTimestamps = words.mapIndexedNotNull { index, _ ->
                             wordMatches.elementAtOrNull(index)?.let { match ->
                                 val wordTimestamp = parseTime(match.groupValues[1] + match.groupValues[2])
-                                Pair(words.take(index + 1).sumOf { it.length }, wordTimestamp)
+                                Triple(words.take(index + 1).sumOf { it.length }, lastWordTimestamp, wordTimestamp).also {
+                                    lastWordTimestamp = wordTimestamp
+                                }
                             }
                         }
                         list.add(
