@@ -166,7 +166,7 @@ object LrcUtils {
                 }
                 result.forEach { match ->
                     currentLabel = SpeakerLabel.Background
-                    val lyricLine = match.value.substring(4, match.value.length - 1)
+                    val lyricLine = match.value.substring(5, match.value.length - 1)
                     if (wordTimeMarksRegex.containsMatchIn(lyricLine)) {
                         val wordMatches = wordTimeMarksRegex.findAll(lyricLine)
                         val words = lyricLine.split(wordTimeMarksRegex)

@@ -1520,6 +1520,9 @@ class FullBottomSheet @JvmOverloads constructor(
             if (lyric.translationContent.isNotEmpty()) {
                 with(holder.transitionFrame) {
                     visibility = VISIBLE
+                    translationY = 0f
+                    pivotX = if (currentLyricHasMultiSpeaker) width / 1f else 0f
+                    pivotY = height / 2f
                     val paddingStart = 12.5f
                     val paddingEnd = if (hasMultiSpeaker) 66.5f else 12.5f
                     updatePaddingRelative(
@@ -1553,6 +1556,7 @@ class FullBottomSheet @JvmOverloads constructor(
                     else
                         JustifyContent.FLEX_START
 
+                translationY = 0f
                 pivotX = if (currentLyricHasMultiSpeaker) width / 1f else 0f
                 pivotY = height / 2f
 
@@ -1591,7 +1595,10 @@ class FullBottomSheet @JvmOverloads constructor(
                     var wordIndex = 0
                     lyric.wordTimestamps.forEach {
                         val lyricContent = lyric.content.substring(wordIndex, it.first)
-                        val lyricTextView = CustomTextView(context).apply {
+                        val lyricTextView = CustomTextView(
+                            context = context,
+                            colors = intArrayOf(Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, 0x24FFFFFF)
+                        ).apply {
                             text = lyricContent
                             setTag(R.id.lyric_duration_start, it.second)
                             setTag(R.id.lyric_duration_end, it.third)
@@ -1606,7 +1613,6 @@ class FullBottomSheet @JvmOverloads constructor(
                                 if (lyric.timeStamp != null) 0f else extraLineHeight.toFloat(),
                                 1f
                             )
-                            scaleText(LYRIC_DEFAULT_SIZE)
                         }
                         if (lyric.wordTimestamps.size != childCount) {
                             addView(lyricTextView)
@@ -1634,7 +1640,6 @@ class FullBottomSheet @JvmOverloads constructor(
                                 if (lyric.timeStamp != null) 0f else extraLineHeight.toFloat(),
                                 1f
                             )
-                            scaleText(LYRIC_DEFAULT_SIZE)
                         }
                     )
                 }
@@ -1642,10 +1647,8 @@ class FullBottomSheet @JvmOverloads constructor(
                 children.getTextViews {
                     with(it) {
                         visibility = if (lyric.content.isNotEmpty()) VISIBLE else GONE
-                        translationY = 0f
 
                         if (lyric.timeStamp == null) {
-                            scaleText(sizeFactor)
                             if (it !is CustomTextView) {
                                 setTextColor(disabledTextColor)
                             }
@@ -1714,16 +1717,20 @@ class FullBottomSheet @JvmOverloads constructor(
         }
 
         override fun onViewRecycled(holder: ViewHolder) {
+            with(holder.lyricFlexboxLayout) {
+                translationY = 0f
+                scaleText(LYRIC_DEFAULT_SIZE)
+            }
             holder.lyricFlexboxLayout.children.getTextViews {
-                it.translationY = 0f
-                it.scaleText(LYRIC_DEFAULT_SIZE)
                 if (it !is CustomTextView) {
                     it.setTextColor(defaultTextColor)
                 }
             }
-            holder.transitionFrame.scaleText(LYRIC_DEFAULT_SIZE)
-            with(holder.transitionTextView) {
+            with(holder.transitionFrame) {
                 translationY = 0f
+                scaleText(LYRIC_DEFAULT_SIZE)
+            }
+            with(holder.transitionTextView) {
                 setTextColor(defaultTextColor)
             }
             holder.blurRadius = 0F
@@ -2048,32 +2055,35 @@ class FullBottomSheet @JvmOverloads constructor(
         val durationStep = (LYRIC_SCROLL_DURATION * 0.1).toLong()
         val lyricFlexboxLayout = view.findViewById<FlexboxLayout>(R.id.lyric_flexbox)
         val translationFrame = view.findViewById<LinearLayout>(R.id.translation_frame)
-        val translationTextView = view.findViewById<TextView>(R.id.transition_text)
         val animator = ValueAnimator.ofFloat(0f, depth)
         animator.setDuration(duration)
         animator.interpolator = inComingInterpolator
         animator.addUpdateListener {
             val value = it.animatedValue as Float
-            lyricFlexboxLayout.children.getTextViews { it.translationY = value }
-            translationTextView.translationY = value
+            lyricFlexboxLayout.translationY = value
+            translationFrame.translationY = value
         }
         animator.doOnEnd {
-            lyricFlexboxLayout.children.getTextViews { it.translationY = depth }
-            translationTextView.translationY = depth
+            lyricFlexboxLayout.translationY = depth
+            translationFrame.translationY = depth
 
             val animator1 = ObjectAnimator.ofFloat(depth, 0f)
             animator1.setDuration(durationReturn + ii * durationStep)
             animator1.interpolator = liftInterpolator
             animator1.addUpdateListener {
                 val value = it.animatedValue as Float
-                lyricFlexboxLayout.children.getTextViews { it.translationY = value }
-                translationTextView.translationY = value
+                lyricFlexboxLayout.translationY = value
+                translationFrame.translationY = value
             }
             animator1.doOnEnd {
-                lyricFlexboxLayout.children.getTextViews { it.translationY = 0f }
-                lyricFlexboxLayout.scaleText(LYRIC_DEFAULT_SIZE)
-                translationTextView.translationY = 0f
-                translationFrame.scaleText(LYRIC_DEFAULT_SIZE)
+                with(lyricFlexboxLayout) {
+                    translationY = 0f
+                    scaleText(LYRIC_DEFAULT_SIZE)
+                }
+                with(translationFrame) {
+                    translationY = 0f
+                    scaleText(LYRIC_DEFAULT_SIZE)
+                }
             }
             animator1.start()
         }

@@ -13,12 +13,9 @@ import androidx.core.view.doOnLayout
 class CustomTextView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
+    private val colors: IntArray = intArrayOf(Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, 0x24FFFFFF)
 ) : AppCompatTextView(context, attrs, defStyleAttr) {
-
-    companion object {
-        val FADE_COLORS_REVERSE = intArrayOf(Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, 0x24FFFFFF)
-    }
 
     var gradient: LinearGradient? = null
     val localMatrix = Matrix()
@@ -48,7 +45,7 @@ class CustomTextView @JvmOverloads constructor(
         }
     }
 
-    fun setDefaultGradient() = updateGradient(FADE_COLORS_REVERSE)
+    fun setDefaultGradient() = updateGradient(colors)
 
     fun updateGradient(colors: IntArray) {
         gradient = LinearGradient(
