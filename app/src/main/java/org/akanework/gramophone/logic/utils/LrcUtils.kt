@@ -218,7 +218,7 @@ object LrcUtils {
         list.takeWhile { it.content.isEmpty() }.forEach { _ -> list.removeAt(0) }
         var absolutePosition = 0
         list.forEachIndexed { index, it ->
-            if (it.content.isNotEmpty()) {
+            if (it.content.isNotEmpty() && it.label != SpeakerLabel.Background) {
                 it.absolutePosition = absolutePosition
                 absolutePosition ++
             } else {
@@ -235,13 +235,13 @@ object LrcUtils {
     }
 
     private fun parseSpeakerLabel(lyricContent: String): SpeakerLabel {
-        val lyricLabel = lyricContent.substring(0, lyricContent.length.coerceAtMost(4)).trim()
+        val lyricLabel = lyricContent.substring(0, lyricContent.length.coerceAtMost(4))
         return when {
-            lyricLabel.startsWith("v1") -> SpeakerLabel.Voice1
-            lyricLabel.startsWith("v2") -> SpeakerLabel.Voice2
-            lyricLabel.startsWith("F") -> SpeakerLabel.Female
-            lyricLabel.startsWith("M") -> SpeakerLabel.Male
-            lyricLabel.startsWith("D") -> SpeakerLabel.Duet
+            lyricLabel.startsWith("v1: ") -> SpeakerLabel.Voice1
+            lyricLabel.startsWith("v2: ") -> SpeakerLabel.Voice2
+            lyricLabel.startsWith("F: ") -> SpeakerLabel.Female
+            lyricLabel.startsWith("M: ") -> SpeakerLabel.Male
+            lyricLabel.startsWith("D: ") -> SpeakerLabel.Duet
             else -> SpeakerLabel.None
         }
     }
