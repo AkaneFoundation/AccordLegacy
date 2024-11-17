@@ -524,10 +524,10 @@ fun TextView.animateText(targetColor: Int, interpolator: TimeInterpolator) {
 }
 
 fun CustomTextView.resetShader(interpolator: TimeInterpolator) {
-    val colorAnimator = ValueAnimator.ofArgb(Color.WHITE, 0x24FFFFFF)
+    val colorAnimator = ValueAnimator.ofArgb(colors.first(), colors.last())
     colorAnimator.addUpdateListener { animation ->
         val animatedValue = animation.animatedValue as Int
-        val animatedFadeColors = intArrayOf(animatedValue, animatedValue, animatedValue, animatedValue, 0x24FFFFFF)
+        val animatedFadeColors = intArrayOf(animatedValue, animatedValue, animatedValue, animatedValue, colors.last())
         updateGradient(animatedFadeColors)
         setProgress(currentProgress)
     }

@@ -8,35 +8,22 @@ import android.graphics.Matrix
 import android.graphics.Shader
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.view.doOnLayout
 
 class CustomTextView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-    private val colors: IntArray = intArrayOf(Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, 0x24FFFFFF)
+    val colors: IntArray = intArrayOf(Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, 0x24FFFFFF)
 ) : AppCompatTextView(context, attrs, defStyleAttr) {
 
     var gradient: LinearGradient? = null
     val localMatrix = Matrix()
     var currentProgress = 0f
-    private var firstSetProgress = true
-
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-        doOnLayout {
-            setDefaultGradient()
-        }
-    }
 
     fun setProgress(
         percent: Float,
         invalidate: Boolean = true
     ) {
-        if (firstSetProgress) {
-            setDefaultGradient()
-            firstSetProgress = false
-        }
         currentProgress = percent
         localMatrix.setTranslate(percent * width, height.toFloat())
         gradient?.setLocalMatrix(localMatrix)
@@ -63,5 +50,10 @@ class CustomTextView @JvmOverloads constructor(
         paint.setShader(gradient)
         super.onDraw(canvas)
         paint.setShader(null)
+    }
+
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
+        setDefaultGradient()
     }
 }
