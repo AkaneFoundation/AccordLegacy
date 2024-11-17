@@ -146,7 +146,7 @@
                 android:focusable="true"
                 app:cardBackgroundColor="@color/contrast_cardBackground"
                 app:cardCornerRadius="16dp"
-                app:layout_constraintEnd_toStartOf="@id/duo_cv"
+                app:layout_constraintEnd_toStartOf="@id/lightsummer_cv"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/main_dev"
                 app:strokeWidth="0dp">
@@ -200,7 +200,7 @@
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/duo_cv"
+                android:id="@+id/lightsummer_cv"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
@@ -209,8 +209,71 @@
                 android:focusable="true"
                 app:cardBackgroundColor="@color/contrast_cardBackground"
                 app:cardCornerRadius="16dp"
-                app:layout_constraintEnd_toStartOf="@id/nick_cv"
+                app:layout_constraintEnd_toStartOf="@id/duo3_cv"
                 app:layout_constraintStart_toEndOf="@id/akane_cv"
+                app:layout_constraintTop_toTopOf="@id/akane_cv"
+                app:strokeWidth="0dp">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="12dp"
+                    app:cardCornerRadius="128dp"
+                    app:strokeColor="@color/contrast_colorOutline"
+                    app:strokeWidth="1dp">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:importantForAccessibility="no"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/awainatsu" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="74dp"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/awainatsu"
+                    android:textColor="@color/contrast_colorOnSurface"
+                    android:textFontWeight="500" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="94dp"
+                    android:fontFamily="monospace"
+                    android:text="@string/awainatsu_tag"
+                    android:textColor="@color/contrast_colorOnSurfaceSecondary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="120dp"
+                    android:layout_marginBottom="12dp"
+                    android:text="@string/awainatsu_job"
+                    android:textColor="@color/contrast_colorOnSurface" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/duo3_cv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="24dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="@color/contrast_cardBackground"
+                app:cardCornerRadius="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/lightsummer_cv"
                 app:layout_constraintTop_toTopOf="@id/akane_cv"
                 app:strokeWidth="0dp">
 
@@ -258,69 +321,6 @@
                     android:layout_marginTop="120dp"
                     android:layout_marginBottom="12dp"
                     android:text="@string/duo3_job"
-                    android:textColor="@color/contrast_colorOnSurface" />
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/nick_cv"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:layout_marginEnd="24dp"
-                android:clickable="true"
-                android:focusable="true"
-                app:cardBackgroundColor="@color/contrast_cardBackground"
-                app:cardCornerRadius="16dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/duo_cv"
-                app:layout_constraintTop_toTopOf="@id/akane_cv"
-                app:strokeWidth="0dp">
-
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginTop="12dp"
-                    app:cardCornerRadius="128dp"
-                    app:strokeColor="@color/contrast_colorOutline"
-                    app:strokeWidth="1dp">
-
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:importantForAccessibility="no"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/nick" />
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginTop="74dp"
-                    android:fontFamily="sans-serif"
-                    android:text="@string/nick"
-                    android:textColor="@color/contrast_colorOnSurface"
-                    android:textFontWeight="500" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginTop="94dp"
-                    android:fontFamily="monospace"
-                    android:text="@string/nick_tag"
-                    android:textColor="@color/contrast_colorOnSurfaceSecondary" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginTop="120dp"
-                    android:layout_marginBottom="12dp"
-                    android:text="@string/nick_job"
                     android:textColor="@color/contrast_colorOnSurface" />
 
             </com.google.android.material.card.MaterialCardView>
@@ -436,7 +436,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:importantForAccessibility="no"
-                                android:src="@drawable/awainatsu" />
+                                android:src="@drawable/nick" />
 
                         </com.google.android.material.card.MaterialCardView>
 
@@ -451,7 +451,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/awainatsu"
+                                android:text="@string/nick"
                                 android:textColor="@color/contrast_colorOnSurface"
                                 android:textSize="16sp" />
 
@@ -459,7 +459,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="monospace"
-                                android:text="@string/awainatsu_tag"
+                                android:text="@string/nick_tag"
                                 android:textColor="@color/contrast_colorOnSurfaceSecondary"
                                 android:textFontWeight="400"
                                 android:textSize="13sp" />
