@@ -168,19 +168,19 @@ configurations.configureEach {
 }
 
 dependencies {
-    val media3Version = "1.5.0-beta01"
+    val media3Version = "1.5.0-rc01"
     val roomVersion = "2.7.0-alpha11"
 
     ksp("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     implementation("androidx.core:core-ktx:1.15.0")
-    implementation("androidx.activity:activity-ktx:1.10.0-alpha03")
+    implementation("androidx.activity:activity-ktx:1.10.0-beta01")
     implementation("androidx.concurrent:concurrent-futures-ktx:1.2.0")
     implementation("androidx.transition:transition-ktx:1.5.1") // <-- for predictive back
     implementation("androidx.fragment:fragment-ktx:1.8.5")
     implementation("androidx.core:core-splashscreen:1.2.0-alpha02")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.0-alpha06")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.0-alpha07")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.0")
     implementation("androidx.media3:media3-exoplayer:$media3Version")
@@ -190,9 +190,9 @@ dependencies {
     implementation("com.google.android.material:material:1.13.0-alpha07")
     implementation("com.google.android.flexbox:flexbox:3.0.0")
     implementation("me.zhanghai.android.fastscroll:library:1.3.0")
-    implementation("io.coil-kt.coil3:coil:3.0.1")
+    implementation("io.coil-kt.coil3:coil:3.0.3")
     implementation(files("../libs/lib-decoder-ffmpeg-release.aar"))
-    implementation(project(":recyclerview"))
+    implementation(projects.recyclerview)
     // --- below does not apply to release builds ---
     debugImplementation("com.squareup.leakcanary:leakcanary-android:3.0-alpha-8")
     testImplementation("junit:junit:4.13.2")

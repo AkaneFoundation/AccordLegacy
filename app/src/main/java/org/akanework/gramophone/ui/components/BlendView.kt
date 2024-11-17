@@ -3,7 +3,14 @@ package org.akanework.gramophone.ui.components
 import android.animation.ValueAnimator
 import android.content.ContentResolver
 import android.content.Context
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.Paint
+import android.graphics.RenderEffect
+import android.graphics.Shader
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper

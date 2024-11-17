@@ -23,13 +23,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.viewpager2.widget.ViewPager2
 import androidx.fragment.app.activityViewModels
 import androidx.media3.common.util.UnstableApi
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.tabs.FluidTabLayoutMediator
 import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.applyGeneralMenuItem
 import org.akanework.gramophone.logic.enableEdgeToEdgePaddingListener
@@ -78,7 +78,7 @@ class BrowseFragment : BaseFragment(null) {
         viewPager2.offscreenPageLimit = 9999
         val adapter = ViewPager2Adapter(childFragmentManager, viewLifecycleOwner.lifecycle)
         viewPager2.adapter = adapter
-        FluidTabLayoutMediator(
+        TabLayoutMediator(
             tabLayout,
             viewPager2
         ) { tab, position ->
