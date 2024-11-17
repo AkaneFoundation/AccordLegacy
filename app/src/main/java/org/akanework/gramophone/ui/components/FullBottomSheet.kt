@@ -1435,7 +1435,7 @@ class FullBottomSheet @JvmOverloads constructor(
                         it.setProgress(percent)
                     }
                 }
-                if (payloads.size <= 1) return
+                if (payloads.size == 1) return
             }
 
             val hasSetBlurPayload = payloads.contains(LYRIC_SET_BLUR)
@@ -2031,7 +2031,9 @@ class FullBottomSheet @JvmOverloads constructor(
             val targetFocusLyricPosition = newIndex.minOrNull()
             if (targetFocusLyricPosition != null) {
                 if (bottomSheetFullLyricAdapter.currentHighlightLyricPositions.contains(targetFocusLyricPosition) &&
-                    bottomSheetFullLyricAdapter.currentFocusLyricPosition != targetFocusLyricPosition
+                    bottomSheetFullLyricAdapter.currentFocusLyricPosition != targetFocusLyricPosition &&
+                    (bottomSheetFullLyricList.getOrNull(bottomSheetFullLyricAdapter.currentFocusLyricPosition)?.absolutePosition ?: 10721) != bottomSheetFullLyricList.getOrNull(targetFocusLyricPosition)?.absolutePosition &&
+                    bottomSheetFullLyricList.getOrNull(targetFocusLyricPosition)?.label != LrcUtils.SpeakerLabel.Background
                 ) {
                     if (bottomSheetFullLyricList[targetFocusLyricPosition].content.isNotEmpty() &&
                         !isFingerOnScreen
@@ -2161,11 +2163,9 @@ class FullBottomSheet @JvmOverloads constructor(
             animator1.doOnEnd {
                 with(lyricFlexboxLayout) {
                     translationY = 0f
-                    scaleText(LYRIC_DEFAULT_SIZE)
                 }
                 with(translationFrame) {
                     translationY = 0f
-                    scaleText(LYRIC_DEFAULT_SIZE)
                 }
             }
             animator1.start()
