@@ -151,23 +151,17 @@
                 app:layout_constraintTop_toBottomOf="@id/main_dev"
                 app:strokeWidth="0dp">
 
-                <com.google.android.material.card.MaterialCardView
+                <com.google.android.material.imageview.ShapeableImageView
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_marginStart="12dp"
                     android:layout_marginTop="12dp"
-                    app:cardCornerRadius="128dp"
+                    android:importantForAccessibility="no"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/akane_avatar"
+                    app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"
                     app:strokeColor="@color/contrast_colorOutline"
-                    app:strokeWidth="1dp">
-
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:importantForAccessibility="no"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/akane_avatar" />
-
-                </com.google.android.material.card.MaterialCardView>
+                    app:strokeWidth="1dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -214,23 +208,17 @@
                 app:layout_constraintTop_toTopOf="@id/akane_cv"
                 app:strokeWidth="0dp">
 
-                <com.google.android.material.card.MaterialCardView
+                <com.google.android.material.imageview.ShapeableImageView
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_marginStart="12dp"
                     android:layout_marginTop="12dp"
-                    app:cardCornerRadius="128dp"
+                    android:importantForAccessibility="no"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/awainatsu"
+                    app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"
                     app:strokeColor="@color/contrast_colorOutline"
-                    app:strokeWidth="1dp">
-
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:importantForAccessibility="no"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/awainatsu" />
-
-                </com.google.android.material.card.MaterialCardView>
+                    app:strokeWidth="1dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -277,23 +265,17 @@
                 app:layout_constraintTop_toTopOf="@id/akane_cv"
                 app:strokeWidth="0dp">
 
-                <com.google.android.material.card.MaterialCardView
+                <com.google.android.material.imageview.ShapeableImageView
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_marginStart="12dp"
                     android:layout_marginTop="12dp"
-                    app:cardCornerRadius="128dp"
+                    android:importantForAccessibility="no"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/duo3"
+                    app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"
                     app:strokeColor="@color/contrast_colorOutline"
-                    app:strokeWidth="1dp">
-
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:importantForAccessibility="no"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/duo3" />
-
-                </com.google.android.material.card.MaterialCardView>
+                    app:strokeWidth="1dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -363,22 +345,17 @@
                         android:clickable="true"
                         android:focusable="true">
 
-                        <com.google.android.material.card.MaterialCardView
+                        <com.google.android.material.imageview.ShapeableImageView
                             android:layout_width="32dp"
                             android:layout_height="32dp"
                             android:layout_gravity="center_vertical"
                             android:layout_marginStart="16dp"
-                            app:cardCornerRadius="128dp"
+                            android:importantForAccessibility="no"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/lazar"
+                            app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"
                             app:strokeColor="@color/contrast_colorOutline"
-                            app:strokeWidth="0.5dp">
-
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:importantForAccessibility="no"
-                                android:src="@drawable/lazar" />
-
-                        </com.google.android.material.card.MaterialCardView>
+                            app:strokeWidth="0.5dp" />
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -423,22 +400,17 @@
                         android:clickable="true"
                         android:focusable="true">
 
-                        <com.google.android.material.card.MaterialCardView
+                        <com.google.android.material.imageview.ShapeableImageView
                             android:layout_width="32dp"
                             android:layout_height="32dp"
                             android:layout_gravity="center_vertical"
                             android:layout_marginStart="16dp"
-                            app:cardCornerRadius="128dp"
+                            android:importantForAccessibility="no"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/nick"
+                            app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"
                             app:strokeColor="@color/contrast_colorOutline"
-                            app:strokeWidth="0.5dp">
-
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:importantForAccessibility="no"
-                                android:src="@drawable/nick" />
-
-                        </com.google.android.material.card.MaterialCardView>
+                            app:strokeWidth="0.5dp" />
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -483,22 +455,17 @@
                         android:clickable="true"
                         android:focusable="true">
 
-                        <com.google.android.material.card.MaterialCardView
+                        <com.google.android.material.imageview.ShapeableImageView
                             android:layout_width="32dp"
                             android:layout_height="32dp"
                             android:layout_gravity="center_vertical"
                             android:layout_marginStart="16dp"
-                            app:cardCornerRadius="128dp"
+                            android:importantForAccessibility="no"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/skyd"
+                            app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"
                             app:strokeColor="@color/contrast_colorOutline"
-                            app:strokeWidth="0.5dp">
-
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:importantForAccessibility="no"
-                                android:src="@drawable/skyd" />
-
-                        </com.google.android.material.card.MaterialCardView>
+                            app:strokeWidth="0.5dp" />
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -543,22 +510,17 @@
                         android:clickable="true"
                         android:focusable="true">
 
-                        <com.google.android.material.card.MaterialCardView
+                        <com.google.android.material.imageview.ShapeableImageView
                             android:layout_width="32dp"
                             android:layout_height="32dp"
                             android:layout_gravity="center_vertical"
                             android:layout_marginStart="16dp"
-                            app:cardCornerRadius="128dp"
+                            android:importantForAccessibility="no"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/luka"
+                            app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"
                             app:strokeColor="@color/contrast_colorOutline"
-                            app:strokeWidth="0.5dp">
-
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:importantForAccessibility="no"
-                                android:src="@drawable/luka" />
-
-                        </com.google.android.material.card.MaterialCardView>
+                            app:strokeWidth="0.5dp" />
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -632,21 +594,14 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <LinearLayout
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="64dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/settings_contributors"
-                        android:textColor="@color/contrast_colorOnSurface"
-                        android:textSize="16sp" />
-
-                </LinearLayout>
+                    android:text="@string/settings_contributors"
+                    android:textColor="@color/contrast_colorOnSurface"
+                    android:textSize="16sp" />
 
                 <ImageView
                     android:layout_width="24dp"
