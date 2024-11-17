@@ -1364,6 +1364,14 @@ class FullBottomSheet @JvmOverloads constructor(
         private val lyricList: MutableList<MediaStoreUtils.Lyric>
     ) : RecyclerView.Adapter<LyricAdapter.ViewHolder>() {
 
+        init {
+            setHasStableIds(true)
+        }
+
+        override fun getItemId(position: Int): Long {
+            return lyricList[position].hashCode().toLong()
+        }
+
         private var defaultTextColor = ResourcesCompat.getColor(
             resources, R.color.contrast_lyric_defaultColor, null
         )
@@ -2020,21 +2028,23 @@ class FullBottomSheet @JvmOverloads constructor(
             }
 
             // Update focus lyric position
-            val targetFocusLyricPosition = newIndex.min()
-            if (bottomSheetFullLyricAdapter.currentHighlightLyricPositions.contains(targetFocusLyricPosition) &&
-                bottomSheetFullLyricAdapter.currentFocusLyricPosition != targetFocusLyricPosition
-            ) {
-                if (bottomSheetFullLyricList[targetFocusLyricPosition].content.isNotEmpty() &&
-                    !isFingerOnScreen
+            val targetFocusLyricPosition = newIndex.minOrNull()
+            if (targetFocusLyricPosition != null) {
+                if (bottomSheetFullLyricAdapter.currentHighlightLyricPositions.contains(targetFocusLyricPosition) &&
+                    bottomSheetFullLyricAdapter.currentFocusLyricPosition != targetFocusLyricPosition
                 ) {
-                    blurLock = false
-                    val smoothScroller =
-                        createSmoothScroller(animationLock || targetFocusLyricPosition == 0).apply {
-                            targetPosition = targetFocusLyricPosition
-                        }
-                    bottomSheetFullLyricLinearLayoutManager.startSmoothScroll(smoothScroller)
-                    bottomSheetFullLyricAdapter.currentFocusLyricPosition = targetFocusLyricPosition
-                    if (animationLock) animationLock = false
+                    if (bottomSheetFullLyricList[targetFocusLyricPosition].content.isNotEmpty() &&
+                        !isFingerOnScreen
+                    ) {
+                        blurLock = false
+                        val smoothScroller =
+                            createSmoothScroller(animationLock || targetFocusLyricPosition == 0).apply {
+                                targetPosition = targetFocusLyricPosition
+                            }
+                        bottomSheetFullLyricLinearLayoutManager.startSmoothScroll(smoothScroller)
+                        bottomSheetFullLyricAdapter.currentFocusLyricPosition = targetFocusLyricPosition
+                        if (animationLock) animationLock = false
+                    }
                 }
             }
         }
