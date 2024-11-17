@@ -1400,6 +1400,7 @@ class FullBottomSheet @JvmOverloads constructor(
 
         var currentHighlightLyricPositions = mutableListOf<Int>()
         var currentFocusLyricPosition = -1
+        var ignoredPositionAtMost = -1
 
         val isExtendedLRC: Boolean get() = lyricList.any { it.wordTimestamps.isNotEmpty() }
 
@@ -1476,6 +1477,7 @@ class FullBottomSheet @JvmOverloads constructor(
                 it.label == LrcUtils.SpeakerLabel.Voice2 || it.label == LrcUtils.SpeakerLabel.Female
             }
             val currentLyricHasMultiSpeaker = lyric.label == LrcUtils.SpeakerLabel.Voice2 || lyric.label == LrcUtils.SpeakerLabel.Female
+            val currentLyricIsBgSpeaker = lyric.label == LrcUtils.SpeakerLabel.Background
 
             with(holder.lyricCard) {
                 if (lyric.timeStamp != null) {
@@ -1490,6 +1492,11 @@ class FullBottomSheet @JvmOverloads constructor(
                         performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
                         activity.getPlayer()?.apply {
                             animationLock = true
+                            if (currentLyricIsBgSpeaker) {
+                                ignoredPositionAtMost = lyricList.indexOf(lyric) - 1
+                            } else {
+                                ignoredPositionAtMost = lyricList.indexOf(lyric)
+                            }
                             seekTo(it1)
                             if (!isPlaying) play()
                         }
@@ -1576,8 +1583,6 @@ class FullBottomSheet @JvmOverloads constructor(
                     end = paddingEnd.dpToPx(context).toInt(),
                     bottom = paddingBottom.dpToPx(context)
                 )
-
-                val currentLyricIsBgSpeaker = lyric.label == LrcUtils.SpeakerLabel.Background
 
                 // Add TextViews
                 if (lyric.wordTimestamps.isNotEmpty()) {
@@ -2015,20 +2020,41 @@ class FullBottomSheet @JvmOverloads constructor(
 
                     // Update extended lyric
                     if (bottomSheetFullLyricAdapter.isExtendedLRC) {
-                        if (newIndex.contains(it)) {
+
+                        /** Fix abnormal shader state when switch lyric line by click
+                         * @see LyricAdapter.ignoredPositionAtMost
+                         */
+                        if (newIndex.contains(it) && it >= bottomSheetFullLyricAdapter.ignoredPositionAtMost) {
                             bottomSheetFullLyricAdapter.notifyItemChanged(it, LYRIC_UPDATE)
                         }
                     }
 
                     // Update highlight
                     if (bottomSheetFullLyricAdapter.currentHighlightLyricPositions != newIndex) {
-                        bottomSheetFullLyricAdapter.updateHighlight(it, !newIndex.contains(it))
+
+                        // Maybe we needn't update highlight for ignored lines
+                        if (it >= bottomSheetFullLyricAdapter.ignoredPositionAtMost || !newIndex.contains(it)) {
+                            bottomSheetFullLyricAdapter.updateHighlight(it, !newIndex.contains(it))
+                        }
                     }
                 }
             }
 
-            // Update focus lyric position
-            val targetFocusLyricPosition = newIndex.minOrNull()
+            // Get new target lyric position
+            var targetFocusLyricPosition = newIndex.minOrNull()
+
+            /** Fix abnormal smooth scroll when switch lyric line by click
+             *  @see LyricAdapter.ignoredPositionAtMost
+             */
+            if (newIndex.size > 1) {
+                targetFocusLyricPosition = newIndex.filter { i ->
+                    i >= bottomSheetFullLyricAdapter.ignoredPositionAtMost
+                }.minOrNull()
+            } else {
+                bottomSheetFullLyricAdapter.ignoredPositionAtMost = -1
+            }
+
+            // Smooth scroll & Update focus lyric position
             if (targetFocusLyricPosition != null) {
                 if (bottomSheetFullLyricAdapter.currentHighlightLyricPositions.contains(targetFocusLyricPosition) &&
                     bottomSheetFullLyricAdapter.currentFocusLyricPosition != targetFocusLyricPosition &&
