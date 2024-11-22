@@ -1476,7 +1476,8 @@ class FullBottomSheet @JvmOverloads constructor(
             val hasMultiSpeaker = lyricList.any {
                 it.label == LrcUtils.SpeakerLabel.Voice2 || it.label == LrcUtils.SpeakerLabel.Female
             }
-            val currentLyricHasMultiSpeaker = lyric.label == LrcUtils.SpeakerLabel.Voice2 || lyric.label == LrcUtils.SpeakerLabel.Female
+            val currentLyricIsAnotherSpeaker = lyric.label == LrcUtils.SpeakerLabel.Voice2 || lyric.label == LrcUtils.SpeakerLabel.Female
+            val lastLyricIsAnotherSpeaker = lyricList.getOrNull(position - 1)?.label == LrcUtils.SpeakerLabel.Voice2 || lyricList.getOrNull(position - 1)?.label == LrcUtils.SpeakerLabel.Female
             val currentLyricIsBgSpeaker = lyric.label == LrcUtils.SpeakerLabel.Background
 
             with(holder.lyricCard) {
@@ -1487,7 +1488,7 @@ class FullBottomSheet @JvmOverloads constructor(
                     isFocusable = false
                     isClickable = false
                 }
-                lyric.timeStamp?.let { it1 ->
+                lyric.timeStamp?.let { timestamp ->
                     setOnClickListener {
                         performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
                         activity.getPlayer()?.apply {
@@ -1497,7 +1498,7 @@ class FullBottomSheet @JvmOverloads constructor(
                             } else {
                                 ignoredPositionAtMost = lyricList.indexOf(lyric)
                             }
-                            seekTo(it1)
+                            seekTo(timestamp)
                             if (!isPlaying) play()
                         }
                     }
@@ -1529,7 +1530,7 @@ class FullBottomSheet @JvmOverloads constructor(
                 with(holder.transitionFrame) {
                     visibility = VISIBLE
                     translationY = 0f
-                    pivotX = if (currentLyricHasMultiSpeaker) width / 1f else 0f
+                    pivotX = if (currentLyricIsAnotherSpeaker || (currentLyricIsBgSpeaker && lastLyricIsAnotherSpeaker)) width / 1f else 0f
                     pivotY = height / 2f
                     val paddingStart = 12.5f
                     val paddingEnd = if (hasMultiSpeaker) 66.5f else 12.5f
@@ -1559,13 +1560,13 @@ class FullBottomSheet @JvmOverloads constructor(
             with(holder.lyricFlexboxLayout) {
                 visibility = if (lyric.content.isNotEmpty()) VISIBLE else GONE
                 justifyContent =
-                    if (currentLyricHasMultiSpeaker)
+                    if (currentLyricIsAnotherSpeaker || (currentLyricIsBgSpeaker && lastLyricIsAnotherSpeaker))
                         JustifyContent.FLEX_END
                     else
                         JustifyContent.FLEX_START
 
                 translationY = 0f
-                pivotX = if (currentLyricHasMultiSpeaker) width / 1f else 0f
+                pivotX = if (currentLyricIsAnotherSpeaker || (currentLyricIsBgSpeaker && lastLyricIsAnotherSpeaker)) width / 1f else 0f
                 pivotY = height / 2f
 
                 val paddingTop =
