@@ -13,7 +13,10 @@ class CustomTextView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-    val colors: IntArray = intArrayOf(Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, 0x24FFFFFF)
+    val colors: IntArray = intArrayOf(Color.WHITE),
+    val durationStart: Long = -1L,
+    val durationEnd: Long = -1L,
+    val contentHash: Int = 10721
 ) : AppCompatTextView(context, attrs, defStyleAttr) {
 
     var gradient: LinearGradient? = null
@@ -27,9 +30,7 @@ class CustomTextView @JvmOverloads constructor(
         currentProgress = percent
         localMatrix.setTranslate(percent * width, height.toFloat())
         gradient?.setLocalMatrix(localMatrix)
-        if (invalidate == true) {
-            invalidate()
-        }
+        if (invalidate) invalidate()
     }
 
     fun setDefaultGradient() = updateGradient(colors)

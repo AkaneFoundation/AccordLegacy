@@ -217,7 +217,7 @@ class FullBottomSheet @JvmOverloads constructor(
             val mediaId = instance?.currentMediaItem?.mediaId
             if (mediaId != null) {
                 instance?.seekTo((slider.value.toLong()))
-                updateLyric(slider.value.toLong())
+                updateLyric()
             }
             isUserTracking = false
             if (bottomSheetFullCoverFrame.scaleX >= 0.93F &&
@@ -1221,7 +1221,9 @@ class FullBottomSheet @JvmOverloads constructor(
             )
             bottomSheetFullDurationBack.text = bottomSheetFullDuration.text
         }
-        updateLyric(duration)
+        if (duration != null) {
+            updateLyric()
+        }
     }
 
     override fun onTimelineChanged(timeline: Timeline, reason: Int) {
@@ -1398,7 +1400,7 @@ class FullBottomSheet @JvmOverloads constructor(
             R.dimen.lyric_extra_line_height
         )
 
-        var currentHighlightLyricPositions = mutableListOf<Int>()
+        var currentHighlightLyricPositions: MutableList<Int> = mutableListOf()
         var currentFocusLyricPosition = -1
         var ignoredPositionAtMost = -1
 
@@ -1428,11 +1430,9 @@ class FullBottomSheet @JvmOverloads constructor(
             if (hasUpdateLyricPayload) {
                 holder.lyricFlexboxLayout.children.getTextViews {
                     if (it is CustomTextView) {
-                        val lyricDurationStart = it.getTag(R.id.lyric_duration_start) as Long
-                        val lyricDurationEnd = it.getTag(R.id.lyric_duration_end) as Long
-                        val position: Long = instance?.currentPosition ?: 0
-                        val percent: Float = ((position.toFloat() - lyricDurationStart.toFloat()) / (lyricDurationEnd.toFloat() - lyricDurationStart.toFloat()))
-//                        Log.d("Percent", "$percent, $position")
+                        val currentPosition: Long = instance?.currentPosition ?: 0
+                        val percent: Float = ((currentPosition.toFloat() - it.durationStart.toFloat()) / (it.durationEnd.toFloat() - it.durationStart.toFloat()))
+//                        Log.d("Percent", "$percent, $currentPosition")
                         it.setProgress(percent)
                     }
                 }
@@ -1481,29 +1481,29 @@ class FullBottomSheet @JvmOverloads constructor(
             val currentLyricIsBgSpeaker = lyric.label == LrcUtils.SpeakerLabel.Background
 
             with(holder.lyricCard) {
-                if (lyric.timeStamp != null) {
+                if (lyric.startTimestamp != null) {
                     isFocusable = true
                     isClickable = true
                 } else {
                     isFocusable = false
                     isClickable = false
                 }
-                lyric.timeStamp?.let { timestamp ->
+                lyric.startTimestamp?.let { timestamp ->
                     setOnClickListener {
                         performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
                         activity.getPlayer()?.apply {
                             animationLock = true
-                            if (currentLyricIsBgSpeaker) {
-                                ignoredPositionAtMost = lyricList.indexOf(lyric) - 1
+                            ignoredPositionAtMost = if (currentLyricIsBgSpeaker) {
+                                lyricList.indexOf(lyric) - 1
                             } else {
-                                ignoredPositionAtMost = lyricList.indexOf(lyric)
+                                lyricList.indexOf(lyric)
                             }
                             seekTo(timestamp)
                             if (!isPlaying) play()
                         }
                     }
                 }
-                if (lyric.timeStamp != null &&
+                if (lyric.startTimestamp != null &&
                     lyric.absolutePosition != null &&
                     payloads.isEmpty() &&
                     !blurLock
@@ -1542,9 +1542,9 @@ class FullBottomSheet @JvmOverloads constructor(
                 with(holder.transitionTextView) {
                     text = lyric.translationContent
                     typeface =
-                        if (lyric.timeStamp != null) defaultTypeface else disabledTextTypeface
+                        if (lyric.startTimestamp != null) defaultTypeface else disabledTextTypeface
                     setLineSpacing(
-                        if (lyric.timeStamp != null) 0f else extraLineHeight.toFloat(),
+                        if (lyric.startTimestamp != null) 0f else extraLineHeight.toFloat(),
                         1f
                     )
                 }
@@ -1570,11 +1570,11 @@ class FullBottomSheet @JvmOverloads constructor(
                 pivotY = height / 2f
 
                 val paddingTop =
-                    if (lyric.timeStamp != null) 18
+                    if (lyric.startTimestamp != null) 18
                     else 0
                 val paddingBottom =
                     if (lyric.translationContent.isNotEmpty()) 2
-                    else if (lyric.timeStamp != null) 18
+                    else if (lyric.startTimestamp != null) 18
                     else 0
                 val paddingStart = 12.5f
                 val paddingEnd = if (hasMultiSpeaker) 66.5f else 12.5f
@@ -1591,10 +1591,9 @@ class FullBottomSheet @JvmOverloads constructor(
                     if (lyric.wordTimestamps.size != childCount) removeAllViews()
                     if (childCount > 0) {
                         with(children.first()) {
-                            if (
-                                getTag(R.id.lyric_content_hash) != lyric.content.hashCode() ||
-                                getTag(R.id.lyric_duration_hash) != lyric.wordTimestamps[0].hashCode()
-                            ) {
+                            if (this !is CustomTextView) {
+                                removeAllViews()
+                            } else if (contentHash != lyric.hashCode()) {
                                 removeAllViews()
                             }
                         }
@@ -1623,20 +1622,19 @@ class FullBottomSheet @JvmOverloads constructor(
                                 )
                         val lyricTextView = CustomTextView(
                             context = context,
-                            colors = lyricShaderColor
+                            colors = lyricShaderColor,
+                            durationStart = it.second,
+                            durationEnd = it.third,
+                            contentHash = lyric.hashCode()
                         ).apply {
                             text = lyricContent
-                            setTag(R.id.lyric_duration_start, it.second)
-                            setTag(R.id.lyric_duration_end, it.third)
-                            setTag(R.id.lyric_duration_hash, it.hashCode())
-                            setTag(R.id.lyric_content_hash, lyric.content.hashCode())
 
-                            val textSize = if (currentLyricIsBgSpeaker) 23f else if (lyric.timeStamp != null) 34f else 18f
+                            val textSize = if (currentLyricIsBgSpeaker) 23f else if (lyric.startTimestamp != null) 34f else 18f
                             setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
                             typeface =
-                                if (lyric.timeStamp != null) defaultTypeface else disabledTextTypeface
+                                if (lyric.startTimestamp != null) defaultTypeface else disabledTextTypeface
                             setLineSpacing(
-                                if (lyric.timeStamp != null) 0f else extraLineHeight.toFloat(),
+                                if (lyric.startTimestamp != null) 0f else extraLineHeight.toFloat(),
                                 1f
                             )
                         }
@@ -1653,17 +1651,17 @@ class FullBottomSheet @JvmOverloads constructor(
                         }
                     }
 
-                    // Add if no view found
+                    // Add view if no view found
                     if (childCount < 1) addView(
                         AppCompatTextView(context).apply {
                             text = lyric.content
                             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-                            val textSize = if (currentLyricIsBgSpeaker) 23f else if (lyric.timeStamp != null) 34f else 18f
+                            val textSize = if (currentLyricIsBgSpeaker) 23f else if (lyric.startTimestamp != null) 34f else 18f
                             setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
                             typeface =
-                                if (lyric.timeStamp != null) defaultTypeface else disabledTextTypeface
+                                if (lyric.startTimestamp != null) defaultTypeface else disabledTextTypeface
                             setLineSpacing(
-                                if (lyric.timeStamp != null) 0f else extraLineHeight.toFloat(),
+                                if (lyric.startTimestamp != null) 0f else extraLineHeight.toFloat(),
                                 1f
                             )
                         }
@@ -1674,7 +1672,7 @@ class FullBottomSheet @JvmOverloads constructor(
                     with(it) {
                         visibility = if (lyric.content.isNotEmpty()) VISIBLE else GONE
 
-                        if (lyric.timeStamp == null) {
+                        if (lyric.startTimestamp == null) {
                             if (it !is CustomTextView) {
                                 setTextColor(disabledTextColor)
                             }
@@ -1991,52 +1989,39 @@ class FullBottomSheet @JvmOverloads constructor(
     private fun getNewIndex(): List<Int> {
         val currentPosition = instance?.currentPosition ?: 0
         val filteredList = bottomSheetFullLyricList.filter { lyric ->
-            (lyric.timeStamp ?: 0) <= currentPosition
-        }
-        val filteredWordTimestampList = filteredList.filter { lyric ->
-            (lyric.wordTimestamps.lastOrNull()?.third ?: 0) >= currentPosition
+            (lyric.startTimestamp ?: 0) <= currentPosition && (lyric.endTimestamp ?: 0) >= currentPosition
         }.map { lyric ->
             bottomSheetFullLyricList.indexOf(lyric)
         }
-        val index = if (filteredList.isNotEmpty()) {
-            (listOf<Int>(filteredList.indices.maxBy { (filteredList[it].timeStamp ?: 0) }) + filteredWordTimestampList).sorted().distinct()
-        } else {
-            emptyList<Int>()
-        }
+//        Log.d("Index", filteredList.toString())
 
-        return index
+        return filteredList
     }
 
-    fun updateLyric(
-        duration: Long?
-    ) {
+    fun updateLyric() {
         if (bottomSheetFullLyricList.isNotEmpty() && alpha > 0f) {
 
             val newIndex = getNewIndex()
-            val fullList =
-                (newIndex + bottomSheetFullLyricAdapter.currentHighlightLyricPositions).sorted().distinct()
+            val fullList = (newIndex + bottomSheetFullLyricAdapter.currentHighlightLyricPositions).sorted().distinct()
 
             fullList.forEach {
-                if (duration != null) {
+                // Update extended lyric
+                if (bottomSheetFullLyricAdapter.isExtendedLRC) {
 
-                    // Update extended lyric
-                    if (bottomSheetFullLyricAdapter.isExtendedLRC) {
-
-                        /** Fix abnormal shader state when switch lyric line by click
-                         * @see LyricAdapter.ignoredPositionAtMost
-                         */
-                        if (newIndex.contains(it) && it >= bottomSheetFullLyricAdapter.ignoredPositionAtMost) {
-                            bottomSheetFullLyricAdapter.notifyItemChanged(it, LYRIC_UPDATE)
-                        }
+                    /** Fix abnormal shader state when switch lyric line by click
+                     * @see LyricAdapter.ignoredPositionAtMost
+                     */
+                    if (newIndex.contains(it) && it >= bottomSheetFullLyricAdapter.ignoredPositionAtMost) {
+                        bottomSheetFullLyricAdapter.notifyItemChanged(it, LYRIC_UPDATE)
                     }
+                }
 
-                    // Update highlight
-                    if (bottomSheetFullLyricAdapter.currentHighlightLyricPositions != newIndex) {
+                // Update highlight
+                if (bottomSheetFullLyricAdapter.currentHighlightLyricPositions != newIndex) {
 
-                        // Maybe we needn't update highlight for ignored lines
-                        if (it >= bottomSheetFullLyricAdapter.ignoredPositionAtMost || !newIndex.contains(it)) {
-                            bottomSheetFullLyricAdapter.updateHighlight(it, !newIndex.contains(it))
-                        }
+                    // Maybe we needn't update highlight for ignored lines
+                    if (it >= bottomSheetFullLyricAdapter.ignoredPositionAtMost || !newIndex.contains(it)) {
+                        bottomSheetFullLyricAdapter.updateHighlight(it, !newIndex.contains(it))
                     }
                 }
             }
@@ -2218,8 +2203,8 @@ class FullBottomSheet @JvmOverloads constructor(
                 )
                 bottomSheetFullDurationBack.text = bottomSheetFullDuration.text
             }
-            if (duration != null && duration >= LYRIC_SCROLL_DURATION) {
-                updateLyric(duration - LYRIC_SCROLL_DURATION)
+            if (duration != null) {
+                updateLyric()
             }
             if (instance?.isPlaying == true) {
                 handler.postDelayed(

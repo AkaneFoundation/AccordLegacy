@@ -135,7 +135,8 @@ object MediaStoreUtils {
 
     @Parcelize
     data class Lyric(
-        val timeStamp: Long? = null,
+        val startTimestamp: Long? = null,
+        var endTimestamp: Long? = null,
         val content: String = "",
         var translationContent: String = "",
         var absolutePosition: Int? = null,

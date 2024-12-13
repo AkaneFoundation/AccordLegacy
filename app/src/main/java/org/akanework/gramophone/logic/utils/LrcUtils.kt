@@ -31,8 +31,11 @@ object LrcUtils {
     }
 
     @OptIn(UnstableApi::class)
-    fun extractAndParseLyrics(metadata: Metadata, trim: Boolean): MutableList<MediaStoreUtils.Lyric>? {
-        for (i in 0..< metadata.length()) {
+    fun extractAndParseLyrics(
+        metadata: Metadata,
+        trim: Boolean
+    ): MutableList<MediaStoreUtils.Lyric>? {
+        for (i in 0..<metadata.length()) {
             val meta = metadata.get(i)
             val data =
                 if (meta is VorbisComment && meta.key == "LYRICS") // ogg / flac
@@ -134,15 +137,23 @@ object LrcUtils {
                         var lastWordTimestamp = currentTimeStamp
                         val wordTimestamps = words.mapIndexedNotNull { index, _ ->
                             wordMatches.elementAtOrNull(index)?.let { match ->
-                                val wordTimestamp = parseTime(match.groupValues[1] + match.groupValues[2])
-                                Triple(words.take(index + 1).sumOf { it.length }, lastWordTimestamp, wordTimestamp).also {
+                                val wordTimestamp =
+                                    parseTime(match.groupValues[1] + match.groupValues[2])
+                                Triple(
+                                    words.take(index + 1).sumOf { it.length },
+                                    lastWordTimestamp,
+                                    wordTimestamp
+                                ).also {
                                     lastWordTimestamp = wordTimestamp
                                 }
                             }
+                        }.toMutableList().apply {
+                            // Remove word timestamps whose content is empty
+                            removeIf { it.first == 0 }
                         }
                         list.add(
                             MediaStoreUtils.Lyric(
-                                timeStamp = currentTimeStamp,
+                                startTimestamp = currentTimeStamp,
                                 content = lyricLine.replace(wordTimeMarksRegex, ""),
                                 wordTimestamps = wordTimestamps,
                                 label = currentLabel
@@ -151,7 +162,7 @@ object LrcUtils {
                     } else {
                         list.add(
                             MediaStoreUtils.Lyric(
-                                timeStamp = currentTimeStamp,
+                                startTimestamp = currentTimeStamp,
                                 content = lyricLine,
                                 label = currentLabel
                             )
@@ -173,15 +184,23 @@ object LrcUtils {
                         var lastWordTimestamp = currentTimeStamp
                         val wordTimestamps = words.mapIndexedNotNull { index, _ ->
                             wordMatches.elementAtOrNull(index)?.let { match ->
-                                val wordTimestamp = parseTime(match.groupValues[1] + match.groupValues[2])
-                                Triple(words.take(index + 1).sumOf { it.length }, lastWordTimestamp, wordTimestamp).also {
+                                val wordTimestamp =
+                                    parseTime(match.groupValues[1] + match.groupValues[2])
+                                Triple(
+                                    words.take(index + 1).sumOf { it.length },
+                                    lastWordTimestamp,
+                                    wordTimestamp
+                                ).also {
                                     lastWordTimestamp = wordTimestamp
                                 }
                             }
+                        }.toMutableList().apply {
+                            // Remove word timestamps whose content is empty
+                            removeIf { it.first == 0 }
                         }
                         list.add(
                             MediaStoreUtils.Lyric(
-                                timeStamp = currentTimeStamp + 1,
+                                startTimestamp = currentTimeStamp + 1,
                                 content = lyricLine.replace(wordTimeMarksRegex, ""),
                                 wordTimestamps = wordTimestamps,
                                 label = currentLabel
@@ -190,7 +209,7 @@ object LrcUtils {
                     } else {
                         list.add(
                             MediaStoreUtils.Lyric(
-                                timeStamp = currentTimeStamp,
+                                startTimestamp = currentTimeStamp,
                                 content = lyricLine,
                                 label = currentLabel
                             )
@@ -201,35 +220,45 @@ object LrcUtils {
         }
 
         // Sort and mark as translations all found duplicated timestamps (usually one)
-        list.sortBy { it.timeStamp }
+        list.sortBy { it.startTimestamp }
         var previousTs = -1L
         var translationItems = intArrayOf()
         list.forEach {
             // Merge lyric and translation
-            if (it.timeStamp == previousTs && it.label != SpeakerLabel.Background) {
+            if (it.startTimestamp == previousTs && it.label != SpeakerLabel.Background) {
                 list[list.indexOf(it) - 1].translationContent = it.content
                 translationItems += list.indexOf(it)
             }
-            previousTs = it.timeStamp!!
+            previousTs = it.startTimestamp!!
         }
         // Remove translation items
         translationItems.reversed().forEach { list.removeAt(it) }
 
+        // Add end timestamp to each item
+        list.forEachIndexed { index, it ->
+            if (it.wordTimestamps.isNotEmpty()) {
+                it.endTimestamp = it.wordTimestamps.last().third
+            } else {
+                it.endTimestamp = list.getOrNull(index + 1)?.startTimestamp ?: Long.MAX_VALUE
+            }
+        }
+
+        // Add absolute position to each item
         list.takeWhile { it.content.isEmpty() }.forEach { _ -> list.removeAt(0) }
         var absolutePosition = 0
         list.forEachIndexed { index, it ->
             if (it.content.isNotEmpty() && it.label != SpeakerLabel.Background) {
                 it.absolutePosition = absolutePosition
-                absolutePosition ++
+                absolutePosition++
             } else {
                 it.absolutePosition = list[index - 1].absolutePosition
             }
         }
         if (list.isEmpty() && lrcContent.isNotEmpty()) {
-            list.add(MediaStoreUtils.Lyric(null, lrcContent))
+            list.add(MediaStoreUtils.Lyric(content = lrcContent))
         } else if (!foundNonNull) {
             list.clear()
-            list.add(MediaStoreUtils.Lyric(null, lyricsText!!.toString()))
+            list.add(MediaStoreUtils.Lyric(content = lyricsText!!.toString()))
         }
         return list
     }

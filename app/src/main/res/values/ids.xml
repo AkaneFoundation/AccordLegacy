@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <item name="lyric_duration_start" type="id" />
-    <item name="lyric_duration_end" type="id" />
-    <item name="lyric_duration_hash" type="id" />
-    <item name="lyric_content_hash" type="id" />
-</resources>
