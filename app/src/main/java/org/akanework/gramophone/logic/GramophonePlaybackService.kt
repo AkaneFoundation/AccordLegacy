@@ -521,6 +521,9 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
                         break@loop
                     }
                 }
+            } else {
+                // add empty element at the beginning
+                lrc.add(0, MediaStoreUtils.Lyric())
             }
             CoroutineScope(Dispatchers.Main).launch {
                 mediaSession?.let {
