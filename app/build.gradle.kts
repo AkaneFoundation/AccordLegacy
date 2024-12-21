@@ -166,7 +166,7 @@ configurations.configureEach {
 }
 
 dependencies {
-    val media3Version = "1.5.0"
+    val media3Version = "1.5.1"
     val roomVersion = "2.7.0-alpha12"
 
     ksp("androidx.room:room-compiler:$roomVersion")
@@ -185,7 +185,7 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer-midi:$media3Version")
     implementation("androidx.media3:media3-session:$media3Version")
     implementation("androidx.preference:preference-ktx:1.2.1")
-    implementation("com.google.android.material:material:1.13.0-alpha08")
+    implementation("com.google.android.material:material:1.13.0-alpha09")
     implementation("com.google.android.flexbox:flexbox:3.0.0")
     implementation("me.zhanghai.android.fastscroll:library:1.3.0")
     implementation("io.coil-kt.coil3:coil:3.0.4")
