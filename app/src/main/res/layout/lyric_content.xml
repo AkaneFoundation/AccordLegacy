@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/lyric_text"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="32.5dp"
+    android:paddingVertical="18dp"
+    android:focusable="true"
+    android:textColor="@color/contrast_lyric_defaultColor"
+    android:textFontWeight="500"
+    android:textSize="23sp" />

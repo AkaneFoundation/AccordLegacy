@@ -680,9 +680,9 @@ inline fun mayThrowForegroundServiceStartNotAllowed(): Boolean =
             Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2
 
 inline fun Sequence<View>.getTextViews(
-    crossinline action: (TextView) -> Unit
+    crossinline action: (CustomTextView) -> Unit
 ) {
     this.forEach {
-        if (it is TextView) action.invoke(it)
+        if (it is CustomTextView) action.invoke(it)
     }
 }

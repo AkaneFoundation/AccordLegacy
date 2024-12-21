@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/lyric_cardview"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="20dp"
+    android:clickable="true"
+    android:clipChildren="false"
+    android:clipToOutline="false"
+    android:clipToPadding="false"
+    android:focusable="true"
+    app:cardBackgroundColor="@android:color/transparent"
+    app:cardElevation="0dp"
+    app:strokeColor="@android:color/transparent"
+    tools:cardBackgroundColor="@color/contrast_colorOnSurface">
+
+    <TextView
+        android:id="@+id/lyric_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="12.5dp"
+        android:paddingVertical="18dp"
+        android:scaleX="0.98"
+        android:scaleY="0.98"
+        android:textColor="@color/contrast_lyric_defaultColor"
+        android:textFontWeight="700"
+        android:textSize="34sp" />
+
+</com.google.android.material.card.MaterialCardView>

@@ -291,7 +291,7 @@
             android:paddingTop="36dp"
             android:paddingBottom="36dp"
             android:scrollbars="none"
-            tools:listitem="@layout/lyrics" />
+            tools:listitem="@layout/lyric_syllable" />
 
     </org.akanework.gramophone.ui.components.FadingVerticalEdgeLayout>
 

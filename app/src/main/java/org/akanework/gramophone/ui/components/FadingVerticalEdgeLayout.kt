@@ -18,7 +18,16 @@ import androidx.core.view.doOnLayout
 import org.akanework.gramophone.R
 import kotlin.math.min
 
-class FadingVerticalEdgeLayout : FrameLayout {
+class FadingVerticalEdgeLayout @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : FrameLayout(context, attrs, defStyleAttr) {
+
+    init {
+        init(attrs)
+    }
+
     private var fadeTop = false
     private var fadeBottom = false
     private var gradientSizeTop = 0
@@ -40,22 +49,6 @@ class FadingVerticalEdgeLayout : FrameLayout {
 
     private val overlayColorFilter = ColorMatrixColorFilter(colorMatrix)
 
-    constructor(context: Context?) : super(context!!) {
-        init(null)
-    }
-
-    constructor(context: Context?, attrs: AttributeSet?) : super(
-        context!!, attrs
-    ) {
-        init(attrs)
-    }
-
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
-        context!!, attrs, defStyleAttr
-    ) {
-        init(attrs)
-    }
-
     private val overlayPaint = Paint().apply {
         xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
         colorFilter = overlayColorFilter
@@ -67,15 +60,18 @@ class FadingVerticalEdgeLayout : FrameLayout {
             resources.displayMetrics
         ).toInt()
         if (attrs != null) {
-            val arr =
-                context.obtainStyledAttributes(attrs, R.styleable.FadingVerticalEdgeLayout, 0, 0)
+            val arr = context.obtainStyledAttributes(
+                attrs, R.styleable.FadingVerticalEdgeLayout, 0, 0
+            )
             val flags = arr.getInt(R.styleable.FadingVerticalEdgeLayout_fel_edge, 0)
             fadeTop = flags and FADE_EDGE_TOP == FADE_EDGE_TOP
             fadeBottom = flags and FADE_EDGE_BOTTOM == FADE_EDGE_BOTTOM
-            gradientSizeTop =
-                arr.getDimensionPixelSize(R.styleable.FadingVerticalEdgeLayout_fel_size_top, defaultSize)
-            gradientSizeBottom =
-                arr.getDimensionPixelSize(R.styleable.FadingVerticalEdgeLayout_fel_size_bottom, defaultSize)
+            gradientSizeTop = arr.getDimensionPixelSize(
+                R.styleable.FadingVerticalEdgeLayout_fel_size_top, defaultSize
+            )
+            gradientSizeBottom = arr.getDimensionPixelSize(
+                R.styleable.FadingVerticalEdgeLayout_fel_size_bottom, defaultSize
+            )
             if (fadeTop && gradientSizeTop > 0) {
                 gradientDirtyFlags = gradientDirtyFlags or DIRTY_FLAG_TOP
             }
@@ -88,10 +84,12 @@ class FadingVerticalEdgeLayout : FrameLayout {
             gradientSizeTop = gradientSizeBottom
         }
         val mode = PorterDuffXfermode(PorterDuff.Mode.DST_IN)
-        gradientPaintTop = Paint(Paint.ANTI_ALIAS_FLAG)
-        gradientPaintTop!!.xfermode = mode
-        gradientPaintBottom = Paint(Paint.ANTI_ALIAS_FLAG)
-        gradientPaintBottom!!.xfermode = mode
+        gradientPaintTop = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            xfermode = mode
+        }
+        gradientPaintBottom = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            xfermode = mode
+        }
         gradientRectTop = Rect()
         gradientRectBottom = Rect()
     }
@@ -186,13 +184,14 @@ class FadingVerticalEdgeLayout : FrameLayout {
             null,
             Shader.TileMode.CLAMP
         )
-        gradientPaintTop!!.setShader(gradient)
+        gradientPaintTop!!.shader = gradient
     }
 
     private fun initBottomGradient() {
         val actualHeight = height - paddingTop - paddingBottom
-        val size =
-            min(gradientSizeBottom.toDouble(), actualHeight.toDouble()).toInt()
+        val size = min(
+            gradientSizeBottom.toDouble(), actualHeight.toDouble()
+        ).toInt()
         val l = paddingLeft
         val t = paddingTop + actualHeight - size
         val r = width - paddingRight

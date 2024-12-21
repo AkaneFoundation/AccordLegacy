@@ -318,7 +318,7 @@
             android:layout_height="match_parent"
             android:background="@android:color/transparent"
             android:scrollbars="none"
-            tools:listitem="@layout/lyrics" />
+            tools:listitem="@layout/lyric_syllable" />
 
     </org.akanework.gramophone.ui.components.FadingVerticalEdgeLayout>
 

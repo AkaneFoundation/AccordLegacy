@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.util.AttributeSet
 import android.util.Size
 import android.util.TypedValue
+import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -31,13 +32,14 @@ import android.view.ViewGroup
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.view.animation.DecelerateInterpolator
+import android.view.animation.LinearInterpolator
 import android.view.animation.PathInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.Placeholder
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -151,13 +153,7 @@ class FullBottomSheet @JvmOverloads constructor(
     companion object {
         const val SLIDER_UPDATE_INTERVAL = 100L
         const val VIEW_TRANSIT_DURATION = 350L
-        const val LYRIC_REMOVE_HIGHLIGHT = 0
-        const val LYRIC_SET_HIGHLIGHT = 1
-        const val LYRIC_REMOVE_BLUR = 2
-        const val LYRIC_SET_BLUR = 3
-        const val LYRIC_UPDATE = 4
         const val LYRIC_SCROLL_DURATION = 600L
-        const val LYRIC_UPDATE_DURATION = 10L
         const val SHRINK_VALUE_DEFAULT = 0.93F
         const val ALBUM_SHRINK_DURATION_ANIMATION = 300L
         const val SHRINK_TRIGGER_DURATION = 300L
@@ -165,6 +161,22 @@ class FullBottomSheet @JvmOverloads constructor(
         const val BOTTOM_TRANSIT_DURATION = 100L
         const val VOLUME_CHANGED_ACTION = "android.media.VOLUME_CHANGED_ACTION"
         const val LYRIC_DEFAULT_SIZE = .98f
+
+        // Lyric update events
+        const val LYRIC_REMOVE_HIGHLIGHT = 0
+        const val LYRIC_SET_HIGHLIGHT = 1
+        const val LYRIC_REMOVE_BLUR = 2
+        const val LYRIC_SET_BLUR = 3
+        const val LYRIC_UPDATE_PROGRESS = 4
+        const val LYRIC_REMOVE_ANIMATOR = 5
+
+        // Lyric ViewHolder types
+        const val LYRIC_COMMON = 1000
+        const val LYRIC_COMMON_TRANSLATION = 1001
+        const val LYRIC_SYLLABLE = 1002
+        const val LYRIC_SYLLABLE_TRANSLATION = 1003
+        const val LYRIC_CONTENT = 1004
+        const val LYRIC_EMPTY = 1005
     }
 
     private fun buildShrinkAnimator(
@@ -706,6 +718,9 @@ class FullBottomSheet @JvmOverloads constructor(
                 buildShrinkAnimator(false, SHRINK_VALUE_PAUSE)
             }
             instance?.playOrPause()
+            if (instance?.isPlaying == true && instance?.currentMediaItem?.mediaMetadata?.extras?.getLong("Duration") != null) {
+                updateLyric(resume = true)
+            }
         }
         bottomSheetFullPreviousButton.setOnClickListener {
             it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
@@ -1364,11 +1379,13 @@ class FullBottomSheet @JvmOverloads constructor(
 
     private inner class LyricAdapter(
         private val lyricList: MutableList<MediaStoreUtils.Lyric>
-    ) : RecyclerView.Adapter<LyricAdapter.ViewHolder>() {
+    ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         init {
             setHasStableIds(true)
         }
+
+        override fun getItemCount(): Int = lyricList.size
 
         override fun getItemId(position: Int): Long {
             return lyricList[position].hashCode().toLong()
@@ -1405,61 +1422,626 @@ class FullBottomSheet @JvmOverloads constructor(
         var ignoredPositionAtMost = -1
 
         val isExtendedLRC: Boolean get() = lyricList.any { it.wordTimestamps.isNotEmpty() }
+        var activeAnimatorPosition: MutableSet<Int> = mutableSetOf()
+
+        override fun getItemViewType(position: Int): Int {
+            val lyric = lyricList[position]
+            val hasTranslationContent = lyric.translationContent.isNotEmpty()
+            val hasWordTimestamps = lyric.wordTimestamps.isNotEmpty()
+            val hasTimestamps = lyric.startTimestamp != null
+            val hasContent = lyric.content.isNotEmpty()
+
+            return when {
+                hasTranslationContent && hasWordTimestamps && hasTimestamps -> LYRIC_SYLLABLE_TRANSLATION
+                hasWordTimestamps && hasTimestamps -> LYRIC_SYLLABLE
+                hasTranslationContent && hasTimestamps -> LYRIC_COMMON_TRANSLATION
+                hasTimestamps -> LYRIC_COMMON
+                hasContent -> LYRIC_CONTENT
+                else -> LYRIC_EMPTY
+            }
+        }
 
         override fun onCreateViewHolder(
             parent: ViewGroup,
             viewType: Int
-        ): ViewHolder = ViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.lyrics, parent, false)
-        )
+        ): RecyclerView.ViewHolder = when (viewType) {
+            LYRIC_SYLLABLE_TRANSLATION -> LyricSyllableWithTranslationViewHolder(
+                LayoutInflater.from(parent.context).inflate(R.layout.lyric_syllable_translation, parent, false)
+            )
+            LYRIC_SYLLABLE -> LyricSyllableViewHolder(
+                LayoutInflater.from(parent.context).inflate(R.layout.lyric_syllable, parent, false)
+            )
+            LYRIC_COMMON_TRANSLATION -> LyricCommonWithTranslationViewHolder(
+                LayoutInflater.from(parent.context).inflate(R.layout.lyric_common_translation, parent, false)
+            )
+            LYRIC_COMMON -> LyricCommonViewHolder(
+                LayoutInflater.from(parent.context).inflate(R.layout.lyric_common, parent, false)
+            )
+            LYRIC_CONTENT -> LyricContentViewHolder(
+                LayoutInflater.from(parent.context).inflate(R.layout.lyric_content, parent, false)
+            )
+            else -> LyricEmptyViewHolder(Placeholder(parent.context))
+        }
 
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             onBindViewHolder(holder, position, mutableListOf())
         }
 
         override fun onBindViewHolder(
-            holder: ViewHolder,
+            holder: RecyclerView.ViewHolder,
             position: Int,
             payloads: MutableList<Any>
         ) {
-            val hasUpdateLyricPayload = payloads.contains(LYRIC_UPDATE)
-            val hasSetHighlightPayload = payloads.contains(LYRIC_SET_HIGHLIGHT)
-            val hasRemoveHighlightPayload = payloads.contains(LYRIC_REMOVE_HIGHLIGHT)
-            val hasHighlightPayload = hasSetHighlightPayload || hasRemoveHighlightPayload
+            val lyric = lyricList[position]
 
-            if (hasUpdateLyricPayload) {
-                holder.lyricFlexboxLayout.children.getTextViews {
-                    if (it is CustomTextView) {
-                        val currentPosition: Long = instance?.currentPosition ?: 0
-                        val percent: Float = ((currentPosition.toFloat() - it.durationStart.toFloat()) / (it.durationEnd.toFloat() - it.durationStart.toFloat()))
-//                        Log.d("Percent", "$percent, $currentPosition")
-                        it.setProgress(percent)
-                    }
-                }
-                if (payloads.size == 1) return
-            }
+            val hasUpdateLyricPayload = payloads.contains(LYRIC_UPDATE_PROGRESS)
+            val hasRemoveAnimatorPayload = payloads.contains(LYRIC_REMOVE_ANIMATOR)
 
             val hasSetBlurPayload = payloads.contains(LYRIC_SET_BLUR)
             val hasRemoveBlurPayload = payloads.contains(LYRIC_REMOVE_BLUR)
             val hasBlurPayload = hasSetBlurPayload || hasRemoveBlurPayload
 
-            if (
-                hasBlurPayload &&
-                lyricList.isNotEmpty() &&
-                !blurLock
+            val hasSetHighlightPayload = payloads.contains(LYRIC_SET_HIGHLIGHT)
+            val hasRemoveHighlightPayload = payloads.contains(LYRIC_REMOVE_HIGHLIGHT)
+            val hasHighlightPayload = hasSetHighlightPayload || hasRemoveHighlightPayload
+
+            val applyAnimationPayload = payloads.find { it is Double } as? Double
+
+            when(holder) {
+                is BaseLyricViewHolder -> {
+                    if (applyAnimationPayload != null) {
+                        holder.applyAnimation(applyAnimationPayload.toInt())
+                        if (payloads.size == 1) return
+                    }
+                    if (holder is LyricSyllableViewHolder) {
+                        when {
+                            hasUpdateLyricPayload -> holder.updateLyric(position, lyric)
+                            hasRemoveAnimatorPayload -> holder.lyricProgressAnimator?.cancel()
+                        }
+                        if (payloads.size == 1) return
+                    }
+                    if (hasBlurPayload) {
+                        holder.updateBlur(position)
+                        if (!hasHighlightPayload) return
+                    }
+                    if (!holder.created(lyric)) {
+                        holder.create(position, payloads, lyric)
+                    }
+                    holder.updateHighlight(position, payloads)
+                }
+                is LyricContentViewHolder -> {
+                    holder.create()
+                }
+            }
+        }
+
+        override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+            when(holder) {
+                is LyricSyllableWithTranslationViewHolder -> holder.recycle()
+                is LyricSyllableViewHolder -> holder.recycle()
+                is LyricCommonWithTranslationViewHolder -> holder.recycle()
+                is LyricCommonViewHolder -> holder.recycle()
+            }
+            super.onViewRecycled(holder)
+        }
+
+        open inner class LyricSyllableViewHolder(
+            view: View
+        ) : BaseLyricViewHolder(view) {
+
+            val lyricFlexboxLayout: FlexboxLayout = view.findViewById(R.id.lyric_flexbox)
+
+            var lyricProgressAnimator: ValueAnimator? = null
+
+            override fun create(
+                position: Int,
+                payloads: MutableList<Any>,
+                lyric: MediaStoreUtils.Lyric
             ) {
-                val value = if (hasSetBlurPayload) getBlurRadius(position) else 0f
-                with(ValueAnimator.ofFloat(holder.blurRadius, value)) {
-                    duration = LYRIC_SCROLL_DURATION
-                    interpolator = interpolator
-                    addUpdateListener {
-                        val value = animatedValue as Float
-                        holder.blurRadius = value
-                        holder.lyricCard.setRenderEffect(
-                            if (holder.blurRadius != 0F) {
+                super.create(position, payloads, lyric)
+
+                val hasMultiSpeaker = lyricList.any {
+                    it.label == LrcUtils.SpeakerLabel.Voice2 || it.label == LrcUtils.SpeakerLabel.Female
+                }
+                val currentLyricIsAnotherSpeaker = lyric.label == LrcUtils.SpeakerLabel.Voice2 || lyric.label == LrcUtils.SpeakerLabel.Female
+                val lastLyricIsAnotherSpeaker = lyricList.getOrNull(position - 1)?.label == LrcUtils.SpeakerLabel.Voice2 || lyricList.getOrNull(position - 1)?.label == LrcUtils.SpeakerLabel.Female
+                val currentLyricIsBgSpeaker = lyric.label == LrcUtils.SpeakerLabel.Background
+
+                with(lyricFlexboxLayout) {
+                    justifyContent =
+                        if (currentLyricIsAnotherSpeaker || (currentLyricIsBgSpeaker && lastLyricIsAnotherSpeaker))
+                            JustifyContent.FLEX_END
+                        else
+                            JustifyContent.FLEX_START
+                    pivotX = if (currentLyricIsAnotherSpeaker || (currentLyricIsBgSpeaker && lastLyricIsAnotherSpeaker)) width.toFloat() else 0f
+                    pivotY = height / 2f
+
+                    val paddingBottom = if (lyric.translationContent.isNotEmpty()) 2 else 18
+                    val paddingEnd = if (hasMultiSpeaker) 66.5f else 12.5f
+                    updatePaddingRelative(
+                        end = paddingEnd.dpToPx(context).toInt(),
+                        bottom = paddingBottom.dpToPx(context)
+                    )
+
+                    // Remove old views
+                    if (lyric.wordTimestamps.size != childCount) removeAllViews()
+                    if (childCount > 0) {
+                        if ((children.first() as CustomTextView).contentHash != lyric.hashCode()) {
+                            removeAllViews()
+                        }
+                    }
+
+                    // Add new views after check
+                    var wordIndex = 0
+                    lyric.wordTimestamps.forEach {
+                        if (lyric.wordTimestamps.size != childCount) {
+                            val lyricContent = lyric.content.substring(wordIndex, it.first)
+                            val lyricShaderColor =
+                                if (currentLyricIsBgSpeaker)
+                                    intArrayOf(
+                                        highlightTranslationTextColor,
+                                        highlightTranslationTextColor,
+                                        highlightTranslationTextColor,
+                                        highlightTranslationTextColor,
+                                        defaultTextColor
+                                    )
+                                else
+                                    intArrayOf(
+                                        highlightTextColor,
+                                        highlightTextColor,
+                                        highlightTextColor,
+                                        highlightTextColor,
+                                        defaultTextColor
+                                    )
+                            val lyricTextView = CustomTextView(
+                                context = context,
+                                colors = lyricShaderColor,
+                                durationStart = it.second,
+                                durationEnd = it.third,
+                                contentHash = lyric.hashCode()
+                            ).apply {
+                                text = lyricContent
+                                typeface = defaultTypeface
+
+                                val textSize = if (currentLyricIsBgSpeaker) 23f else 34f
+                                setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
+                                setLineSpacing(0f, 1f)
+                            }
+                            addView(lyricTextView)
+                        }
+                        wordIndex = it.first
+                    }
+                }
+            }
+
+            override fun created(lyric: MediaStoreUtils.Lyric): Boolean {
+                return lyricFlexboxLayout.childCount > 0 && (lyricFlexboxLayout.children.first() as CustomTextView).contentHash == lyric.hashCode()
+            }
+
+            override fun recycle() {
+                super.recycle()
+                with(lyricFlexboxLayout) {
+                    translationY = 0f
+                    scaleText(LYRIC_DEFAULT_SIZE)
+                }
+            }
+
+            fun updateLyric(
+                position: Int,
+                lyric: MediaStoreUtils.Lyric
+            ) {
+                lyricProgressAnimator?.cancel()
+
+                val animationDuration = (lyric.endTimestamp ?: 0) - (instance?.currentPosition ?: 0)
+                if (animationDuration > 0) {
+                    lyricProgressAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
+                        duration = animationDuration
+                        interpolator = LinearInterpolator()
+                        addUpdateListener {
+                            if (!currentHighlightLyricPositions.contains(position)) lyricProgressAnimator?.cancel()
+                            lyricFlexboxLayout.children.getTextViews {
+                                val currentPosition: Long = instance?.currentPosition ?: 0
+                                val percent: Float = ((currentPosition.toFloat() - it.durationStart.toFloat()) / (it.durationEnd.toFloat() - it.durationStart.toFloat()))
+                                if (activeAnimatorPosition.contains(position)) {
+                                    it.setProgress(percent)
+                                } else lyricProgressAnimator?.cancel()
+                            }
+                        }
+                        doOnEnd {
+                            if (activeAnimatorPosition.contains(position)) activeAnimatorPosition.remove(position)
+                        }
+                    }
+                    activeAnimatorPosition.add(position)
+                    lyricProgressAnimator?.start()
+                }
+            }
+
+            override fun updateHighlight(
+                position: Int,
+                payloads: MutableList<Any>
+            ) {
+                val hasSetHighlightPayload = payloads.contains(LYRIC_SET_HIGHLIGHT)
+                val hasRemoveHighlightPayload = payloads.contains(LYRIC_REMOVE_HIGHLIGHT)
+                val hasHighlightPayload = hasSetHighlightPayload || hasRemoveHighlightPayload
+
+                // Highlight Stuffs for lyrics
+                with(lyricFlexboxLayout) {
+                    when {
+                        hasHighlightPayload -> {
+                            val targetScale = if (hasSetHighlightPayload) sizeFactor else LYRIC_DEFAULT_SIZE
+                            if (scaleX != targetScale && scaleY != targetScale)
+                                scaleText(targetScale, interpolator)
+                            children.getTextViews {
+                                if (hasRemoveHighlightPayload) {
+                                    lyricProgressAnimator?.cancel()
+                                    it.resetShader(interpolator)
+                                }
+                            }
+                        }
+                        currentHighlightLyricPositions.contains(position) -> {
+                            if (scaleX != sizeFactor && scaleY != sizeFactor)
+                                scaleText(sizeFactor, interpolator)
+                        }
+                        else -> {
+                            if (scaleX != LYRIC_DEFAULT_SIZE && scaleY != LYRIC_DEFAULT_SIZE)
+                                scaleText(LYRIC_DEFAULT_SIZE, interpolator)
+                        }
+                    }
+                }
+            }
+
+            override fun applyAnimation(ii: Int) {
+                super.applyAnimation(ii, lyricFlexboxLayout)
+            }
+        }
+
+        inner class LyricSyllableWithTranslationViewHolder(
+            view: View
+        ) : LyricSyllableViewHolder(view) {
+
+            val transitionTextView: TextView = view.findViewById(R.id.transition_text)
+
+            override fun create(
+                position: Int,
+                payloads: MutableList<Any>,
+                lyric: MediaStoreUtils.Lyric
+            ) {
+                super.create(position, payloads, lyric)
+
+                val hasMultiSpeaker = lyricList.any {
+                    it.label == LrcUtils.SpeakerLabel.Voice2 || it.label == LrcUtils.SpeakerLabel.Female
+                }
+                val currentLyricIsAnotherSpeaker = lyric.label == LrcUtils.SpeakerLabel.Voice2 || lyric.label == LrcUtils.SpeakerLabel.Female
+                val lastLyricIsAnotherSpeaker = lyricList.getOrNull(position - 1)?.label == LrcUtils.SpeakerLabel.Voice2 || lyricList.getOrNull(position - 1)?.label == LrcUtils.SpeakerLabel.Female
+                val currentLyricIsBgSpeaker = lyric.label == LrcUtils.SpeakerLabel.Background
+
+                with(transitionTextView) {
+                    pivotX = if (currentLyricIsAnotherSpeaker || (currentLyricIsBgSpeaker && lastLyricIsAnotherSpeaker)) width.toFloat() else 0f
+                    pivotY = height / 2f
+                    val paddingEnd = if (hasMultiSpeaker) 66.5f else 12.5f
+                    updatePaddingRelative(
+                        end = paddingEnd.dpToPx(context).toInt()
+                    )
+                    if (currentLyricIsAnotherSpeaker || (currentLyricIsBgSpeaker && lastLyricIsAnotherSpeaker)) gravity = Gravity.END
+
+                    text = lyric.translationContent
+                    typeface = defaultTypeface
+                    setLineSpacing(0f, 1f)
+                }
+            }
+
+            override fun created(lyric: MediaStoreUtils.Lyric): Boolean {
+                return super.created(lyric) && transitionTextView.text == lyric.translationContent
+            }
+
+            override fun recycle() {
+                super.recycle()
+                with(transitionTextView) {
+                    translationY = 0f
+                    scaleText(LYRIC_DEFAULT_SIZE)
+                    setTextColor(defaultTextColor)
+                }
+            }
+
+            override fun updateHighlight(position: Int, payloads: MutableList<Any>) {
+                super.updateHighlight(position, payloads)
+
+                val hasSetHighlightPayload = payloads.contains(LYRIC_SET_HIGHLIGHT)
+                val hasRemoveHighlightPayload = payloads.contains(LYRIC_REMOVE_HIGHLIGHT)
+                val hasHighlightPayload = hasSetHighlightPayload || hasRemoveHighlightPayload
+
+                // Highlight Stuffs for translations
+                with(transitionTextView) {
+                    when {
+                        hasHighlightPayload -> {
+                            val targetScale = if (hasSetHighlightPayload) sizeFactor else LYRIC_DEFAULT_SIZE
+                            val targetColor = if (hasSetHighlightPayload) highlightTranslationTextColor else defaultTextColor
+                            if (scaleX != targetScale && scaleY != targetScale)
+                                scaleText(targetScale, interpolator)
+                            animateText(targetColor, interpolator)
+                        }
+                        currentHighlightLyricPositions.contains(position) -> {
+                            if (scaleX != sizeFactor && scaleY != sizeFactor)
+                                scaleText(sizeFactor, interpolator)
+                            if (currentTextColor != highlightTranslationTextColor)
+                                setTextColor(highlightTranslationTextColor)
+                        }
+                        else -> {
+                            if (scaleX != LYRIC_DEFAULT_SIZE && scaleY != LYRIC_DEFAULT_SIZE)
+                                scaleText(LYRIC_DEFAULT_SIZE, interpolator)
+                            if (currentTextColor != defaultTextColor)
+                                setTextColor(defaultTextColor)
+                        }
+                    }
+                }
+            }
+
+            override fun applyAnimation(ii: Int) {
+                super.applyAnimation(ii, lyricFlexboxLayout, transitionTextView)
+            }
+        }
+
+        open inner class LyricCommonViewHolder(
+            view: View
+        ) : BaseLyricViewHolder(view) {
+
+            val lyricTextView: TextView = view.findViewById(R.id.lyric_text)
+
+            override fun create(
+                position: Int,
+                payloads: MutableList<Any>,
+                lyric: MediaStoreUtils.Lyric
+            ) {
+                super.create(position, payloads, lyric)
+
+                val hasMultiSpeaker = lyricList.any {
+                    it.label == LrcUtils.SpeakerLabel.Voice2 || it.label == LrcUtils.SpeakerLabel.Female
+                }
+                val currentLyricIsAnotherSpeaker = lyric.label == LrcUtils.SpeakerLabel.Voice2 || lyric.label == LrcUtils.SpeakerLabel.Female
+                val lastLyricIsAnotherSpeaker = lyricList.getOrNull(position - 1)?.label == LrcUtils.SpeakerLabel.Voice2 || lyricList.getOrNull(position - 1)?.label == LrcUtils.SpeakerLabel.Female
+                val currentLyricIsBgSpeaker = lyric.label == LrcUtils.SpeakerLabel.Background
+
+                with(lyricTextView) {
+                    pivotX = if (currentLyricIsAnotherSpeaker || (currentLyricIsBgSpeaker && lastLyricIsAnotherSpeaker)) width / 1f else 0f
+                    pivotY = height / 2f
+
+                    val paddingBottom = if (lyric.translationContent.isNotEmpty()) 2 else 18
+                    val paddingEnd = if (hasMultiSpeaker) 66.5f else 12.5f
+                    updatePaddingRelative(
+                        end = paddingEnd.dpToPx(context).toInt(),
+                        bottom = paddingBottom.dpToPx(context)
+                    )
+                    gravity =
+                        if (currentLyricIsAnotherSpeaker || (currentLyricIsBgSpeaker && lastLyricIsAnotherSpeaker))
+                            Gravity.END
+                        else
+                            Gravity.START
+
+                    text = lyric.content
+                    typeface = defaultTypeface
+                    val textSize = if (currentLyricIsBgSpeaker) 23f else 34f
+                    setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
+                    setLineSpacing(0f, 1f)
+                }
+            }
+
+            override fun created(lyric: MediaStoreUtils.Lyric): Boolean {
+                return lyricTextView.text == lyric.content
+            }
+
+            override fun recycle() {
+                super.recycle()
+                with(lyricTextView) {
+                    translationY = 0f
+                    scaleText(LYRIC_DEFAULT_SIZE)
+                    setTextColor(defaultTextColor)
+                }
+            }
+
+            override fun updateHighlight(
+                position: Int,
+                payloads: MutableList<Any>
+            ) {
+                val hasSetHighlightPayload = payloads.contains(LYRIC_SET_HIGHLIGHT)
+                val hasRemoveHighlightPayload = payloads.contains(LYRIC_REMOVE_HIGHLIGHT)
+                val hasHighlightPayload = hasSetHighlightPayload || hasRemoveHighlightPayload
+
+                // Highlight Stuffs for translations
+                with(lyricTextView) {
+                    when {
+                        hasHighlightPayload -> {
+                            val targetScale = if (hasSetHighlightPayload) sizeFactor else LYRIC_DEFAULT_SIZE
+                            val targetColor = if (hasSetHighlightPayload) highlightTextColor else defaultTextColor
+                            if (scaleX != targetScale && scaleY != targetScale)
+                                scaleText(targetScale, interpolator)
+                            animateText(targetColor, interpolator)
+                        }
+                        currentHighlightLyricPositions.contains(position) -> {
+                            if (scaleX != sizeFactor && scaleY != sizeFactor)
+                                scaleText(sizeFactor, interpolator)
+                            if (currentTextColor != highlightTextColor)
+                                setTextColor(highlightTextColor)
+                        }
+                        else -> {
+                            if (scaleX != LYRIC_DEFAULT_SIZE && scaleY != LYRIC_DEFAULT_SIZE)
+                                scaleText(LYRIC_DEFAULT_SIZE, interpolator)
+                            if (currentTextColor != defaultTextColor)
+                                setTextColor(defaultTextColor)
+                        }
+                    }
+                }
+            }
+
+            override fun applyAnimation(ii: Int) {
+                super.applyAnimation(ii, lyricTextView)
+            }
+        }
+
+        inner class LyricCommonWithTranslationViewHolder(
+            view: View
+        ) : LyricCommonViewHolder(view) {
+
+            val transitionTextView: TextView = view.findViewById(R.id.transition_text)
+
+            override fun create(
+                position: Int,
+                payloads: MutableList<Any>,
+                lyric: MediaStoreUtils.Lyric
+            ) {
+                super.create(position, payloads, lyric)
+
+                val hasMultiSpeaker = lyricList.any {
+                    it.label == LrcUtils.SpeakerLabel.Voice2 || it.label == LrcUtils.SpeakerLabel.Female
+                }
+                val currentLyricIsAnotherSpeaker = lyric.label == LrcUtils.SpeakerLabel.Voice2 || lyric.label == LrcUtils.SpeakerLabel.Female
+                val lastLyricIsAnotherSpeaker = lyricList.getOrNull(position - 1)?.label == LrcUtils.SpeakerLabel.Voice2 || lyricList.getOrNull(position - 1)?.label == LrcUtils.SpeakerLabel.Female
+                val currentLyricIsBgSpeaker = lyric.label == LrcUtils.SpeakerLabel.Background
+
+                with(transitionTextView) {
+                    pivotX = if (currentLyricIsAnotherSpeaker || (currentLyricIsBgSpeaker && lastLyricIsAnotherSpeaker)) width.toFloat() else 0f
+                    pivotY = height / 2f
+
+                    val paddingEnd = if (hasMultiSpeaker) 66.5f else 12.5f
+                    updatePaddingRelative(
+                        end = paddingEnd.dpToPx(context).toInt()
+                    )
+                    if (currentLyricIsAnotherSpeaker || (currentLyricIsBgSpeaker && lastLyricIsAnotherSpeaker)) gravity = Gravity.END
+
+                    text = lyric.translationContent
+                    typeface = defaultTypeface
+                    setLineSpacing(0f, 1f)
+                }
+            }
+
+            override fun created(lyric: MediaStoreUtils.Lyric): Boolean {
+                return super.created(lyric) && transitionTextView.text == lyric.translationContent
+            }
+
+            override fun recycle() {
+                super.recycle()
+                with(transitionTextView) {
+                    translationY = 0f
+                    scaleText(LYRIC_DEFAULT_SIZE)
+                    setTextColor(defaultTextColor)
+                }
+            }
+
+            override fun updateHighlight(
+                position: Int,
+                payloads: MutableList<Any>
+            ) {
+                super.updateHighlight(position, payloads)
+
+                val hasSetHighlightPayload = payloads.contains(LYRIC_SET_HIGHLIGHT)
+                val hasRemoveHighlightPayload = payloads.contains(LYRIC_REMOVE_HIGHLIGHT)
+                val hasHighlightPayload = hasSetHighlightPayload || hasRemoveHighlightPayload
+
+                // Highlight Stuffs for translations
+                with(transitionTextView) {
+                    when {
+                        hasHighlightPayload -> {
+                            val targetScale = if (hasSetHighlightPayload) sizeFactor else LYRIC_DEFAULT_SIZE
+                            val targetColor = if (hasSetHighlightPayload) highlightTranslationTextColor else defaultTextColor
+                            if (scaleX != targetScale && scaleY != targetScale)
+                                scaleText(targetScale, interpolator)
+                            animateText(targetColor, interpolator)
+                        }
+                        currentHighlightLyricPositions.contains(position) -> {
+                            if (scaleX != sizeFactor && scaleY != sizeFactor)
+                                scaleText(sizeFactor, interpolator)
+                            if (currentTextColor != highlightTranslationTextColor)
+                                setTextColor(highlightTranslationTextColor)
+                        }
+                        else -> {
+                            if (scaleX != LYRIC_DEFAULT_SIZE && scaleY != LYRIC_DEFAULT_SIZE)
+                                scaleText(LYRIC_DEFAULT_SIZE, interpolator)
+                            if (currentTextColor != defaultTextColor)
+                                setTextColor(defaultTextColor)
+                        }
+                    }
+                }
+            }
+
+            override fun applyAnimation(ii: Int) {
+                super.applyAnimation(ii, lyricTextView, transitionTextView)
+            }
+        }
+
+        abstract inner class BaseLyricViewHolder(
+            view: View
+        ) : RecyclerView.ViewHolder(view) {
+
+            val lyricCard: MaterialCardView = view.findViewById(R.id.lyric_cardview)
+            var blurRadius: Float = 0F
+
+            open fun create(
+                position: Int,
+                payloads: MutableList<Any>,
+                lyric: MediaStoreUtils.Lyric
+            ) {
+                // Setup blur for lyric card
+                if (!blurLock) {
+                    blurRadius = getBlurRadius(position)
+                    lyricCard.setRenderEffect(
+                        if (blurRadius != 0F) {
+                            RenderEffect.createBlurEffect(
+                                blurRadius,
+                                blurRadius,
+                                Shader.TileMode.MIRROR
+                            )
+                        } else {
+                            null
+                        }
+                    )
+                } else {
+                    blurRadius = 0F
+                    lyricCard.setRenderEffect(null)
+                }
+
+                // Setup click listener for lyric card
+                lyricCard.setOnClickListener { v ->
+                    v.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                    if (activeAnimatorPosition.isNotEmpty()) {
+                        activeAnimatorPosition.clear()
+                    }
+                    activity.getPlayer()?.apply {
+                        animationLock = true
+                        ignoredPositionAtMost =
+                            if (lyric.label == LrcUtils.SpeakerLabel.Background)
+                                lyricList.indexOf(lyric) - 1
+                            else
+                                lyricList.indexOf(lyric)
+                        seekTo(lyric.startTimestamp!!)
+                        if (!isPlaying) play()
+                    }
+                }
+            }
+
+            abstract fun created(
+                lyric: MediaStoreUtils.Lyric
+            ): Boolean
+
+            open fun recycle() {
+                lyricCard.setRenderEffect(null)
+                blurRadius = 0F
+            }
+
+            fun updateBlur(
+                position: Int
+            ) {
+                if (lyricList.isNotEmpty() && !blurLock) {
+                    val value = getBlurRadius(position)
+                    val animator = ValueAnimator.ofFloat(blurRadius, value)
+                    animator.duration = LYRIC_SCROLL_DURATION
+                    animator.interpolator = interpolator
+                    animator.addUpdateListener { animation ->
+                        val value = animation.animatedValue as Float
+                        blurRadius = value
+                        lyricCard.setRenderEffect(
+                            if (blurRadius != 0F) {
                                 RenderEffect.createBlurEffect(
-                                    holder.blurRadius,
-                                    holder.blurRadius,
+                                    blurRadius,
+                                    blurRadius,
                                     Shader.TileMode.MIRROR
                                 )
                             } else {
@@ -1467,318 +2049,72 @@ class FullBottomSheet @JvmOverloads constructor(
                             }
                         )
                     }
-                    start()
-                }
-                if (!hasHighlightPayload) return
-            }
-
-            val lyric = lyricList[position]
-            val hasMultiSpeaker = lyricList.any {
-                it.label == LrcUtils.SpeakerLabel.Voice2 || it.label == LrcUtils.SpeakerLabel.Female
-            }
-            val currentLyricIsAnotherSpeaker = lyric.label == LrcUtils.SpeakerLabel.Voice2 || lyric.label == LrcUtils.SpeakerLabel.Female
-            val lastLyricIsAnotherSpeaker = lyricList.getOrNull(position - 1)?.label == LrcUtils.SpeakerLabel.Voice2 || lyricList.getOrNull(position - 1)?.label == LrcUtils.SpeakerLabel.Female
-            val currentLyricIsBgSpeaker = lyric.label == LrcUtils.SpeakerLabel.Background
-
-            with(holder.lyricCard) {
-                if (lyric.startTimestamp != null) {
-                    isFocusable = true
-                    isClickable = true
-                } else {
-                    isFocusable = false
-                    isClickable = false
-                }
-                lyric.startTimestamp?.let { timestamp ->
-                    setOnClickListener {
-                        performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                        activity.getPlayer()?.apply {
-                            animationLock = true
-                            ignoredPositionAtMost = if (currentLyricIsBgSpeaker) {
-                                lyricList.indexOf(lyric) - 1
-                            } else {
-                                lyricList.indexOf(lyric)
-                            }
-                            seekTo(timestamp)
-                            if (!isPlaying) play()
-                        }
-                    }
-                }
-                if (lyric.startTimestamp != null &&
-                    lyric.absolutePosition != null &&
-                    payloads.isEmpty() &&
-                    !blurLock
-                ) {
-                    holder.blurRadius = getBlurRadius(position)
-                    setRenderEffect(
-                        if (holder.blurRadius != 0F) {
-                            RenderEffect.createBlurEffect(
-                                holder.blurRadius,
-                                holder.blurRadius,
-                                Shader.TileMode.MIRROR
-                            )
-                        } else {
-                            null
-                        }
-                    )
-                } else if (blurLock) {
-                    holder.blurRadius = 0F
-                    setRenderEffect(null)
+                    animator.start()
                 }
             }
 
-            if (lyric.translationContent.isNotEmpty()) {
-                with(holder.transitionFrame) {
-                    visibility = VISIBLE
-                    translationY = 0f
-                    pivotX = if (currentLyricIsAnotherSpeaker || (currentLyricIsBgSpeaker && lastLyricIsAnotherSpeaker)) width / 1f else 0f
-                    pivotY = height / 2f
-                    val paddingStart = 12.5f
-                    val paddingEnd = if (hasMultiSpeaker) 66.5f else 12.5f
-                    updatePaddingRelative(
-                        start = paddingStart.dpToPx(context).toInt(),
-                        end = paddingEnd.dpToPx(context).toInt()
-                    )
+            abstract fun updateHighlight(
+                position: Int,
+                payloads: MutableList<Any>
+            )
+
+            fun applyAnimation(ii: Int, vararg view: View) {
+                val depth = 15.dpToPx(context).toFloat()
+                val duration = (LYRIC_SCROLL_DURATION * 0.278).toLong()
+                val durationReturn = (LYRIC_SCROLL_DURATION * 0.722).toLong()
+                val durationStep = (LYRIC_SCROLL_DURATION * 0.1).toLong()
+
+                val animator = ValueAnimator.ofFloat(0f, depth)
+                animator.duration = duration
+                animator.interpolator = inComingInterpolator
+                animator.addUpdateListener {
+                    val value = it.animatedValue as Float
+                    view.forEach {
+                        it.translationY = value
+                    }
                 }
-                with(holder.transitionTextView) {
-                    text = lyric.translationContent
-                    typeface =
-                        if (lyric.startTimestamp != null) defaultTypeface else disabledTextTypeface
-                    setLineSpacing(
-                        if (lyric.startTimestamp != null) 0f else extraLineHeight.toFloat(),
-                        1f
-                    )
+                animator.doOnEnd {
+                    view.forEach {
+                        it.translationY = depth
+                    }
+
+                    val animator1 = ObjectAnimator.ofFloat(depth, 0f)
+                    animator1.duration = durationReturn + ii * durationStep
+                    animator1.interpolator = liftInterpolator
+                    animator1.addUpdateListener {
+                        val value = it.animatedValue as Float
+                        view.forEach {
+                            it.translationY = value
+                        }
+                    }
+                    animator1.doOnEnd {
+                        view.forEach {
+                            it.translationY = 0f
+                        }
+                    }
+                    animator1.start()
                 }
-            } else {
-                with(holder.transitionFrame) {
-                    visibility = GONE
-                }
-                with(holder.transitionTextView) {
-                    text = null
-                }
+                animator.start()
             }
 
-            with(holder.lyricFlexboxLayout) {
-                visibility = if (lyric.content.isNotEmpty()) VISIBLE else GONE
-                justifyContent =
-                    if (currentLyricIsAnotherSpeaker || (currentLyricIsBgSpeaker && lastLyricIsAnotherSpeaker))
-                        JustifyContent.FLEX_END
-                    else
-                        JustifyContent.FLEX_START
-
-                translationY = 0f
-                pivotX = if (currentLyricIsAnotherSpeaker || (currentLyricIsBgSpeaker && lastLyricIsAnotherSpeaker)) width / 1f else 0f
-                pivotY = height / 2f
-
-                val paddingTop =
-                    if (lyric.startTimestamp != null) 18
-                    else 0
-                val paddingBottom =
-                    if (lyric.translationContent.isNotEmpty()) 2
-                    else if (lyric.startTimestamp != null) 18
-                    else 0
-                val paddingStart = 12.5f
-                val paddingEnd = if (hasMultiSpeaker) 66.5f else 12.5f
-                updatePaddingRelative(
-                    start = paddingStart.dpToPx(context).toInt(),
-                    top = paddingTop.dpToPx(context),
-                    end = paddingEnd.dpToPx(context).toInt(),
-                    bottom = paddingBottom.dpToPx(context)
-                )
-
-                // Add TextViews
-                if (lyric.wordTimestamps.isNotEmpty()) {
-                    // Remove old views
-                    if (lyric.wordTimestamps.size != childCount) removeAllViews()
-                    if (childCount > 0) {
-                        with(children.first()) {
-                            if (this !is CustomTextView) {
-                                removeAllViews()
-                            } else if (contentHash != lyric.hashCode()) {
-                                removeAllViews()
-                            }
-                        }
-                    }
-
-                    // Add new views after check
-                    var wordIndex = 0
-                    lyric.wordTimestamps.forEach {
-                        val lyricContent = lyric.content.substring(wordIndex, it.first)
-                        val lyricShaderColor =
-                            if (currentLyricIsBgSpeaker)
-                                intArrayOf(
-                                    highlightTranslationTextColor,
-                                    highlightTranslationTextColor,
-                                    highlightTranslationTextColor,
-                                    highlightTranslationTextColor,
-                                    defaultTextColor
-                                )
-                            else
-                                intArrayOf(
-                                    highlightTextColor,
-                                    highlightTextColor,
-                                    highlightTextColor,
-                                    highlightTextColor,
-                                    defaultTextColor
-                                )
-                        val lyricTextView = CustomTextView(
-                            context = context,
-                            colors = lyricShaderColor,
-                            durationStart = it.second,
-                            durationEnd = it.third,
-                            contentHash = lyric.hashCode()
-                        ).apply {
-                            text = lyricContent
-
-                            val textSize = if (currentLyricIsBgSpeaker) 23f else if (lyric.startTimestamp != null) 34f else 18f
-                            setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
-                            typeface =
-                                if (lyric.startTimestamp != null) defaultTypeface else disabledTextTypeface
-                            setLineSpacing(
-                                if (lyric.startTimestamp != null) 0f else extraLineHeight.toFloat(),
-                                1f
-                            )
-                        }
-                        if (lyric.wordTimestamps.size != childCount) {
-                            addView(lyricTextView)
-                        }
-                        wordIndex = it.first
-                    }
-                } else {
-                    // Remove old views
-                    if (childCount > 0) {
-                        children.getTextViews {
-                            if (it.text != lyric.content) removeAllViews()
-                        }
-                    }
-
-                    // Add view if no view found
-                    if (childCount < 1) addView(
-                        AppCompatTextView(context).apply {
-                            text = lyric.content
-                            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-                            val textSize = if (currentLyricIsBgSpeaker) 23f else if (lyric.startTimestamp != null) 34f else 18f
-                            setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
-                            typeface =
-                                if (lyric.startTimestamp != null) defaultTypeface else disabledTextTypeface
-                            setLineSpacing(
-                                if (lyric.startTimestamp != null) 0f else extraLineHeight.toFloat(),
-                                1f
-                            )
-                        }
-                    )
-                }
-
-                children.getTextViews {
-                    with(it) {
-                        visibility = if (lyric.content.isNotEmpty()) VISIBLE else GONE
-
-                        if (lyric.startTimestamp == null) {
-                            if (it !is CustomTextView) {
-                                setTextColor(disabledTextColor)
-                            }
-                            return@with
-                        }
-                    }
-                }
-
-                // Highlight Stuffs for lyrics
-                when {
-                    hasHighlightPayload -> {
-                        scaleText(
-                            if (hasSetHighlightPayload) sizeFactor else LYRIC_DEFAULT_SIZE,
-                            interpolator
-                        )
-                        children.getTextViews {
-                            if (it is CustomTextView) {
-                                if (hasRemoveHighlightPayload) it.resetShader(interpolator)
-                            } else {
-                                val targetColor =
-                                    if (hasSetHighlightPayload)
-                                        highlightTextColor
-                                    else
-                                        defaultTextColor
-                                it.animateText(targetColor, interpolator)
-                            }
-                        }
-                    }
-
-                    currentHighlightLyricPositions.contains(position) -> {
-                        scaleText(sizeFactor, interpolator)
-                        children.getTextViews { view ->
-                            if (view !is CustomTextView) view.setTextColor(highlightTextColor)
-                        }
-                    }
-
-                    else -> {
-                        if (scaleX != LYRIC_DEFAULT_SIZE && scaleY != LYRIC_DEFAULT_SIZE)
-                            scaleText(LYRIC_DEFAULT_SIZE, interpolator)
-                        children.getTextViews {
-                            if (it !is CustomTextView) it.setTextColor(defaultTextColor)
-                        }
-                    }
-                }
-            }
-
-            // Highlight Stuffs for translations
-            if (lyric.translationContent.isNotEmpty()) {
-                when {
-                    hasHighlightPayload -> {
-                        holder.transitionFrame.scaleText(
-                            if (hasSetHighlightPayload) sizeFactor else LYRIC_DEFAULT_SIZE,
-                            interpolator
-                        )
-                        holder.transitionTextView.animateText(
-                            if (hasSetHighlightPayload) highlightTranslationTextColor else defaultTextColor,
-                            interpolator
-                        )
-                    }
-
-                    currentHighlightLyricPositions.contains(position) -> {
-                        holder.transitionFrame.scaleText(sizeFactor, interpolator)
-                        holder.transitionTextView.setTextColor(highlightTranslationTextColor)
-                    }
-
-                    else -> {
-                        holder.transitionFrame.scaleText(LYRIC_DEFAULT_SIZE, interpolator)
-                        holder.transitionTextView.setTextColor(defaultTextColor)
-                    }
-                }
-            }
+            abstract fun applyAnimation(ii: Int)
         }
 
-        override fun onViewRecycled(holder: ViewHolder) {
-            with(holder.lyricFlexboxLayout) {
-                translationY = 0f
-                scaleText(LYRIC_DEFAULT_SIZE)
-            }
-            holder.lyricFlexboxLayout.children.getTextViews {
-                if (it !is CustomTextView) {
-                    it.setTextColor(defaultTextColor)
-                }
-            }
-            with(holder.transitionFrame) {
-                translationY = 0f
-                scaleText(LYRIC_DEFAULT_SIZE)
-            }
-            with(holder.transitionTextView) {
-                setTextColor(defaultTextColor)
-            }
-            holder.blurRadius = 0F
-            holder.lyricCard.setRenderEffect(null)
-            super.onViewRecycled(holder)
-        }
-
-        override fun getItemCount(): Int = lyricList.size
-
-        inner class ViewHolder(
+        inner class LyricContentViewHolder(
             view: View
         ) : RecyclerView.ViewHolder(view) {
-            val lyricFlexboxLayout: FlexboxLayout = view.findViewById(R.id.lyric_flexbox)
-            val transitionTextView: TextView = view.findViewById(R.id.transition_text)
-            val transitionFrame: LinearLayout = view.findViewById(R.id.translation_frame)
-            val lyricCard: MaterialCardView = view.findViewById(R.id.lyric_cardview)
-            var blurRadius: Float = 0F
+
+            val lyricTextView: TextView = view.findViewById(R.id.lyric_text)
+
+            fun create() {
+                // TODO: Implement this
+            }
         }
+
+        // PlaceHolder for empty lyric line
+        inner class LyricEmptyViewHolder(
+            view: View
+        ) : RecyclerView.ViewHolder(view)
 
         fun updateHighlight(
             position: Int,
@@ -1925,7 +2261,7 @@ class FullBottomSheet @JvmOverloads constructor(
         }
 
         override fun getItemCount(): Int =
-            if (playlist.first.size != playlist.second.size) throw IllegalStateException("${playlist.first.size}, ${playlist.second.size}")
+            if (playlist.first.size != playlist.second.size) throw IllegalStateException("getItemCount: ${playlist.first.size}, ${playlist.second.size}")
             else playlist.first.size
 
         inner class ViewHolder(
@@ -1993,35 +2329,28 @@ class FullBottomSheet @JvmOverloads constructor(
         }.map { lyric ->
             bottomSheetFullLyricList.indexOf(lyric)
         }
-//        Log.d("Index", filteredList.toString())
 
         return filteredList
     }
 
-    fun updateLyric() {
+    fun updateLyric(
+        resume: Boolean = false
+    ) {
         if (bottomSheetFullLyricList.isNotEmpty() && alpha > 0f) {
 
             val newIndex = getNewIndex()
             val fullList = (newIndex + bottomSheetFullLyricAdapter.currentHighlightLyricPositions).sorted().distinct()
 
             fullList.forEach {
-                // Update extended lyric
-                if (bottomSheetFullLyricAdapter.isExtendedLRC) {
-
-                    /** Fix abnormal shader state when switch lyric line by click
-                     * @see LyricAdapter.ignoredPositionAtMost
-                     */
-                    if (newIndex.contains(it) && it >= bottomSheetFullLyricAdapter.ignoredPositionAtMost) {
-                        bottomSheetFullLyricAdapter.notifyItemChanged(it, LYRIC_UPDATE)
-                    }
-                }
-
                 // Update highlight
-                if (bottomSheetFullLyricAdapter.currentHighlightLyricPositions != newIndex) {
+                if (bottomSheetFullLyricAdapter.currentHighlightLyricPositions != newIndex || resume) {
 
                     // Maybe we needn't update highlight for ignored lines
-                    if (it >= bottomSheetFullLyricAdapter.ignoredPositionAtMost || !newIndex.contains(it)) {
+                    if (it >= bottomSheetFullLyricAdapter.ignoredPositionAtMost || !newIndex.contains(it) || resume) {
                         bottomSheetFullLyricAdapter.updateHighlight(it, !newIndex.contains(it))
+                        if (bottomSheetFullLyricAdapter.isExtendedLRC) {
+                            bottomSheetFullLyricAdapter.notifyItemChanged(it, LYRIC_UPDATE_PROGRESS)
+                        }
                     }
                 }
             }
@@ -2103,15 +2432,14 @@ class FullBottomSheet @JvmOverloads constructor(
                         bottomSheetFullLyricLinearLayoutManager.findLastVisibleItemPosition() + 3
                     for (i in firstVisibleItemPosition..lastVisibleItemPosition) {
                         if (i > targetPosition) {
-                            val view: View? =
-                                bottomSheetFullLyricLinearLayoutManager.findViewByPosition(i)
+                            val view: View? = bottomSheetFullLyricLinearLayoutManager.findViewByPosition(i)
                             if (view != null) {
                                 if (!noAnimation &&
                                     bottomSheetFullLyricList[targetPosition].absolutePosition != null &&
                                     bottomSheetFullLyricList[i].absolutePosition != null
                                 ) {
                                     val ii = (bottomSheetFullLyricList[i].absolutePosition!! - bottomSheetFullLyricList[targetPosition].absolutePosition!!).absoluteValue
-                                    applyAnimation(view, ii)
+                                    bottomSheetFullLyricAdapter.notifyItemChanged(i, ii.toDouble())
                                 }
                             }
                         }
@@ -2145,47 +2473,6 @@ class FullBottomSheet @JvmOverloads constructor(
     private val inComingInterpolator = PathInterpolator(0.96f, 0.43f, 0.72f, 1f)
     private val liftInterpolator = PathInterpolator(0.17f, 0f, -0.15f, 1f)
 
-    private fun applyAnimation(view: View, ii: Int) {
-        val depth = 15.dpToPx(context).toFloat()
-        val duration = (LYRIC_SCROLL_DURATION * 0.278).toLong()
-        val durationReturn = (LYRIC_SCROLL_DURATION * 0.722).toLong()
-        val durationStep = (LYRIC_SCROLL_DURATION * 0.1).toLong()
-        val lyricFlexboxLayout = view.findViewById<FlexboxLayout>(R.id.lyric_flexbox)
-        val translationFrame = view.findViewById<LinearLayout>(R.id.translation_frame)
-        val animator = ValueAnimator.ofFloat(0f, depth)
-        animator.setDuration(duration)
-        animator.interpolator = inComingInterpolator
-        animator.addUpdateListener {
-            val value = it.animatedValue as Float
-            lyricFlexboxLayout.translationY = value
-            translationFrame.translationY = value
-        }
-        animator.doOnEnd {
-            lyricFlexboxLayout.translationY = depth
-            translationFrame.translationY = depth
-
-            val animator1 = ObjectAnimator.ofFloat(depth, 0f)
-            animator1.setDuration(durationReturn + ii * durationStep)
-            animator1.interpolator = liftInterpolator
-            animator1.addUpdateListener {
-                val value = it.animatedValue as Float
-                lyricFlexboxLayout.translationY = value
-                translationFrame.translationY = value
-            }
-            animator1.doOnEnd {
-                with(lyricFlexboxLayout) {
-                    translationY = 0f
-                }
-                with(translationFrame) {
-                    translationY = 0f
-                }
-            }
-            animator1.start()
-        }
-        animator.start()
-    }
-
-
     private val positionRunnable = object : Runnable {
         @SuppressLint("SetTextI18n")
         override fun run() {
@@ -2207,10 +2494,7 @@ class FullBottomSheet @JvmOverloads constructor(
                 updateLyric()
             }
             if (instance?.isPlaying == true) {
-                handler.postDelayed(
-                    this,
-                    if (bottomSheetFullLyricAdapter.isExtendedLRC) LYRIC_UPDATE_DURATION else SLIDER_UPDATE_INTERVAL
-                )
+                handler.postDelayed(this, SLIDER_UPDATE_INTERVAL)
             } else {
                 runnableRunning = false
             }

@@ -48,9 +48,9 @@ class CustomTextView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        paint.setShader(gradient)
+        paint.shader = gradient
         super.onDraw(canvas)
-        paint.setShader(null)
+        paint.shader = null
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {

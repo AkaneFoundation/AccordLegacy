@@ -5,8 +5,7 @@
     android:id="@+id/lyric_cardview"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="20dp"
-    android:layout_marginEnd="20dp"
+    android:layout_marginHorizontal="20dp"
     android:clickable="true"
     android:clipChildren="false"
     android:clipToOutline="false"
@@ -25,42 +24,30 @@
         android:clipToPadding="false"
         android:orientation="vertical">
 
-        <com.google.android.flexbox.FlexboxLayout
-            android:id="@+id/lyric_flexbox"
+        <TextView
+            android:id="@+id/lyric_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipChildren="false"
-            android:clipToOutline="false"
-            android:clipToPadding="false"
-            android:layoutDirection="ltr"
+            android:paddingHorizontal="12.5dp"
+            android:paddingVertical="18dp"
             android:scaleX="0.98"
             android:scaleY="0.98"
-            app:alignItems="baseline"
-            app:flexDirection="row"
-            app:flexWrap="wrap" />
+            android:textColor="@color/contrast_lyric_defaultColor"
+            android:textFontWeight="700"
+            android:textSize="34sp" />
 
-        <LinearLayout
-            android:id="@+id/translation_frame"
+        <TextView
+            android:id="@+id/transition_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipChildren="false"
-            android:clipToOutline="false"
-            android:clipToPadding="false"
+            android:paddingHorizontal="12.5dp"
             android:paddingTop="2dp"
             android:paddingBottom="18dp"
             android:scaleX="0.98"
             android:scaleY="0.98"
-            android:visibility="gone">
-
-            <TextView
-                android:id="@+id/transition_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/contrast_lyric_defaultColor"
-                android:textFontWeight="600"
-                android:textSize="20sp" />
-
-        </LinearLayout>
+            android:textColor="@color/contrast_lyric_defaultColor"
+            android:textFontWeight="500"
+            android:textSize="20sp" />
 
     </LinearLayout>
 
