@@ -104,11 +104,9 @@ object LrcUtils {
     fun parseLrcString(lrcContent: String, trim: Boolean): MutableList<MediaStoreUtils.Lyric> {
         val timeMarksRegex = "\\[(\\d{2}:\\d{2})([.:]\\d+)?]".toRegex()
         val wordTimeMarksRegex = "<(\\d{2}:\\d{2})([.:]\\d+)?>".toRegex()
-        val labelRegex = "(v\\d+|bg):\\s?".toRegex()
+        val labelRegex = "(v\\d+|bg|F|M|D):\\s?".toRegex()
         val bgRegex = "\\[bg: (.*?)]".toRegex()
         val list = mutableListOf<MediaStoreUtils.Lyric>()
-        var foundNonNull = false
-        var lyricsText: StringBuilder? = StringBuilder()
         var currentLabel = SpeakerLabel.None
         var currentTimeStamp = -1L
         // Add all lines found on LRC (probably will be unordered because of "compression" or translation type)
@@ -124,12 +122,6 @@ object LrcUtils {
                 sequence.forEach { match ->
                     val timeString = match.groupValues[1] + match.groupValues[2]
                     currentTimeStamp = parseTime(timeString)
-
-                    if (!foundNonNull && currentTimeStamp > 0) {
-                        foundNonNull = true
-                        lyricsText = null
-                    }
-                    lyricsText?.append(lyricLine + "\n")
 
                     if (wordTimeMarksRegex.containsMatchIn(lyricLine)) {
                         val wordMatches = wordTimeMarksRegex.findAll(lyricLine)
@@ -256,9 +248,6 @@ object LrcUtils {
         }
         if (list.isEmpty() && lrcContent.isNotEmpty()) {
             list.add(MediaStoreUtils.Lyric(content = lrcContent))
-        } else if (!foundNonNull) {
-            list.clear()
-            list.add(MediaStoreUtils.Lyric(content = lyricsText!!.toString()))
         }
         return list
     }
@@ -268,6 +257,7 @@ object LrcUtils {
         return when {
             lyricLabel.startsWith("v1: ") -> SpeakerLabel.Voice1
             lyricLabel.startsWith("v2: ") -> SpeakerLabel.Voice2
+            lyricLabel.startsWith("bg: ") -> SpeakerLabel.Background
             lyricLabel.startsWith("F: ") -> SpeakerLabel.Female
             lyricLabel.startsWith("M: ") -> SpeakerLabel.Male
             lyricLabel.startsWith("D: ") -> SpeakerLabel.Duet

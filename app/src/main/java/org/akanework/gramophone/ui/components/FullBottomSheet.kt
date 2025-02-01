@@ -50,6 +50,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.children
 import androidx.core.view.doOnLayout
+import androidx.core.view.isGone
+import androidx.core.view.isInvisible
+import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.updatePaddingRelative
 import androidx.media3.common.C
@@ -159,8 +162,9 @@ class FullBottomSheet @JvmOverloads constructor(
         const val SHRINK_TRIGGER_DURATION = 300L
         const val SHRINK_VALUE_PAUSE = 0.85F
         const val BOTTOM_TRANSIT_DURATION = 100L
-        const val VOLUME_CHANGED_ACTION = "android.media.VOLUME_CHANGED_ACTION"
         const val LYRIC_DEFAULT_SIZE = .98f
+
+        const val VOLUME_CHANGED_ACTION = "android.media.VOLUME_CHANGED_ACTION"
 
         // Lyric update events
         const val LYRIC_REMOVE_HIGHLIGHT = 0
@@ -619,7 +623,7 @@ class FullBottomSheet @JvmOverloads constructor(
                 )
                 bottomSheetFullPlaylistFrame.fadInAnimation(interpolator, VIEW_TRANSIT_DURATION)
                 hideJob?.cancel()
-                if (bottomSheetFullControllerButton.visibility == GONE || bottomSheetFullControllerButton.visibility == INVISIBLE) {
+                if (bottomSheetFullControllerButton.isGone || bottomSheetFullControllerButton.isInvisible) {
                     showEveryController()
                 }
             } else {
@@ -703,7 +707,7 @@ class FullBottomSheet @JvmOverloads constructor(
                 )
 
                 hideJob?.cancel()
-                if (bottomSheetFullControllerButton.visibility == GONE || bottomSheetFullControllerButton.visibility == INVISIBLE) {
+                if (bottomSheetFullControllerButton.isGone || bottomSheetFullControllerButton.isInvisible) {
                     showEveryController()
                 }
                 bottomSheetFullBlendView?.animateBlurRadius(true, VIEW_TRANSIT_DURATION)
@@ -1565,7 +1569,7 @@ class FullBottomSheet @JvmOverloads constructor(
 
                     // Remove old views
                     if (lyric.wordTimestamps.size != childCount) removeAllViews()
-                    if (childCount > 0) {
+                    if (/* ViewGroup. */isNotEmpty()) {
                         if ((children.first() as CustomTextView).contentHash != lyric.hashCode()) {
                             removeAllViews()
                         }
@@ -1615,7 +1619,7 @@ class FullBottomSheet @JvmOverloads constructor(
             }
 
             override fun created(lyric: MediaStoreUtils.Lyric): Boolean {
-                return lyricFlexboxLayout.childCount > 0 && (lyricFlexboxLayout.children.first() as CustomTextView).contentHash == lyric.hashCode()
+                return lyricFlexboxLayout.isNotEmpty() && (lyricFlexboxLayout.children.first() as CustomTextView).contentHash == lyric.hashCode()
             }
 
             override fun recycle() {
